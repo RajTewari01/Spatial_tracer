@@ -1,10 +1,13 @@
 {
-  "$schema": "https://openapi.vercel.sh/vercel.json",
-  "name": "spatial-tracer",
-  "buildCommand": null,
-  "installCommand": null,
-  "framework": null,
+  "version": 2,
   "rewrites": [
-    { "source": "/", "destination": "/index.html" }
+    {
+      "source": "/",
+      "destination": "/web-client/index.html"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/web-client/$1"
+    }
   ]
 }
