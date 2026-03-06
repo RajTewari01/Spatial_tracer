@@ -45,7 +45,7 @@ class InitilizeCamera:
     
     def start_stream(
         self
-    ) ->Generator[Dict, None, None] : 
-        
+    ) ->Generator[Dict, None, None] : pass
+
 
       
