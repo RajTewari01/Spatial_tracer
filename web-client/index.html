@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vision Tracking Engine — 3D Hand Visualizer</title>
+    <meta name="description" content="Real-time 3D hand gesture visualization powered by MediaPipe and Three.js">
+    <link rel="stylesheet" href="/static/style.css">
+
+    <!-- Three.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- OrbitControls -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- ── Three.js Canvas ──────────────────────────────────── -->
+    <div id="canvas-container"></div>
+
+    <!-- ── Overlay UI ───────────────────────────────────────── -->
+    <header id="top-bar">
+        <div class="logo">
+            <span class="logo-icon">🖐️</span>
+            <span class="logo-text">Vision Tracker</span>
+        </div>
+        <div class="status-group">
+            <div id="connection-indicator" class="indicator disconnected">
+                <span class="dot"></span>
+                <span id="connection-text">Disconnected</span>
+            </div>
+            <div class="fps-display">
+                <span id="fps-value">0</span> FPS
+            </div>
+        </div>
+    </header>
+
+    <!-- ── Info Panel ───────────────────────────────────────── -->
+    <aside id="info-panel">
+        <div class="panel-section">
+            <h3>Active Gestures</h3>
+            <div id="gesture-display" class="gesture-badge-container">
+                <span class="gesture-placeholder">No gestures detected</span>
+            </div>
+        </div>
+
+        <div class="panel-section">
+            <h3>Hands Detected</h3>
+            <div id="hands-count" class="stat-value">0</div>
+        </div>
+
+        <div class="panel-section">
+            <h3>Recent Events</h3>
+            <div id="event-log" class="event-log"></div>
+        </div>
+
+        <div class="panel-section controls">
+            <h3>Controls</h3>
+            <button id="btn-connect" class="btn btn-primary" onclick="toggleConnection()">
+                Connect
+            </button>
+            <button id="btn-start" class="btn btn-secondary" onclick="startTracking()">
+                Start Tracking
+            </button>
+        </div>
+    </aside>
+
+    <!-- ── Gesture Flash Overlay ────────────────────────────── -->
+    <div id="gesture-flash" class="gesture-flash hidden"></div>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>
