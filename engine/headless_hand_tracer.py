@@ -45,7 +45,10 @@ class InitilizeCamera:
     
     def start_stream(
         self
-    ) ->Generator[Dict, None, None] : pass
-
-
-      
+    ) ->Generator[Dict, None, None] : 
+        '''
+        >>> we will yeild as we will use a generator here to feed the raw data to the backend via our fastapi
+        '''
+        self.cap = cv2.VideoCapture(0)
+        self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, self.width)
+        self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, self.height)
