@@ -34,32 +34,28 @@ It ships as three clients:
 
 ```mermaid
 graph TB
-    subgraph Input ["📷 Input Layer"]
-        CAM["Camera Feed<br/>(Webcam / Phone)"]
+    subgraph Input["Input Layer"]
+        CAM["Camera Feed"]
     end
 
-    subgraph Engine ["⚙️ Processing Engine"]
-        MP["MediaPipe<br/>Hand Landmarker"]
-        GD["Gesture Detector<br/>13 Gestures"]
-        AID["Air Input Driver<br/>OS Control"]
+    subgraph Engine["Processing Engine"]
+        MP["MediaPipe Hand Landmarker"]
+        GD["Gesture Detector - 13 Gestures"]
+        AID["Air Input Driver - OS Control"]
     end
 
-    subgraph Output ["🖥️ Output Layer"]
-        MOUSE["Mouse Control<br/>Move · Click · Scroll"]
-        KBD["Keyboard Control<br/>Enter · Backspace · Tab · Esc"]
-        VIZ["3D Visualization<br/>Particle Sphere"]
+    subgraph Output["Output Layer"]
+        MOUSE["Mouse: Move, Click, Scroll"]
+        KBD["Keyboard: Enter, Back, Tab, Esc"]
+        VIZ["3D Particle Visualization"]
     end
 
     CAM --> MP
-    MP -->|21 Landmarks| GD
-    GD -->|Gesture Events| AID
+    MP -->|"21 Landmarks"| GD
+    GD -->|"Gesture Events"| AID
     AID --> MOUSE
     AID --> KBD
     GD --> VIZ
-
-    style Input fill:#0a0a0f,stroke:#7c6aff,color:#f0f0f5
-    style Engine fill:#0a0a0f,stroke:#22d3ee,color:#f0f0f5
-    style Output fill:#0a0a0f,stroke:#34d399,color:#f0f0f5
 ```
 
 ---
@@ -70,28 +66,28 @@ graph TB
 sequenceDiagram
     participant C as Camera
     participant MP as MediaPipe
-    participant GD as Gesture Detector
-    participant D as Air Input Driver
-    participant OS as Operating System
+    participant GD as GestureDetector
+    participant D as AirInputDriver
+    participant OS as OperatingSystem
 
-    C->>MP: Video Frame (30fps)
-    MP->>GD: 21 Hand Landmarks (x, y, z)
-    GD->>GD: Finger State Analysis<br/>(extended / folded)
-    GD->>GD: Stability Buffer<br/>(2-frame threshold)
-    GD->>D: Gesture Event (POINTING, PINCH, etc.)
-    
+    C->>MP: Video Frame at 30fps
+    MP->>GD: 21 Hand Landmarks x y z
+    GD->>GD: Finger State Analysis
+    GD->>GD: 2-Frame Stability Buffer
+    GD->>D: Gesture Event
+
     alt POINTING
-        D->>OS: Move mouse cursor (smoothed EMA)
+        D->>OS: Move mouse cursor with EMA smoothing
     else PINCH
         D->>OS: Left click
     else PEACE
         D->>OS: Double click
     else FIST
         D->>OS: Right click
-    else THUMBS_UP
-        D->>OS: Press Enter
+    else THUMBS UP
+        D->>OS: Press Enter key
     else SWIPE
-        D->>OS: Scroll (±3 lines)
+        D->>OS: Scroll 3 lines
     end
 ```
 
@@ -125,33 +121,29 @@ sequenceDiagram
 
 ```mermaid
 flowchart LR
-    subgraph Detect ["Finger State"]
-        A["isExtended(f)"] --> B["Tip.y < MCP.y"]
-        C["isFolded(f)"] --> D["Tip.y > PIP.y"]
+    subgraph Detect["Finger State"]
+        A["isExtended fn"] --> B["Tip.y below MCP.y"]
+        C["isFolded fn"] --> D["Tip.y above PIP.y"]
     end
 
-    subgraph Classify ["Gesture Classification"]
-        B --> E{"Pattern<br/>Match"}
+    subgraph Classify["Gesture Classification"]
+        B --> E{"Pattern Match"}
         D --> E
-        E -->|"idx↑ mid↓ rng↓ pnk↓"| F["POINTING"]
-        E -->|"thumb·index < 0.07"| G["PINCH"]
-        E -->|"idx↑ mid↑ rng↓ pnk↓"| H["PEACE"]
-        E -->|"all↓"| I["FIST"]
-        E -->|"all↑"| J["OPEN PALM"]
+        E -->|"idx up, rest down"| F["POINTING"]
+        E -->|"thumb-index close"| G["PINCH"]
+        E -->|"idx+mid up, rest down"| H["PEACE"]
+        E -->|"all down"| I["FIST"]
+        E -->|"all up"| J["OPEN PALM"]
     end
 
-    subgraph Stable ["Stability"]
-        F --> K["2-Frame<br/>Buffer"]
+    subgraph Stable["Stability"]
+        F --> K["2-Frame Buffer"]
         G --> K
         H --> K
         I --> K
         J --> K
         K --> L["Emit Gesture"]
     end
-
-    style Detect fill:#0a0a0f,stroke:#7c6aff,color:#f0f0f5
-    style Classify fill:#0a0a0f,stroke:#22d3ee,color:#f0f0f5
-    style Stable fill:#0a0a0f,stroke:#34d399,color:#f0f0f5
 ```
 
 ---
@@ -200,37 +192,32 @@ spatial_tracer/
 
 ```mermaid
 graph LR
-    subgraph Web ["🌐 Web Client"]
-        W1["MediaPipe JS<br/>(in-browser)"]
-        W2["Three.js<br/>4000 Particles"]
-        W3["Gesture Tags<br/>+ Event Log"]
+    subgraph Web["Web Client"]
+        W1["MediaPipe JS in-browser"]
+        W2["Three.js 4000 Particles"]
+        W3["Gesture Tags + Event Log"]
     end
 
-    subgraph Desktop ["🖥️ Desktop Client"]
-        D1["HeadlessHandTracker<br/>(in-process)"]
-        D2["AirInputDriver<br/>(pynput)"]
-        D3["PyQt5 Overlay<br/>+ Camera Panel"]
+    subgraph Desktop["Desktop Client"]
+        D1["HeadlessHandTracker in-process"]
+        D2["AirInputDriver via pynput"]
+        D3["PyQt5 Overlay + Camera Panel"]
     end
 
-    subgraph Mobile ["📱 Mobile Client"]
-        M1["Kotlin MediaPipe<br/>(platform channel)"]
-        M2["Dart Gesture<br/>Detection"]
-        M3["Flutter UI<br/>+ Skeleton Painter"]
+    subgraph Mobile["Mobile Client"]
+        M1["Kotlin MediaPipe platform channel"]
+        M2["Dart Gesture Detection"]
+        M3["Flutter UI + Skeleton Painter"]
     end
 
-    subgraph Shared ["🔧 Shared Engine"]
-        S1["Gesture Logic<br/>(same algorithm)"]
-        S2["13 Gestures<br/>MCP-based detection"]
+    subgraph Shared["Shared Gesture Engine"]
+        S1["Gesture Logic - same algorithm"]
+        S2["13 Gestures MCP-based"]
     end
 
     S1 -.->|"Dart port"| M2
     S1 -.->|"JS port"| W1
     S1 -.->|"Python"| D1
-
-    style Web fill:#0a0a0f,stroke:#7c6aff,color:#f0f0f5
-    style Desktop fill:#0a0a0f,stroke:#22d3ee,color:#f0f0f5
-    style Mobile fill:#0a0a0f,stroke:#34d399,color:#f0f0f5
-    style Shared fill:#0a0a0f,stroke:#f472b6,color:#f0f0f5
 ```
 
 ---
@@ -332,13 +319,10 @@ A **2-frame stability buffer** prevents single-frame noise from triggering false
 
 ```mermaid
 flowchart LR
-    A["Index Fingertip<br/>(normalized 0-1)"] --> B["Margin Mapping<br/>(0.1 dead zone)"]
-    B --> C["Screen Mapping<br/>(0-1920, 0-1080)"]
-    C --> D["EMA Smoothing<br/>(α = 0.6)"]
-    D --> E["pynput.mouse<br/>.position = (x, y)"]
-
-    style A fill:#0a0a0f,stroke:#7c6aff,color:#f0f0f5
-    style E fill:#0a0a0f,stroke:#34d399,color:#f0f0f5
+    A["Index Fingertip normalized 0-1"] --> B["Margin Mapping 0.1 dead zone"]
+    B --> C["Screen Mapping 1920x1080"]
+    C --> D["EMA Smoothing alpha 0.6"]
+    D --> E["pynput mouse position"]
 ```
 
 - **Smoothing**: Exponential Moving Average prevents cursor jitter
