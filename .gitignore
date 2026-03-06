@@ -1,6 +1,10 @@
 # Ignore virtual environment
 vision_tracker/
 
+# Ignore MediaPipe model binary (download separately)
+config/*.task
+
+
 # Ignore Python cache
 __pycache__/
 *.pyc   
