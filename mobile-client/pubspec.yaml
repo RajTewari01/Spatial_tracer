@@ -1,0 +1,24 @@
+name: spatial_tracer_mobile
+description: "Spatial_Tracer — Air gesture control for Android"
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.11.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+  camera: ^0.11.0+2
+  google_mlkit_commons: ^0.7.1
+  permission_handler: ^11.3.1
+  google_fonts: ^6.2.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true

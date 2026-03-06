@@ -64,22 +64,19 @@ def open_web_client(delay: float = 2.0):
 
 
 def run_desktop():
-    """Start the server and launch the PyQt desktop app."""
-    # Start server in background
-    server_proc = start_server(block=False)
-    time.sleep(1.5)
+    """Launch the PyQt desktop overlay (runs tracker in-process, no server needed)."""
+    print("╔══════════════════════════════════════════════════╗")
+    print("║   Spatial_Tracer — Desktop Overlay               ║")
+    print("║   Air gesture mouse + keyboard control            ║")
+    print("╚══════════════════════════════════════════════════╝")
 
     try:
-        # Import and run the desktop app
         sys.path.insert(0, str(_ROOT / "desktop-client"))
         from app import run_desktop_app
         run_desktop_app()
     except ImportError as e:
         print(f"[error] Could not start desktop app: {e}")
         print("        Make sure PyQt5 is installed: pip install pyqt5")
-    finally:
-        if server_proc:
-            server_proc.terminate()
 
 
 def run_debug():

@@ -16,6 +16,7 @@ let trailParticles = [], ripples = [];
 let gestureFlashTimer = null;
 let eventLog = [];
 let frameCount = 0, lastFpsTime = performance.now(), currentFps = 0;
+let trailFrameSkip = 0;  // throttle trail spawning
 
 const CONN = [
     [0,1],[1,2],[2,3],[3,4],
@@ -277,7 +278,7 @@ function updateEffects() {
             trailParticles.splice(i,1);
         }
     }
-    while (trailParticles.length>250) {
+    while (trailParticles.length>80) {
         const o=trailParticles.shift(); scene.remove(o); o.geometry.dispose(); o.material.dispose();
     }
     for (let i=ripples.length-1; i>=0; i--) {
@@ -301,8 +302,8 @@ function initMediaPipe() {
         locateFile: f => `https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4.1675469240/${f}`
     });
     mpHands.setOptions({
-        maxNumHands: 2, modelComplexity: 1,
-        minDetectionConfidence: 0.65, minTrackingConfidence: 0.55,
+        maxNumHands: 2, modelComplexity: 0,
+        minDetectionConfidence: 0.6, minTrackingConfidence: 0.5,
     });
     mpHands.onResults(onResults);
 }
@@ -335,10 +336,13 @@ function onResults(results) {
 
             drawHand(ctx, lm, canvas.width, canvas.height, h);
 
-            // Trails on fingertips
-            for (const tid of TIP) {
-                const l=lm[tid];
-                spawnTrail((l.x-0.5)*4, -(l.y-0.5)*4, -l.z*2, h===0?0x7c6aff:0x22d3ee);
+            // Trails — only every 3rd frame for performance
+            trailFrameSkip++;
+            if (trailFrameSkip % 3 === 0) {
+                for (const tid of [8, 4]) { // index + thumb only
+                    const l=lm[tid];
+                    spawnTrail((l.x-0.5)*4, -(l.y-0.5)*4, -l.z*2, h===0?0x7c6aff:0x22d3ee);
+                }
             }
 
             // Detect + show gestures
@@ -400,27 +404,21 @@ function drawHand(ctx, lm, w, h, hIdx) {
 
 function isExtended(lm, f) {
     if (f === 0) {
-        // Thumb: tip is further from palm center than IP joint
-        // Use index MCP (lm[5]) as a palm reference — more stable than wrist
-        const palmX = lm[5].x;
-        const tipDist  = Math.abs(lm[4].x - palmX);
-        const ipDist   = Math.abs(lm[3].x - palmX);
-        return tipDist > ipDist + 0.01;
+        // Thumb: tip is further from palm center (index MCP) than IP joint
+        const ref = lm[5].x;
+        return Math.abs(lm[4].x - ref) > Math.abs(lm[3].x - ref);
     }
-    // Fingers 1-4: tip is above its MCP joint (screen y)
+    // Fingers 1-4: tip is clearly above its MCP
     return lm[TIP[f]].y < lm[MCP[f]].y;
 }
 
 function isFolded(lm, f) {
     if (f === 0) {
-        // Thumb is folded if tip is closer to palm than IP
-        const palmX = lm[5].x;
-        const tipDist  = Math.abs(lm[4].x - palmX);
-        const ipDist   = Math.abs(lm[3].x - palmX);
-        return tipDist < ipDist - 0.01;
+        const ref = lm[5].x;
+        return Math.abs(lm[4].x - ref) < Math.abs(lm[3].x - ref);
     }
-    // Tip is below its PIP joint → definitively curled
-    return lm[TIP[f]].y > lm[PIP[f]].y + 0.01;
+    // Tip is at or below its PIP joint
+    return lm[TIP[f]].y > lm[PIP[f]].y;
 }
 
 function dist(a, b) {
@@ -461,29 +459,32 @@ function detectGestures(lm, hand) {
 
     // ── Most specific gestures first ────────────────────────
 
-    // THUMBS UP: only thumb extended, all others folded, thumb tip above wrist
+    // Palm center Y for thumb direction
+    const palmCenterY = (lm[0].y + lm[5].y + lm[17].y) / 3;
+
+    // THUMBS UP: only thumb extended, all others folded, thumb tip above palm
     const isThumbOnly = thuE && idxF && midF && rngF && pnkF;
-    if (isThumbOnly && lm[4].y < lm[0].y) {
+    if (isThumbOnly && lm[4].y < palmCenterY - 0.03) {
         raw.push('thumbs_up');
     }
 
-    // THUMBS DOWN: only thumb extended, all others folded, thumb tip below wrist
-    if (isThumbOnly && lm[4].y > lm[0].y) {
+    // THUMBS DOWN: only thumb extended, all others folded, thumb tip below palm
+    if (isThumbOnly && lm[4].y > palmCenterY + 0.03) {
         raw.push('thumbs_down');
     }
 
-    // MIDDLE FINGER: only middle extended, others folded
-    if (midE && idxF && rngF && pnkF && !thuE) {
+    // MIDDLE FINGER: only middle extended, index + ring + pinky folded
+    if (midE && idxF && rngF && pnkF) {
         raw.push('middle_finger');
     }
 
     // PEACE: index + middle extended, ring + pinky folded
-    if (idxE && midE && rngF && pnkF) {
+    if (idxE && midE && rngF && pnkF && !midF) {
         raw.push('peace');
     }
 
-    // POINTING: only index extended, others folded
-    if (idxE && !midE && rngF && pnkF && !thuE) {
+    // POINTING: index extended, middle + ring + pinky folded (thumb can be anything)
+    if (idxE && midF && rngF && pnkF) {
         raw.push('pointing');
     }
 

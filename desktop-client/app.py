@@ -1,305 +1,572 @@
 '''
-app.py
->>> Main PyQt5 desktop application window.
-    - Camera preview panel with hand skeleton overlay
-    - Virtual keyboard with gesture-driven input
-    - Toolbar for start/stop and settings
-    - Wires everything together: camera → gesture → keyboard → keystroke
+app.py — Spatial_Tracer Desktop Overlay
+
+Transparent floating overlay that:
+  - Runs HeadlessHandTracker + GestureDetector + AirInputDriver in-process
+  - Shows small camera panel with hand skeleton
+  - Shows active gesture badge + cursor indicator
+  - Controls real OS mouse & keyboard via air gestures
+
+Usage:
+    python desktop-client/app.py
+    (or via: python main.py desktop)
 '''
 
 import sys
-import subprocess
-import threading
 import time
+import threading
 from pathlib import Path
 
+import cv2
+import numpy as np
 from PyQt5.QtWidgets import (
-    QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
-    QSplitter, QToolBar, QAction, QLabel, QTextEdit,
-    QStatusBar, QSizePolicy, QFrame
+    QApplication, QMainWindow, QWidget, QLabel, QPushButton,
+    QVBoxLayout, QHBoxLayout, QFrame, QSystemTrayIcon, QMenu, QAction,
 )
-from PyQt5.QtCore import Qt, QSize, QTimer
-from PyQt5.QtGui import QFont, QIcon, QColor
+from PyQt5.QtCore import (
+    Qt, QTimer, pyqtSignal, QThread, QPoint, QSize, QRect,
+)
+from PyQt5.QtGui import (
+    QPainter, QColor, QPen, QBrush, QFont, QImage, QPixmap, QIcon,
+    QRadialGradient, QPainterPath,
+)
 
 _ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(_ROOT))
 
-from api.input_controller import InputController
+from engine.headless_hand_tracer import HeadlessHandTracker
+from engine.gesture_detector import GestureDetector
+from engine.air_input_driver import AirInputDriver
 
-# Import sibling modules
-from virtual_keyboard import VirtualKeyboard
-from camera_widget import CameraWidget
-
-
-class GestureLog(QFrame):
-    """A small panel showing recent gesture events and typed characters."""
-
-    def __init__(self, parent=None):
-        super().__init__(parent)
-        self._setup_ui()
-        self._log_lines = []
-
-    def _setup_ui(self):
-        layout = QVBoxLayout(self)
-        layout.setContentsMargins(8, 8, 8, 8)
-
-        title = QLabel("📝 Output")
-        title.setFont(QFont("Segoe UI", 10, QFont.Bold))
-        title.setStyleSheet("color: #c9d1d9;")
-        layout.addWidget(title)
-
-        self._text_edit = QTextEdit()
-        self._text_edit.setReadOnly(True)
-        self._text_edit.setFont(QFont("Consolas", 10))
-        self._text_edit.setStyleSheet("""
-            QTextEdit {
-                background-color: #161b22;
-                color: #c9d1d9;
-                border: 1px solid #21262d;
-                border-radius: 8px;
-                padding: 8px;
-            }
-        """)
-        layout.addWidget(self._text_edit)
-
-        self.setStyleSheet("""
-            QFrame {
-                background-color: #0d1117;
-                border-radius: 12px;
-                border: 1px solid #21262d;
-            }
-        """)
-
-    def log_key(self, label: str):
-        """Log a key press."""
-        display = label if len(label) == 1 else f"[{label}]"
-        self._log_lines.append(display)
-        if len(self._log_lines) > 100:
-            self._log_lines = self._log_lines[-50:]
-        self._text_edit.setPlainText("".join(self._log_lines))
-        # Auto-scroll
-        cursor = self._text_edit.textCursor()
-        cursor.movePosition(cursor.End)
-        self._text_edit.setTextCursor(cursor)
-
-    def log_gesture(self, gesture: str):
-        """Log a gesture event."""
-        self._log_lines.append(f"\n⚡ {gesture}\n")
-        self._text_edit.setPlainText("".join(self._log_lines))
+# ── Screen resolution ───────────────────────────────────────────
+try:
+    import ctypes
+    user32 = ctypes.windll.user32
+    SCREEN_W = user32.GetSystemMetrics(0)
+    SCREEN_H = user32.GetSystemMetrics(1)
+except Exception:
+    SCREEN_W, SCREEN_H = 1920, 1080
 
 
-class MainWindow(QMainWindow):
-    """Main application window."""
+# ═══════════════════════════════════════════════════════════════
+#  TRACKING THREAD
+# ═══════════════════════════════════════════════════════════════
+
+class TrackingThread(QThread):
+    """
+    Runs HeadlessHandTracker + GestureDetector + AirInputDriver
+    in a background thread. Emits frame data + driver results.
+    """
+    frameReady = pyqtSignal(object, object, object)  # cv2 frame, hand_data, driver_result
 
     def __init__(self):
         super().__init__()
-        self._input_controller = InputController()
-        self._server_process = None
-        self._tracking_active = False
-        self._setup_ui()
-        self._setup_toolbar()
-        self._setup_statusbar()
-        self._connect_signals()
+        self._running = False
+        self._tracker = HeadlessHandTracker(
+            width=640, height=480,
+            max_hands=1,
+            detection_confidence=0.5,
+            tracking_confidence=0.5,
+        )
+        self._gesture_detector = GestureDetector()
+        self._driver = AirInputDriver(
+            screen_w=SCREEN_W,
+            screen_h=SCREEN_H,
+            smoothing=0.4,
+            margin=0.1,
+        )
 
-    def _setup_ui(self):
-        self.setWindowTitle("Vision Tracking Engine — Air Gesture Keyboard")
-        self.setMinimumSize(1100, 700)
-        self.resize(1280, 800)
+    @property
+    def driver(self):
+        return self._driver
 
-        # Dark theme
-        self.setStyleSheet("""
-            QMainWindow {
-                background-color: #0d1117;
-            }
-            QToolBar {
-                background-color: #161b22;
-                border-bottom: 1px solid #21262d;
-                padding: 4px 8px;
-                spacing: 8px;
-            }
-            QToolBar QToolButton {
-                background-color: transparent;
-                color: #c9d1d9;
-                border: 1px solid #30363d;
-                border-radius: 6px;
-                padding: 6px 12px;
-                font-family: 'Segoe UI';
-                font-size: 10pt;
-            }
-            QToolBar QToolButton:hover {
-                background-color: #21262d;
-                border-color: #6c63ff;
-            }
-            QToolBar QToolButton:pressed {
-                background-color: #6c63ff;
-            }
-            QStatusBar {
-                background-color: #161b22;
-                color: #8b949e;
-                border-top: 1px solid #21262d;
-                font-family: 'Segoe UI';
-                font-size: 9pt;
-            }
-        """)
+    def run(self):
+        self._running = True
+        cap = cv2.VideoCapture(0)
+        cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
+        cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
 
-        # ── Central widget ──────────────────────────────────────
-        central = QWidget()
-        self.setCentralWidget(central)
-        main_layout = QVBoxLayout(central)
-        main_layout.setContentsMargins(12, 12, 12, 12)
-        main_layout.setSpacing(12)
-
-        # ── Top: camera + gesture log ───────────────────────────
-        top_splitter = QSplitter(Qt.Horizontal)
-
-        self._camera_widget = CameraWidget()
-        self._camera_widget.setMinimumWidth(400)
-        top_splitter.addWidget(self._camera_widget)
-
-        self._gesture_log = GestureLog()
-        self._gesture_log.setMinimumWidth(250)
-        self._gesture_log.setMaximumWidth(400)
-        top_splitter.addWidget(self._gesture_log)
-
-        top_splitter.setStretchFactor(0, 3)
-        top_splitter.setStretchFactor(1, 1)
-        main_layout.addWidget(top_splitter, stretch=2)
-
-        # ── Bottom: virtual keyboard ────────────────────────────
-        self._keyboard = VirtualKeyboard()
-        main_layout.addWidget(self._keyboard, stretch=3)
-
-    def _setup_toolbar(self):
-        toolbar = QToolBar("Main Toolbar")
-        toolbar.setMovable(False)
-        toolbar.setIconSize(QSize(20, 20))
-        self.addToolBar(toolbar)
-
-        # Title label
-        title = QLabel("  🖐️ Vision Tracker  ")
-        title.setFont(QFont("Segoe UI", 12, QFont.Bold))
-        title.setStyleSheet("color: #6c63ff; border: none;")
-        toolbar.addWidget(title)
-
-        toolbar.addSeparator()
-
-        # Start server
-        self._start_action = QAction("▶ Start Server", self)
-        self._start_action.triggered.connect(self._start_server)
-        toolbar.addAction(self._start_action)
-
-        # Stop server
-        self._stop_action = QAction("⏹ Stop", self)
-        self._stop_action.triggered.connect(self._stop_server)
-        self._stop_action.setEnabled(False)
-        toolbar.addAction(self._stop_action)
-
-        toolbar.addSeparator()
-
-        # Connect camera
-        self._connect_action = QAction("📡 Connect Camera", self)
-        self._connect_action.triggered.connect(self._toggle_camera)
-        toolbar.addAction(self._connect_action)
-
-    def _setup_statusbar(self):
-        self._status_label = QLabel("Ready")
-        self.statusBar().addPermanentWidget(self._status_label)
-
-    def _connect_signals(self):
-        # Camera finger position → keyboard highlight
-        self._camera_widget.fingerPosition.connect(self._on_finger_position)
-
-        # Camera gesture → handle gesture
-        self._camera_widget.gestureDetected.connect(self._on_gesture)
-
-        # Keyboard key tap → input controller
-        self._keyboard.keyTapped.connect(self._on_key_tapped)
-
-    def _on_finger_position(self, x: float, y: float):
-        """Highlight the key under the finger."""
-        self._keyboard.highlight_at_position(x, y)
-
-    def _on_gesture(self, gesture: str, x: float, y: float):
-        """Handle a detected gesture."""
-        self._gesture_log.log_gesture(gesture)
-
-        if gesture == "tap":
-            # Tap the key at the finger position
-            label = self._keyboard.tap_at_position(x, y)
-            if label:
-                self._input_controller.press_key(label)
-                self._gesture_log.log_key(label)
-
-    def _on_key_tapped(self, label: str):
-        """Handle direct keyboard clicks."""
-        self._input_controller.press_key(label)
-        self._gesture_log.log_key(label)
-
-    def _start_server(self):
-        """Start the FastAPI server in a subprocess."""
-        if self._server_process and self._server_process.poll() is None:
+        if not cap.isOpened():
+            self._running = False
             return
 
-        self._server_process = subprocess.Popen(
-            [sys.executable, "-m", "uvicorn", "api.fastapi_main:app",
-             "--host", "0.0.0.0", "--port", "8765"],
-            cwd=str(_ROOT),
+        from mediapipe.tasks.python import BaseOptions
+        from mediapipe.tasks.python.vision import (
+            HandLandmarker, HandLandmarkerOptions,
         )
-        self._start_action.setEnabled(False)
-        self._stop_action.setEnabled(True)
-        self._status_label.setText("Server running on localhost:8765")
+        from mediapipe.tasks.python.vision.hand_landmarker import _RunningMode as RunningMode
+        import mediapipe as mp
 
-        # Auto-connect camera after short delay
-        QTimer.singleShot(1500, self._camera_widget.start_connection)
+        model_path = str(_ROOT / "config" / "hand_landmarker.task")
+        options = HandLandmarkerOptions(
+            base_options=BaseOptions(model_asset_path=model_path),
+            running_mode=RunningMode.VIDEO,
+            num_hands=1,
+            min_hand_detection_confidence=0.5,
+            min_tracking_confidence=0.5,
+        )
+        landmarker = HandLandmarker.create_from_options(options)
 
-    def _stop_server(self):
-        """Stop the server subprocess."""
-        self._camera_widget.stop_connection()
-        if self._server_process:
-            self._server_process.terminate()
-            self._server_process = None
-        self._start_action.setEnabled(True)
-        self._stop_action.setEnabled(False)
-        self._status_label.setText("Server stopped")
+        frame_idx = 0
+        start_time = time.time()
 
-    def _toggle_camera(self):
-        """Toggle camera WebSocket connection."""
-        if self._camera_widget._connected:
-            self._camera_widget.stop_connection()
-            self._connect_action.setText("📡 Connect Camera")
+        while self._running:
+            ret, frame = cap.read()
+            if not ret:
+                break
+
+            frame = cv2.flip(frame, 1)
+            rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+            mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=rgb)
+
+            frame_idx += 1
+            ts_ms = int(frame_idx * (1000 / 30))
+            result = landmarker.detect_for_video(mp_image, ts_ms)
+
+            elapsed = time.time() - start_time
+            fps = frame_idx / elapsed if elapsed > 0 else 0
+
+            # Extract landmarks
+            hands_data = []
+            if result.hand_landmarks:
+                for h_idx, hand_lms in enumerate(result.hand_landmarks):
+                    handedness = "Unknown"
+                    if result.handedness and h_idx < len(result.handedness):
+                        handedness = result.handedness[h_idx][0].category_name
+
+                    landmarks = []
+                    for idx, lm in enumerate(hand_lms):
+                        landmarks.append({
+                            'id': idx,
+                            'x': round(lm.x, 5),
+                            'y': round(lm.y, 5),
+                            'z': round(lm.z, 5),
+                        })
+
+                    fingertip_ids = [4, 8, 12, 16, 20]
+                    fingertips = []
+                    for tid in fingertip_ids:
+                        lm = hand_lms[tid]
+                        fingertips.append({
+                            'id': tid,
+                            'x': round(lm.x, 5),
+                            'y': round(lm.y, 5),
+                            'px_x': int(lm.x * 640),
+                            'px_y': int(lm.y * 480),
+                        })
+
+                    hands_data.append({
+                        'handedness': handedness,
+                        'landmarks': landmarks,
+                        'fingertips': fingertips,
+                    })
+
+            frame_data = {
+                'timestamp': round(time.time(), 3),
+                'fps': round(fps, 1),
+                'frame_index': frame_idx,
+                'hands': hands_data,
+            }
+
+            # Drive mouse/keyboard
+            driver_result = self._driver.process_frame(frame_data)
+
+            self.frameReady.emit(rgb, frame_data, driver_result)
+
+        cap.release()
+        landmarker.close()
+
+    def stop(self):
+        self._running = False
+        self.wait(3000)
+
+
+# ═══════════════════════════════════════════════════════════════
+#  CAMERA PANEL WIDGET
+# ═══════════════════════════════════════════════════════════════
+
+class CameraPanel(QWidget):
+    """Small camera preview with hand skeleton overlay."""
+
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setFixedSize(280, 180)
+        self._frame: QImage = None
+        self._landmarks = []
+        self._gesture = 'IDLE'
+        self._fps = 0.0
+
+    def update_frame(self, rgb_frame, landmarks, gesture, fps):
+        h, w, ch = rgb_frame.shape
+        qimg = QImage(rgb_frame.data, w, h, w * ch, QImage.Format_RGB888)
+        self._frame = qimg.scaled(self.width(), self.height(),
+                                   Qt.KeepAspectRatio, Qt.SmoothTransformation)
+        self._landmarks = landmarks
+        self._gesture = gesture
+        self._fps = fps
+        self.update()
+
+    def paintEvent(self, event):
+        p = QPainter(self)
+        p.setRenderHint(QPainter.Antialiasing)
+
+        # Background
+        p.setBrush(QColor(0, 0, 0))
+        p.setPen(Qt.NoPen)
+        p.drawRoundedRect(self.rect(), 10, 10)
+
+        # Camera frame
+        if self._frame:
+            # Center the frame
+            fx = (self.width() - self._frame.width()) // 2
+            fy = (self.height() - self._frame.height()) // 2
+            p.drawImage(fx, fy, self._frame)
+
+            # Draw skeleton
+            if self._landmarks:
+                self._draw_skeleton(p, self._landmarks, fx, fy,
+                                     self._frame.width(), self._frame.height())
         else:
-            self._camera_widget.start_connection()
-            self._connect_action.setText("📡 Disconnect")
+            p.setPen(QColor(100, 100, 120))
+            p.setFont(QFont('JetBrains Mono', 9))
+            p.drawText(self.rect(), Qt.AlignCenter, 'No camera')
+
+        # Gesture badge
+        if self._gesture and self._gesture != 'IDLE':
+            badge_text = self._gesture
+            p.setFont(QFont('JetBrains Mono', 8, QFont.Bold))
+            fm = p.fontMetrics()
+            tw = fm.horizontalAdvance(badge_text) + 16
+            bx = self.width() - tw - 6
+            by = 6
+            p.setBrush(QColor(124, 106, 255, 180))
+            p.setPen(Qt.NoPen)
+            p.drawRoundedRect(bx, by, tw, 20, 10, 10)
+            p.setPen(QColor(255, 255, 255))
+            p.drawText(bx + 8, by + 14, badge_text)
+
+        # FPS
+        p.setFont(QFont('JetBrains Mono', 7))
+        p.setPen(QColor(52, 211, 153))
+        p.drawText(8, 16, f'{self._fps:.0f} FPS')
+
+        # Border
+        p.setBrush(Qt.NoBrush)
+        p.setPen(QPen(QColor(124, 106, 255, 60), 1))
+        p.drawRoundedRect(self.rect().adjusted(0, 0, -1, -1), 10, 10)
+
+        p.end()
+
+    def _draw_skeleton(self, p, landmarks, ox, oy, fw, fh):
+        conns = [
+            (0,1),(1,2),(2,3),(3,4),
+            (0,5),(5,6),(6,7),(7,8),
+            (0,9),(9,10),(10,11),(11,12),
+            (0,13),(13,14),(14,15),(15,16),
+            (0,17),(17,18),(18,19),(19,20),
+            (5,9),(9,13),(13,17),
+        ]
+
+        pen = QPen(QColor(124, 106, 255, 200), 1)
+        p.setPen(pen)
+        for a, b in conns:
+            if a < len(landmarks) and b < len(landmarks):
+                ax = ox + int(landmarks[a]['x'] * fw)
+                ay = oy + int(landmarks[a]['y'] * fh)
+                bx = ox + int(landmarks[b]['x'] * fw)
+                by = oy + int(landmarks[b]['y'] * fh)
+                p.drawLine(ax, ay, bx, by)
+
+        # Fingertips
+        tips = [4, 8, 12, 16, 20]
+        for tid in tips:
+            if tid < len(landmarks):
+                tx = ox + int(landmarks[tid]['x'] * fw)
+                ty = oy + int(landmarks[tid]['y'] * fh)
+                p.setBrush(QColor(52, 211, 153, 180))
+                p.setPen(Qt.NoPen)
+                p.drawEllipse(tx - 3, ty - 3, 6, 6)
+
+
+# ═══════════════════════════════════════════════════════════════
+#  MAIN OVERLAY WINDOW
+# ═══════════════════════════════════════════════════════════════
+
+class OverlayWindow(QMainWindow):
+    """Transparent overlay with camera panel and gesture status."""
+
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle('Spatial_Tracer')
+        self.setFixedSize(300, 280)
+
+        # Position bottom-right
+        self.move(SCREEN_W - 320, SCREEN_H - 350)
+
+        # Frameless + always on top + transparent background
+        self.setWindowFlags(
+            Qt.FramelessWindowHint |
+            Qt.WindowStaysOnTopHint |
+            Qt.Tool
+        )
+        self.setAttribute(Qt.WA_TranslucentBackground)
+
+        # Tracking thread
+        self._tracker_thread = TrackingThread()
+        self._tracker_thread.frameReady.connect(self._on_frame)
+
+        # UI
+        self._setup_ui()
+
+        # Dragging
+        self._drag_pos = None
+
+    def _setup_ui(self):
+        central = QWidget()
+        self.setCentralWidget(central)
+        layout = QVBoxLayout(central)
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(0)
+
+        # Main frame with background
+        self._frame = QFrame()
+        self._frame.setStyleSheet('''
+            QFrame {
+                background-color: rgba(5, 5, 8, 230);
+                border: 1px solid rgba(124, 106, 255, 0.15);
+                border-radius: 14px;
+            }
+        ''')
+        frame_layout = QVBoxLayout(self._frame)
+        frame_layout.setContentsMargins(10, 10, 10, 10)
+        frame_layout.setSpacing(8)
+
+        # Top bar
+        top_bar = QHBoxLayout()
+        self._title = QLabel('SPATIAL_TRACER')
+        self._title.setStyleSheet('''
+            QLabel {
+                color: #7c6aff;
+                font-family: 'JetBrains Mono';
+                font-size: 10px;
+                font-weight: bold;
+                letter-spacing: 2px;
+                background: transparent;
+                border: none;
+            }
+        ''')
+        top_bar.addWidget(self._title)
+        top_bar.addStretch()
+
+        self._status_badge = QLabel('IDLE')
+        self._status_badge.setStyleSheet('''
+            QLabel {
+                color: #6e6e80;
+                font-family: 'JetBrains Mono';
+                font-size: 9px;
+                font-weight: bold;
+                background: rgba(255,255,255,0.03);
+                padding: 2px 8px;
+                border-radius: 8px;
+                border: 1px solid rgba(255,255,255,0.04);
+            }
+        ''')
+        top_bar.addWidget(self._status_badge)
+
+        btn_close = QPushButton('×')
+        btn_close.setFixedSize(20, 20)
+        btn_close.setStyleSheet('''
+            QPushButton {
+                color: #3c3c4a;
+                background: transparent;
+                border: none;
+                font-size: 16px;
+                font-weight: bold;
+            }
+            QPushButton:hover { color: #ef4444; }
+        ''')
+        btn_close.clicked.connect(self.close)
+        top_bar.addWidget(btn_close)
+        frame_layout.addLayout(top_bar)
+
+        # Camera panel
+        self._camera = CameraPanel()
+        frame_layout.addWidget(self._camera)
+
+        # Bottom controls
+        bottom = QHBoxLayout()
+        self._btn_start = QPushButton('START')
+        self._btn_start.setStyleSheet('''
+            QPushButton {
+                background: #7c6aff;
+                color: white;
+                font-family: 'JetBrains Mono';
+                font-size: 10px;
+                font-weight: bold;
+                padding: 6px 16px;
+                border-radius: 6px;
+                border: none;
+                letter-spacing: 1px;
+            }
+            QPushButton:hover { background: #6c5ce7; }
+        ''')
+        self._btn_start.clicked.connect(self._toggle_tracking)
+        bottom.addWidget(self._btn_start)
+
+        self._gesture_label = QLabel('')
+        self._gesture_label.setStyleSheet('''
+            QLabel {
+                color: #22d3ee;
+                font-family: 'JetBrains Mono';
+                font-size: 11px;
+                font-weight: bold;
+                background: transparent;
+                border: none;
+            }
+        ''')
+        bottom.addWidget(self._gesture_label)
+        bottom.addStretch()
+
+        frame_layout.addLayout(bottom)
+        layout.addWidget(self._frame)
+
+    def _toggle_tracking(self):
+        if self._tracker_thread.isRunning():
+            self._tracker_thread.stop()
+            self._btn_start.setText('START')
+            self._btn_start.setStyleSheet('''
+                QPushButton {
+                    background: #7c6aff; color: white;
+                    font-family: 'JetBrains Mono'; font-size: 10px;
+                    font-weight: bold; padding: 6px 16px;
+                    border-radius: 6px; border: none; letter-spacing: 1px;
+                }
+                QPushButton:hover { background: #6c5ce7; }
+            ''')
+            self._status_badge.setText('IDLE')
+            self._status_badge.setStyleSheet('''
+                QLabel {
+                    color: #6e6e80; font-family: 'JetBrains Mono';
+                    font-size: 9px; font-weight: bold;
+                    background: rgba(255,255,255,0.03); padding: 2px 8px;
+                    border-radius: 8px; border: 1px solid rgba(255,255,255,0.04);
+                }
+            ''')
+        else:
+            self._tracker_thread.start()
+            self._btn_start.setText('STOP')
+            self._btn_start.setStyleSheet('''
+                QPushButton {
+                    background: #ef4444; color: white;
+                    font-family: 'JetBrains Mono'; font-size: 10px;
+                    font-weight: bold; padding: 6px 16px;
+                    border-radius: 6px; border: none; letter-spacing: 1px;
+                }
+                QPushButton:hover { background: #dc2626; }
+            ''')
+
+    def _on_frame(self, rgb_frame, frame_data, driver_result):
+        hands = frame_data.get('hands', [])
+        landmarks = hands[0]['landmarks'] if hands else []
+        gesture = driver_result.get('gesture', 'IDLE')
+        fps = frame_data.get('fps', 0)
+
+        self._camera.update_frame(rgb_frame, landmarks, gesture, fps)
+
+        # Update gesture label
+        action = driver_result.get('action', 'none')
+        if gesture != 'IDLE':
+            self._gesture_label.setText(f'{gesture}')
+            # Color based on gesture
+            colors = {
+                'POINTING': '#34d399', 'PINCH': '#fbbf24',
+                'FIST': '#ef4444', 'PEACE': '#7c6aff',
+                'THUMBS_UP': '#34d399', 'THUMBS_DOWN': '#f472b6',
+                'ROCK': '#fbbf24', 'THREE': '#a393ff',
+                'OPEN_PALM': '#22d3ee', 'MIDDLE_FINGER': '#fb923c',
+            }
+            c = colors.get(gesture, '#6e6e80')
+            self._gesture_label.setStyleSheet(f'''
+                QLabel {{
+                    color: {c}; font-family: 'JetBrains Mono';
+                    font-size: 11px; font-weight: bold;
+                    background: transparent; border: none;
+                }}
+            ''')
+        else:
+            self._gesture_label.setText('')
+
+        # Status badge
+        self._status_badge.setText(gesture)
+        if gesture == 'POINTING':
+            self._status_badge.setStyleSheet('''
+                QLabel {
+                    color: #34d399; font-family: 'JetBrains Mono';
+                    font-size: 9px; font-weight: bold;
+                    background: rgba(52,211,153,0.08); padding: 2px 8px;
+                    border-radius: 8px; border: 1px solid rgba(52,211,153,0.15);
+                }
+            ''')
+        elif gesture != 'IDLE':
+            self._status_badge.setStyleSheet('''
+                QLabel {
+                    color: #7c6aff; font-family: 'JetBrains Mono';
+                    font-size: 9px; font-weight: bold;
+                    background: rgba(124,106,255,0.08); padding: 2px 8px;
+                    border-radius: 8px; border: 1px solid rgba(124,106,255,0.15);
+                }
+            ''')
+        else:
+            self._status_badge.setStyleSheet('''
+                QLabel {
+                    color: #6e6e80; font-family: 'JetBrains Mono';
+                    font-size: 9px; font-weight: bold;
+                    background: rgba(255,255,255,0.03); padding: 2px 8px;
+                    border-radius: 8px; border: 1px solid rgba(255,255,255,0.04);
+                }
+            ''')
+
+    # ── Window dragging ─────────────────────────────────────────
+    def mousePressEvent(self, event):
+        if event.button() == Qt.LeftButton:
+            self._drag_pos = event.globalPos() - self.pos()
+
+    def mouseMoveEvent(self, event):
+        if self._drag_pos and event.buttons() & Qt.LeftButton:
+            self.move(event.globalPos() - self._drag_pos)
+
+    def mouseReleaseEvent(self, event):
+        self._drag_pos = None
 
     def closeEvent(self, event):
-        """Cleanup on window close."""
-        self._camera_widget.stop_connection()
-        self._stop_server()
+        if self._tracker_thread.isRunning():
+            self._tracker_thread.stop()
         event.accept()
 
 
-def run_desktop_app():
-    """Launch the desktop application."""
-    app = QApplication(sys.argv)
-    app.setStyle("Fusion")
+# ═══════════════════════════════════════════════════════════════
+#  ENTRY POINT
+# ═══════════════════════════════════════════════════════════════
 
-    # Set dark palette
-    palette = app.palette()
-    palette.setColor(palette.Window, QColor(13, 17, 23))
-    palette.setColor(palette.WindowText, QColor(201, 209, 217))
-    palette.setColor(palette.Base, QColor(22, 27, 34))
-    palette.setColor(palette.AlternateBase, QColor(13, 17, 23))
-    palette.setColor(palette.ToolTipBase, QColor(22, 27, 34))
-    palette.setColor(palette.ToolTipText, QColor(201, 209, 217))
-    palette.setColor(palette.Text, QColor(201, 209, 217))
-    palette.setColor(palette.Button, QColor(33, 38, 45))
-    palette.setColor(palette.ButtonText, QColor(201, 209, 217))
-    palette.setColor(palette.Highlight, QColor(108, 99, 255))
-    palette.setColor(palette.HighlightedText, QColor(255, 255, 255))
+def run_desktop_app():
+    app = QApplication(sys.argv)
+    app.setApplicationName('Spatial_Tracer')
+    app.setStyle('Fusion')
+
+    # Dark palette
+    from PyQt5.QtGui import QPalette
+    palette = QPalette()
+    palette.setColor(QPalette.Window, QColor(5, 5, 8))
+    palette.setColor(QPalette.WindowText, QColor(240, 240, 245))
+    palette.setColor(QPalette.Base, QColor(10, 10, 15))
+    palette.setColor(QPalette.Text, QColor(240, 240, 245))
+    palette.setColor(QPalette.Button, QColor(14, 14, 20))
+    palette.setColor(QPalette.ButtonText, QColor(240, 240, 245))
     app.setPalette(palette)
 
-    window = MainWindow()
+    window = OverlayWindow()
     window.show()
+
     sys.exit(app.exec_())
 
 
