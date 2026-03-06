@@ -1,8 +1,10 @@
 '''
-handtracker.py 
+simple_hand_tracer.py
 >>> Features :
-    1. Detects hands in the image
+    1. Detects hands in the image with OpenCV window
     2. Tracks hands across frames
+    3. Draws keyboard overlay from mapping.json
+NOTE: This is the visual/debug tracer. For headless usage, see headless_hand_tracer.py
 '''
 
 from typing import Tuple
@@ -15,7 +17,7 @@ import sys
 _ROOT = Path(__file__).resolve().parents[1]
 _KEYS_MAPPING = _ROOT / "config/mapping.json"
 
-class InitilizeCamera:
+class InitializeCamera:
 
     __slots__ = ['try_load_model', 'cam','load_hand','hands','mp_draw','dataset_path']
     
@@ -104,4 +106,4 @@ class InitilizeCamera:
       
 
 if __name__ == "__main__":
-  InitilizeCamera(try_load_model=True).run()
+  InitializeCamera(try_load_model=True).run()
