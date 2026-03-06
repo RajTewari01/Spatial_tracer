@@ -26,8 +26,9 @@ class InitilizeCamera:
       self.hands = self.load_hand.Hands(
        max_num_hands=2,
        min_detection_confidence=0.5,
-       min_tracking_confidence=0.5 
+       min_tracking_confidence=0.5
       )
+      
       self.mp_draw = mp.solutions.drawing_utils
       self.dataset_path = _KEYS_MAPPING
       assert self.dataset_path.exists(),'Hey you cannot continue without the key-mapping.'
