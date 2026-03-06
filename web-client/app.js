@@ -386,119 +386,165 @@ function drawHand(ctx, lm, w, h, hIdx) {
 
 
 // ═══════════════════════════════════════════════════════════════
-//  GESTURE DETECTION — IMPROVED ACCURACY
+//  GESTURE DETECTION v3 — ROBUST
+//  Uses MCP as anchor for finger state, 3-frame stability,
+//  and priority system to prevent fist/palm domination
 // ═══════════════════════════════════════════════════════════════
 
-function isUp(lm, f) {
+/*
+ * Key insight: MediaPipe landmark Y increases downward.
+ *   - Finger "extended": tip.y < MCP.y  (tip is ABOVE MCP on screen)
+ *   - Finger "curled":   tip.y > PIP.y  (tip is BELOW its own PIP knuckle)
+ *   - In between = ambiguous → don't count as either
+ */
+
+function isExtended(lm, f) {
     if (f === 0) {
-        // Thumb: compare tip x vs IP joint x relative to wrist
-        // For right hand: thumb tip should be further left (lower x)
-        // For left hand: opposite
-        // Use absolute distance from wrist as a simpler heuristic
-        const wristX = lm[0].x;
-        const tipDist = Math.abs(lm[4].x - wristX);
-        const ipDist = Math.abs(lm[3].x - wristX);
-        return tipDist > ipDist * 1.15;
+        // Thumb: tip is further from palm center than IP joint
+        // Use index MCP (lm[5]) as a palm reference — more stable than wrist
+        const palmX = lm[5].x;
+        const tipDist  = Math.abs(lm[4].x - palmX);
+        const ipDist   = Math.abs(lm[3].x - palmX);
+        return tipDist > ipDist + 0.01;
     }
-    // Other fingers: tip above PIP (y is inverted in screen space)
-    return lm[TIP[f]].y < lm[PIP[f]].y - 0.02;
+    // Fingers 1-4: tip is above its MCP joint (screen y)
+    return lm[TIP[f]].y < lm[MCP[f]].y;
 }
 
-function isCurled(lm, f) {
-    if (f === 0) return !isUp(lm, 0);
-    // Finger is curled if tip is below MCP
-    return lm[TIP[f]].y > lm[MCP[f]].y;
+function isFolded(lm, f) {
+    if (f === 0) {
+        // Thumb is folded if tip is closer to palm than IP
+        const palmX = lm[5].x;
+        const tipDist  = Math.abs(lm[4].x - palmX);
+        const ipDist   = Math.abs(lm[3].x - palmX);
+        return tipDist < ipDist - 0.01;
+    }
+    // Tip is below its PIP joint → definitively curled
+    return lm[TIP[f]].y > lm[PIP[f]].y + 0.01;
 }
 
 function dist(a, b) {
     return Math.sqrt((a.x-b.x)**2 + (a.y-b.y)**2);
 }
 
-function fingerStates(lm) {
-    return [isUp(lm,0), isUp(lm,1), isUp(lm,2), isUp(lm,3), isUp(lm,4)];
+function getStates(lm) {
+    const ext = [], fold = [];
+    for (let f = 0; f < 5; f++) {
+        ext.push(isExtended(lm, f));
+        fold.push(isFolded(lm, f));
+    }
+    return { ext, fold };
+}
+
+// ── Stability buffer: require gesture for 3 consecutive frames ──
+let gestureBuffer = {};  // { gestureName: frameCount }
+const STABILITY_FRAMES = 2;
+
+function stabilize(name, active) {
+    if (active) {
+        gestureBuffer[name] = (gestureBuffer[name] || 0) + 1;
+    } else {
+        gestureBuffer[name] = 0;
+    }
+    return gestureBuffer[name] >= STABILITY_FRAMES;
 }
 
 let lastGTime = {};
 
 function detectGestures(lm, hand) {
     const now = Date.now();
-    const [thu, idx, mid, rng, pnk] = fingerStates(lm);
-    const detected = [];
+    const { ext, fold } = getStates(lm);
+    const [thuE, idxE, midE, rngE, pnkE] = ext;
+    const [thuF, idxF, midF, rngF, pnkF] = fold;
 
-    // Priority order matters — most specific first
+    const raw = [];  // Raw detections before stability
 
-    // ── THUMBS UP / DOWN ──
-    if (thu && !idx && !mid && !rng && !pnk) {
-        // Check thumb direction: tip above or below thumb MCP
-        if (lm[4].y < lm[2].y - 0.04) {
-            detected.push('thumbs_up');
-        } else if (lm[4].y > lm[2].y + 0.04) {
-            detected.push('thumbs_down');
+    // ── Most specific gestures first ────────────────────────
+
+    // THUMBS UP: only thumb extended, all others folded, thumb tip above wrist
+    const isThumbOnly = thuE && idxF && midF && rngF && pnkF;
+    if (isThumbOnly && lm[4].y < lm[0].y) {
+        raw.push('thumbs_up');
+    }
+
+    // THUMBS DOWN: only thumb extended, all others folded, thumb tip below wrist
+    if (isThumbOnly && lm[4].y > lm[0].y) {
+        raw.push('thumbs_down');
+    }
+
+    // MIDDLE FINGER: only middle extended, others folded
+    if (midE && idxF && rngF && pnkF && !thuE) {
+        raw.push('middle_finger');
+    }
+
+    // PEACE: index + middle extended, ring + pinky folded
+    if (idxE && midE && rngF && pnkF) {
+        raw.push('peace');
+    }
+
+    // POINTING: only index extended, others folded
+    if (idxE && !midE && rngF && pnkF && !thuE) {
+        raw.push('pointing');
+    }
+
+    // ROCK: index + pinky extended, middle + ring folded
+    if (idxE && pnkE && midF && rngF) {
+        raw.push('rock');
+    }
+
+    // SPIDERMAN: thumb + index + pinky extended, middle + ring folded
+    if (thuE && idxE && pnkE && midF && rngF) {
+        raw.push('spiderman');
+    }
+
+    // CALL ME: thumb + pinky extended, index + middle + ring folded
+    if (thuE && pnkE && idxF && midF && rngF) {
+        raw.push('call_me');
+    }
+
+    // THREE: index + middle + ring extended, pinky folded
+    if (idxE && midE && rngE && pnkF && !thuE) {
+        raw.push('three');
+    }
+
+    // OK: thumb tip touching index tip, other 3 extended
+    const thumbIdxDist = dist(lm[4], lm[8]);
+    if (thumbIdxDist < 0.07 && midE && rngE && pnkE) {
+        raw.push('ok');
+    }
+
+    // PINCH: thumb tip touching index tip (but not OK)
+    if (thumbIdxDist < 0.07 && !raw.includes('ok')) {
+        raw.push('pinch');
+    }
+
+    // ── Catch-all gestures — ONLY if nothing specific detected ──
+    if (raw.length === 0) {
+        // OPEN PALM: all 5 extended
+        if (thuE && idxE && midE && rngE && pnkE) {
+            raw.push('open_palm');
+        }
+
+        // FIST: all 5 curled
+        if (thuF && idxF && midF && rngF && pnkF) {
+            raw.push('fist');
         }
     }
 
-    // ── PEACE ✌ ──
-    if (!thu && idx && mid && !rng && !pnk) {
-        // Extra: index and middle should be spread apart
-        const spread = dist(lm[8], lm[12]);
-        if (spread > 0.04) detected.push('peace');
-    }
-
-    // ── MIDDLE FINGER ──
-    if (!thu && !idx && mid && !rng && !pnk) {
-        detected.push('middle_finger');
-    }
-
-    // ── ROCK 🤘 ──
-    if (idx && !mid && !rng && pnk) {
-        detected.push('rock');
-    }
-
-    // ── SPIDERMAN ──
-    if (thu && idx && !mid && !rng && pnk) {
-        detected.push('spiderman');
-    }
-
-    // ── CALL ME 🤙 ──
-    if (thu && !idx && !mid && !rng && pnk) {
-        detected.push('call_me');
-    }
-
-    // ── THREE ──
-    if (!thu && idx && mid && rng && !pnk) {
-        detected.push('three');
-    }
-
-    // ── OK 👌 ──
-    const thumbIndexDist = dist(lm[4], lm[8]);
-    if (thumbIndexDist < 0.055 && mid && rng && pnk) {
-        detected.push('ok');
-    }
-
-    // ── PINCH 🤏 ──
-    if (thumbIndexDist < 0.055 && !detected.includes('ok')) {
-        detected.push('pinch');
-    }
-
-    // ── OPEN PALM ──
-    if (thu && idx && mid && rng && pnk) {
-        detected.push('open_palm');
-    }
-
-    // ── FIST ──
-    if (!thu && !idx && !mid && !rng && !pnk) {
-        detected.push('fist');
-    }
-
-    // ── POINTING ──
-    if (!thu && idx && !mid && !rng && !pnk) {
-        detected.push('pointing');
+    // ── Apply stability filter ──
+    const allGNames = Object.keys(G);
+    const detected = [];
+    for (const name of allGNames) {
+        const active = raw.includes(name);
+        if (stabilize(name, active)) {
+            detected.push(name);
+        }
     }
 
     // Flash + log with cooldown
     for (const g of detected) {
         const key = `${hand}_${g}`;
-        if (!lastGTime[key] || now-lastGTime[key] > 1000) {
+        if (!lastGTime[key] || now - lastGTime[key] > 1200) {
             lastGTime[key] = now;
             const info = G[g];
             if (info) {
@@ -530,12 +576,12 @@ function showGestureTags(gestures) {
 
 
 function updateFingerStatus(lm) {
-    const up = fingerStates(lm);
     for (let f=0; f<5; f++) {
         const el = document.getElementById(`f-${FNAMES[f]}`);
         if (!el) continue;
-        el.textContent = `${FLABELS[f]} ${up[f]?'UP':'DN'}`;
-        el.className = `finger ${up[f]?'up':'down'}`;
+        const up = isExtended(lm, f);
+        el.textContent = `${FLABELS[f]} ${up?'UP':'DN'}`;
+        el.className = `finger ${up?'up':'down'}`;
     }
 }
 
