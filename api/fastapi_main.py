@@ -64,6 +64,14 @@ async def index():
         return FileResponse(str(index_path))
     return JSONResponse({"message": "Vision Tracking Engine API", "status": "running"})
 
+@app.get("/style.css")
+async def serve_css():
+    return FileResponse(str(_WEB_CLIENT_DIR / "style.css"), media_type="text/css")
+
+@app.get("/app.js")
+async def serve_js():
+    return FileResponse(str(_WEB_CLIENT_DIR / "app.js"), media_type="application/javascript")
+
 
 @app.post("/start")
 async def start_tracking():
