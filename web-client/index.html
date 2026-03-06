@@ -3,33 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vision Tracking Engine — Air Gesture Demo</title>
-    <meta name="description" content="Real-time hand gesture tracking with MediaPipe and Three.js particle visualization">
+    <title>Spatial_Tracer — Air Gesture Engine</title>
+    <meta name="description" content="Real-time hand gesture tracking with MediaPipe and Three.js — by Biswadeep Tewari">
     <link rel="stylesheet" href="/static/style.css">
 
-    <!-- Three.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 
-    <!-- MediaPipe JS -->
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4.1675469240/hands.min.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils@0.3.1675466862/camera_utils.min.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils@0.3.1675466124/drawing_utils.min.js" crossorigin="anonymous"></script>
 
-    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
-    <!-- ── Three.js Canvas ──────────────────────────────────── -->
+    <!-- Three.js -->
     <div id="canvas-container"></div>
 
-    <!-- ── Camera Feed ──────────────────────────────────────── -->
+    <!-- Camera PiP -->
     <div id="camera-panel">
         <div class="camera-header">
-            <span class="cam-icon">📷</span>
-            <span>Camera Feed</span>
-            <button id="btn-toggle-cam" class="btn-icon" onclick="toggleCameraSize()">⛶</button>
+            <span class="cam-dot"></span>
+            <span>CAMERA</span>
+            <button id="btn-toggle-cam" class="btn-icon" onclick="toggleCameraSize()">
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M1 4V1h3M8 1h3v3M11 8v3H8M4 11H1V8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            </button>
         </div>
         <div class="camera-body">
             <video id="webcam" autoplay playsinline></video>
@@ -37,63 +36,85 @@
         </div>
     </div>
 
-    <!-- ── Top Bar ──────────────────────────────────────────── -->
+    <!-- Top Bar -->
     <header id="top-bar">
         <div class="logo">
-            <span class="logo-icon">🖐️</span>
-            <span class="logo-text">Vision Tracker</span>
+            <div class="logo-mark">S_T</div>
+            <div class="logo-typewriter">
+                <span id="typewriter-text" class="typewriter"></span>
+                <span class="cursor-blink">|</span>
+            </div>
         </div>
         <div class="status-group">
             <div id="connection-indicator" class="indicator disconnected">
                 <span class="dot"></span>
-                <span id="connection-text">Camera Off</span>
+                <span id="connection-text">Offline</span>
             </div>
-            <div class="fps-display">
-                <span id="fps-value">0</span> FPS
+            <div class="stat-pill">
+                <span id="fps-value">0</span>
+                <span class="stat-label">FPS</span>
             </div>
-            <div class="hands-display">
-                <span id="hands-value">0</span> ✋
+            <div class="stat-pill">
+                <span id="hands-value">0</span>
+                <span class="stat-label">HANDS</span>
             </div>
         </div>
     </header>
 
-    <!-- ── Info Panel ───────────────────────────────────────── -->
+    <!-- Right Panel -->
     <aside id="info-panel">
-        <div class="panel-section">
-            <h3>Active Gestures</h3>
-            <div id="gesture-display" class="gesture-badge-container">
-                <span class="gesture-placeholder">Waiting for hands...</span>
+        <!-- About Section -->
+        <div class="panel-section about-section">
+            <h3>Creator</h3>
+            <div class="about-card">
+                <div class="about-name">Biswadeep Tewari</div>
+                <div class="about-handle">@RajTewari01</div>
+                <div class="about-bio" id="about-bio"></div>
+                <div class="about-links">
+                    <a href="https://github.com/RajTewari01" target="_blank" class="about-link">GitHub</a>
+                </div>
             </div>
         </div>
 
+        <!-- Gesture Detection -->
         <div class="panel-section">
-            <h3>Finger Status</h3>
+            <h3>Detected Gesture</h3>
+            <div id="gesture-display" class="gesture-display">
+                <span class="gesture-placeholder">No hands in frame</span>
+            </div>
+        </div>
+
+        <!-- Finger State -->
+        <div class="panel-section">
+            <h3>Finger State</h3>
             <div id="finger-status" class="finger-grid">
-                <span class="finger" id="f-thumb">👍 —</span>
-                <span class="finger" id="f-index">☝️ —</span>
-                <span class="finger" id="f-middle">🖕 —</span>
-                <span class="finger" id="f-ring">💍 —</span>
-                <span class="finger" id="f-pinky">🤙 —</span>
+                <span class="finger" id="f-thumb">THM &mdash;</span>
+                <span class="finger" id="f-index">IDX &mdash;</span>
+                <span class="finger" id="f-middle">MID &mdash;</span>
+                <span class="finger" id="f-ring">RNG &mdash;</span>
+                <span class="finger" id="f-pinky">PNK &mdash;</span>
             </div>
         </div>
 
+        <!-- Event Log -->
         <div class="panel-section">
-            <h3>Recent Events</h3>
+            <h3>Event Log</h3>
             <div id="event-log" class="event-log"></div>
         </div>
 
+        <!-- Controls -->
         <div class="panel-section controls">
             <h3>Controls</h3>
             <button id="btn-start" class="btn btn-primary" onclick="startCamera()">
-                🎥 Start Camera
+                Start Camera
             </button>
             <button id="btn-stop" class="btn btn-secondary" onclick="stopCamera()">
-                ⏹ Stop
+                Stop
             </button>
         </div>
     </aside>
 
-    <!-- ── Gesture Flash ────────────────────────────────────── -->
+    <!-- Gesture Flash (typewriter) -->
     <div id="gesture-flash" class="gesture-flash hidden"></div>
 
     <script src="/static/app.js"></script>
