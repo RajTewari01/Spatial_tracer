@@ -1,0 +1,23 @@
+# Ignore virtual environment
+vision_tracker/
+
+# Ignore Python cache
+__pycache__/
+*.pyc   
+
+# Ignore IDE files
+.vscode/
+.idea/
+
+# Ignore OS files
+.DS_Store
+Thumbs.db
+
+# Ignore build files
+dist/
+build/
+*.egg-info/
+
+# Ignore temporary files
+*.tmp
+*.log
