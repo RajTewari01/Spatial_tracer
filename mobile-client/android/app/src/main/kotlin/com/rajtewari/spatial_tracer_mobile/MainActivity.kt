@@ -8,6 +8,7 @@ import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
 import android.os.Build
 import android.util.Log
+import io.flutter.plugin.common.EventChannel
 
 class MainActivity : FlutterActivity() {
     private val CHANNEL = "com.rajtewari/hand_tracker"
@@ -49,6 +50,7 @@ class MainActivity : FlutterActivity() {
                     } else true
                     result.success(hasPerm)
                 }
+
                 "openAccessibilitySettings" -> {
                     val intent = Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)
                     startActivity(intent)
@@ -57,6 +59,20 @@ class MainActivity : FlutterActivity() {
                 else -> result.notImplemented()
             }
         }
+
+        // --- NEW: Register EventChannel for live gesture streaming to Flutter ---
+        EventChannel(flutterEngine.dartExecutor.binaryMessenger, "com.rajtewari/gesture_stream").setStreamHandler(
+            object : EventChannel.StreamHandler {
+                override fun onListen(arguments: Any?, events: EventChannel.EventSink?) {
+                    TrackerService.gestureEventSink = events
+                }
+
+                override fun onCancel(arguments: Any?) {
+                    TrackerService.gestureEventSink = null
+                }
+            }
+        )
+
     }
 }
 

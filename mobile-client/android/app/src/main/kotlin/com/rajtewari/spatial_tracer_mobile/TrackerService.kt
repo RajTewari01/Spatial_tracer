@@ -29,6 +29,8 @@ import java.util.concurrent.Executors
 import android.os.Handler
 import android.os.Looper
 import android.widget.Toast
+import io.flutter.embedding.engine.FlutterEngineCache
+import io.flutter.plugin.common.EventChannel
 
 class TrackerService : LifecycleService() {
 
@@ -40,6 +42,9 @@ class TrackerService : LifecycleService() {
         const val TAG = "TrackerService"
         const val NOTIFICATION_ID = 12345
         const val CHANNEL_ID = "SpatialTracerChannel"
+        
+        // EventSink for pushing live gestures to Flutter
+        var gestureEventSink: EventChannel.EventSink? = null
     }
 
     override fun onCreate() {
@@ -205,36 +210,45 @@ class TrackerService : LifecycleService() {
     private fun handleGestureAction(acc: SpatialAccessibilityService, gesture: String, lm: List<Map<String, Double>>, px: Float, py: Float) {
         val now = System.currentTimeMillis()
         
+        // Broadcast the active gesture state back to the Flutter UI layer
+        Handler(Looper.getMainLooper()).post {
+            gestureEventSink?.success(gesture)
+        }
+        
         when (gesture) {
             "POINTING" -> {
                 // Overlay updates automatically above
             }
-            "PINCH" -> {
+            "PEACE" -> {
                 if (now - lastActionTime > 500) {
                     val resources = resources
                     val displayMetrics = resources.displayMetrics
                     val sw = displayMetrics.widthPixels
                     val sh = displayMetrics.heightPixels
                     
+                    // PEACE -> Taps the screen at pointer location
                     acc.performTap(px, py, sw, sh)
+                    lastActionTime = now
+                }
+            }
+            "PINCH" -> {
+                if (now - lastActionTime > 1000) {
+                    // PINCH -> Goes Back
+                    acc.performBackAction()
                     lastActionTime = now
                 }
             }
             "FIST" -> {
                 if (now - lastActionTime > 1000) {
-                    acc.performBackAction()
-                    lastActionTime = now
-                }
-            }
-            "PEACE" -> {
-                if (now - lastActionTime > 1000) {
-                    acc.performHomeAction()
+                    // FIST -> Opens Recent Apps menu
+                    acc.performRecentsAction()
                     lastActionTime = now
                 }
             }
             "THREE" -> {
                 if (now - lastActionTime > 1000) {
-                    acc.performRecentsAction()
+                    // THREE fingers -> Go Home
+                    acc.performHomeAction()
                     lastActionTime = now
                 }
             }

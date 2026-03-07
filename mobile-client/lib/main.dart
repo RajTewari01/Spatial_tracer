@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -52,6 +53,7 @@ class GlassCard extends StatelessWidget {
   final double height;
   final double borderRadius;
   final EdgeInsetsGeometry padding;
+  final Color borderColor;
 
   const GlassCard({
     super.key,
@@ -60,6 +62,7 @@ class GlassCard extends StatelessWidget {
     this.height = double.infinity,
     this.borderRadius = 24.0,
     this.padding = const EdgeInsets.all(24.0),
+    this.borderColor = Colors.white10,
   });
 
   @override
@@ -76,7 +79,7 @@ class GlassCard extends StatelessWidget {
             color: Colors.white.withOpacity(0.05),
             borderRadius: BorderRadius.circular(borderRadius),
             border: Border.all(
-              color: Colors.white.withOpacity(0.1),
+              color: borderColor,
               width: 1.0,
             ),
           ),
@@ -88,7 +91,7 @@ class GlassCard extends StatelessWidget {
 }
 
 // ═══════════════════════════════════════════════════════════════
-//  ONBOARDING SCREEN
+//  INTERACTIVE ONBOARDING SCREEN
 // ═══════════════════════════════════════════════════════════════
 
 class OnboardingScreen extends StatefulWidget {
@@ -101,28 +104,97 @@ class OnboardingScreen extends StatefulWidget {
 class _OnboardingScreenState extends State<OnboardingScreen> {
   final PageController _pageController = PageController();
   int _currentPage = 0;
+  
+  static const _methodChannel = MethodChannel('com.rajtewari/hand_tracker');
+  static const _eventChannel = EventChannel('com.rajtewari/gesture_stream');
+  StreamSubscription? _gestureSubscription;
+
+  bool _isSuccessAnim = false;
 
   final List<Map<String, dynamic>> _pages = [
     {
-      'icon': Icons.back_hand_rounded,
-      'title': 'Spatial Control.\nUnbound.',
-      'subtitle': 'Navigate your entire OS with invisible air gestures. A premium devops approach to mobility.',
+      'icon': Icons.pan_tool_alt_rounded,
+      'title': 'Form a Pointer',
+      'subtitle': 'Hold up your index finger to control the physical pointer. Point your finger to the camera now to continue.',
+      'requiredGesture': 'POINTING',
+      'accent': const Color(0xFF0EA5E9),
     },
     {
-      'icon': Icons.pan_tool_alt_rounded,
-      'title': 'Precision Pointing',
-      'subtitle': 'Index finger to move the global cursor. Pinch to execute a perfect tap.',
+      'icon': Icons.back_hand_rounded,
+      'title': 'The Peace Tap',
+      'subtitle': 'A tap is triggered by making a Peace Sign. (Index & Middle). Tap the camera with a peace sign now.',
+      'requiredGesture': 'PEACE',
+      'accent': const Color(0xFF8B5CF6),
     },
     {
       'icon': Icons.swipe_rounded,
-      'title': 'System Navigation',
-      'subtitle': 'Closed fist to go Back. Peace sign for Home. Three fingers for Recents. Thumbs for scrolling.',
+      'title': 'System Control',
+      'subtitle': 'Form a closed FIST to view Recent Apps. Do it now to finish setup.',
+      'requiredGesture': 'FIST',
+      'accent': const Color(0xFF10B981),
     },
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    _startTrackerForOnboarding();
+  }
+
+  Future<void> _startTrackerForOnboarding() async {
+    try {
+      // Must have permissions to demonstrate the cursor
+      await _methodChannel.invokeMethod('startService');
+      
+      _gestureSubscription = _eventChannel.receiveBroadcastStream().listen((gesture) {
+        _handleLiveGesture(gesture.toString());
+      });
+    } catch (e) {
+      debugPrint("Onboarding Tracker Error: $e");
+    }
+  }
+
+  void _handleLiveGesture(String gesture) {
+    if (_isSuccessAnim) return; // Prevent double-triggers during transition
+
+    final requiredGesture = _pages[_currentPage]['requiredGesture'];
+    if (gesture == requiredGesture) {
+      _triggerSuccessAndAdvance();
+    }
+  }
+
+  Future<void> _triggerSuccessAndAdvance() async {
+    setState(() => _isSuccessAnim = true);
+    
+    // Smooth haptic success feedback (visual)
+    await Future.delayed(const Duration(milliseconds: 600));
+    
+    if (!mounted) return;
+    
+    if (_currentPage == _pages.length - 1) {
+      _completeOnboarding();
+    } else {
+      _pageController.nextPage(
+        duration: const Duration(milliseconds: 600),
+        curve: Curves.fastOutSlowIn,
+      );
+      setState(() {
+        _isSuccessAnim = false;
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _gestureSubscription?.cancel();
+    _pageController.dispose();
+    super.dispose();
+  }
 
   Future<void> _completeOnboarding() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('has_seen_onboarding', true);
+    // Tracker is already running, just transition
     if (!mounted) return;
     Navigator.of(context).pushReplacement(
       PageRouteBuilder(
@@ -178,6 +250,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 Expanded(
                   child: PageView.builder(
                     controller: _pageController,
+                    physics: const NeverScrollableScrollPhysics(), // Force them to do the gesture
                     onPageChanged: (idx) => setState(() => _currentPage = idx),
                     itemCount: _pages.length,
                     itemBuilder: (context, index) {
@@ -187,30 +260,40 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            GlassCard(
-                              width: 140,
-                              height: 140,
-                              padding: EdgeInsets.zero,
-                              borderRadius: 40,
-                              child: Center(
-                                child: Icon(page['icon'], size: 70, color: Colors.white),
+                            AnimatedContainer(
+                              duration: const Duration(milliseconds: 400),
+                              curve: Curves.easeOutBack,
+                              transform: _isSuccessAnim ? Matrix4.diagonal3Values(1.1, 1.1, 1.0) : Matrix4.identity(),
+                              child: GlassCard(
+                                width: 140,
+                                height: 140,
+                                padding: EdgeInsets.zero,
+                                borderRadius: 40,
+                                borderColor: _isSuccessAnim ? page['accent'] : Colors.white10,
+                                child: Center(
+                                  child: Icon(
+                                    _isSuccessAnim ? Icons.check_circle_rounded : page['icon'], 
+                                    size: 70, 
+                                    color: _isSuccessAnim ? page['accent'] : Colors.white
+                                  ),
+                                ),
                               ),
                             ),
                             const SizedBox(height: 60),
                             Text(
-                              page['title'],
+                              _isSuccessAnim ? "Perfect!" : page['title'],
                               textAlign: TextAlign.center,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 32,
                                 height: 1.2,
                                 fontWeight: FontWeight.w600,
                                 letterSpacing: -1,
-                                color: Colors.white,
+                                color: _isSuccessAnim ? page['accent'] : Colors.white,
                               ),
                             ),
                             const SizedBox(height: 20),
                             Text(
-                              page['subtitle'],
+                              _isSuccessAnim ? "Gesture Recognized" : page['subtitle'],
                               textAlign: TextAlign.center,
                               style: const TextStyle(
                                 fontSize: 16,
@@ -218,6 +301,21 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                 height: 1.5,
                               ),
                             ),
+                            
+                            const SizedBox(height: 40),
+                            if (!_isSuccessAnim)
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  const SizedBox(
+                                    width: 16,
+                                    height: 16,
+                                    child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white54),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Text("Awaiting gesture...", style: TextStyle(color: Colors.white54, fontStyle: FontStyle.italic)),
+                                ],
+                              )
                           ],
                         ),
                       );
@@ -227,51 +325,19 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 Padding(
                   padding: const EdgeInsets.only(bottom: 60.0, left: 40.0, right: 40.0),
                   child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Row(
-                        children: List.generate(_pages.length, (index) {
-                          return AnimatedContainer(
-                            duration: const Duration(milliseconds: 300),
-                            margin: const EdgeInsets.only(right: 8),
-                            height: 6,
-                            width: _currentPage == index ? 24 : 6,
-                            decoration: BoxDecoration(
-                              color: _currentPage == index ? Colors.white : Colors.white24,
-                              borderRadius: BorderRadius.circular(3),
-                            ),
-                          );
-                        }),
-                      ),
-                      GestureDetector(
-                        onTap: () {
-                          if (_currentPage == _pages.length - 1) {
-                            _completeOnboarding();
-                          } else {
-                            _pageController.nextPage(
-                              duration: const Duration(milliseconds: 400),
-                              curve: Curves.easeInOut,
-                            );
-                          }
-                        },
-                        child: GlassCard(
-                          width: 120,
-                          height: 56,
-                          borderRadius: 28,
-                          padding: EdgeInsets.zero,
-                          child: Center(
-                            child: Text(
-                              _currentPage == _pages.length - 1 ? "Start" : "Next",
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ),
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: List.generate(_pages.length, (index) {
+                      return AnimatedContainer(
+                        duration: const Duration(milliseconds: 300),
+                        margin: const EdgeInsets.symmetric(horizontal: 4),
+                        height: 6,
+                        width: _currentPage == index ? 24 : 6,
+                        decoration: BoxDecoration(
+                          color: _currentPage == index ? Colors.white : Colors.white24,
+                          borderRadius: BorderRadius.circular(3),
                         ),
-                      )
-                    ],
+                      );
+                    }),
                   ),
                 )
               ],
@@ -284,7 +350,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 }
 
 // ═══════════════════════════════════════════════════════════════
-//  DASHBOARD SCREEN (Apple + Linux)
+//  DASHBOARD SCREEN (Apple + Linux Sidebar Hub)
 // ═══════════════════════════════════════════════════════════════
 
 class DashboardScreen extends StatefulWidget {
@@ -295,7 +361,7 @@ class DashboardScreen extends StatefulWidget {
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
-  static const _channel = MethodChannel('com.rajtewari/hand_tracker');
+  static const _methodChannel = MethodChannel('com.rajtewari/hand_tracker');
   bool _isActive = false;
   final List<String> _terminalLogs = [];
   Timer? _cursorBlinkTimer;
@@ -331,14 +397,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
     try {
       if (_isActive) {
         _addLog("Sending SIGTERM to tracker process...");
-        await _channel.invokeMethod('stopService');
+        await _methodChannel.invokeMethod('stopService');
         setState(() => _isActive = false);
         _addLog("Service stopped successfully. (exit 0)");
       } else {
         _addLog("Verifying overlay & accessibility permissions...");
         
         // Let the Android code request permissions if needed.
-        await _channel.invokeMethod('startService');
+        await _methodChannel.invokeMethod('startService');
         setState(() => _isActive = true);
         _addLog("Process forked. Tracker daemon running...");
         _addLog("Global Cursor Overlay initialized.");
@@ -352,9 +418,119 @@ class _DashboardScreenState extends State<DashboardScreen> {
     }
   }
 
+  // Links for Sidebar Profile
+  Future<void> _launchURL(String urlString) async {
+    final Uri url = Uri.parse(urlString);
+    if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
+      _addLog("ERR: Unable to open intent $urlString");
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        iconTheme: const IconThemeData(color: Colors.white),
+        title: const Text(
+          "Spatial Tracer",
+          style: TextStyle(fontWeight: FontWeight.w700, letterSpacing: -1, color: Colors.white),
+        ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.settings_accessibility_rounded, color: Colors.white54),
+            onPressed: () {
+              _methodChannel.invokeMethod('openAccessibilitySettings');
+              _addLog("Opened Accessibility settings intent.");
+            },
+          )
+        ],
+      ),
+      drawer: Drawer(
+        backgroundColor: const Color(0xFF09090B).withOpacity(0.95),
+        surfaceTintColor: Colors.transparent,
+        child: SafeArea(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // Beautiful Sidebar Profile Header
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      width: 80,
+                      height: 80,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(color: const Color(0xFF34D399), width: 2),
+                        image: const DecorationImage(
+                          image: AssetImage("assets/images/app_icon.png"), // Generated icon
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    const Text(
+                      "Biswadeep Tewari",
+                      style: TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.white,
+                        letterSpacing: -0.5,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    const Text(
+                      "Full-Stack Engineer\nAI/ML Architect\nMobile Developer",
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Color(0xFFA1A1AA),
+                        height: 1.4,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    const Text(
+                      "build → ship → learn → repeat",
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: Color(0xFF38BDF8),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const Divider(color: Colors.white10, height: 1),
+              const SizedBox(height: 16),
+              
+              // External Links
+              ListTile(
+                leading: const Icon(Icons.code_rounded, color: Colors.white70),
+                title: const Text("GitHub Project"),
+                subtitle: const Text("RajTewari01/Spatial_tracer", style: TextStyle(fontSize: 12)),
+                onTap: () => _launchURL("https://github.com/RajTewari01/Spatial_tracer"),
+              ),
+              ListTile(
+                leading: const Icon(Icons.email_rounded, color: Colors.white70),
+                title: const Text("Contact Support"),
+                subtitle: const Text("tewari765@gmail.com", style: TextStyle(fontSize: 12)),
+                onTap: () => _launchURL("mailto:tewari765@gmail.com"),
+              ),
+              const Spacer(),
+              const Padding(
+                padding: EdgeInsets.all(24.0),
+                child: Text(
+                  "Spatial_Tracer Core v1.0\nLinux Engine Hooked",
+                  style: TextStyle(color: Colors.white38, fontSize: 11, fontFamily: 'monospace'),
+                ),
+              )
+            ],
+          ),
+        ),
+      ),
       body: Stack(
         children: [
           // Sleek ambient background
@@ -383,203 +559,128 @@ class _DashboardScreenState extends State<DashboardScreen> {
             ).blurred(120),
           ),
 
-          SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
-              child: Column(
-                children: [
-                  // App Header
-                  const Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "Spatial Tracer",
-                        style: TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.w700,
-                          letterSpacing: -1,
-                          color: Colors.white,
-                        ),
-                      ),
-                      Icon(Icons.radar_rounded, color: Colors.white54),
-                    ],
-                  ),
-                  const SizedBox(height: 32),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
+            child: Column(
+              children: [
+                const Spacer(),
 
-                  // Prominent User Profile Card (Glassmorphism)
-                  GlassCard(
-                    height: 120,
-                    padding: const EdgeInsets.all(20),
-                    child: Row(
-                      children: [
-                        Container(
-                          width: 64,
-                          height: 64,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            border: Border.all(color: Colors.white24, width: 2),
-                            image: const DecorationImage(
-                              image: AssetImage("assets/images/profile.png"), // Uses the generated cover image
-                              fit: BoxFit.cover,
-                            ),
+                // Apple-like Glowing Engine Toggle
+                GestureDetector(
+                  onTap: _toggleService,
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 400),
+                    curve: Curves.fastOutSlowIn,
+                    width: 220,
+                    height: 220,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: _isActive 
+                        ? Colors.white.withOpacity(0.1) 
+                        : Colors.black.withOpacity(0.3),
+                      border: Border.all(
+                        color: _isActive 
+                          ? const Color(0xFF34D399) 
+                          : Colors.white.withOpacity(0.1),
+                        width: _isActive ? 4 : 1,
+                      ),
+                      boxShadow: [
+                        if (_isActive)
+                          BoxShadow(
+                            color: const Color(0xFF34D399).withOpacity(0.3),
+                            blurRadius: 50,
+                            spreadRadius: 15,
                           ),
-                        ),
-                        const SizedBox(width: 16),
-                        const Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                "Biswadeep Tewari",
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.white,
-                                ),
-                              ),
-                              SizedBox(height: 4),
-                              Text(
-                                "AI/ML Architect & Devops",
-                                style: TextStyle(
-                                  fontSize: 13,
-                                  color: Color(0xFFA1A1AA),
-                                ),
-                              ),
-                              SizedBox(height: 8),
-                              Text(
-                                "build → ship → learn → repeat",
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w500,
-                                  color: Color(0xFF38BDF8),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
+                        if (!_isActive)
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.6),
+                            blurRadius: 30,
+                            spreadRadius: 8,
+                          )
                       ],
                     ),
-                  ),
-
-                  const Spacer(),
-
-                  // Apple-like Glowing Engine Toggle
-                  GestureDetector(
-                    onTap: _toggleService,
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 400),
-                      curve: Curves.fastOutSlowIn,
-                      width: 200,
-                      height: 200,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: _isActive 
-                          ? Colors.white.withOpacity(0.1) 
-                          : Colors.black.withOpacity(0.3),
-                        border: Border.all(
-                          color: _isActive 
-                            ? const Color(0xFF34D399) 
-                            : Colors.white.withOpacity(0.1),
-                          width: _isActive ? 4 : 1,
-                        ),
-                        boxShadow: [
-                          if (_isActive)
-                            BoxShadow(
-                              color: const Color(0xFF34D399).withOpacity(0.3),
-                              blurRadius: 40,
-                              spreadRadius: 10,
-                            ),
-                          if (!_isActive)
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.5),
-                              blurRadius: 20,
-                              spreadRadius: 5,
-                            )
-                        ],
-                      ),
-                      child: Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              _isActive ? Icons.power_rounded : Icons.power_settings_new_rounded,
-                              size: 48,
+                    child: Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            _isActive ? Icons.power_rounded : Icons.power_settings_new_rounded,
+                            size: 64,
+                            color: _isActive ? const Color(0xFF34D399) : Colors.white54,
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            _isActive ? "DAEMON UP" : "STANDBY",
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 2,
                               color: _isActive ? const Color(0xFF34D399) : Colors.white54,
                             ),
-                            const SizedBox(height: 12),
-                            Text(
-                              _isActive ? "ACTIVE" : "STANDBY",
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w700,
-                                letterSpacing: 2,
-                                color: _isActive ? const Color(0xFF34D399) : Colors.white54,
-                              ),
-                            ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
+                ),
 
-                  const Spacer(),
+                const Spacer(),
 
-                  // Linux Commanding Terminal Bottom Panel
-                  GlassCard(
-                    height: 200,
-                    borderRadius: 16,
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        const Row(
-                          children: [
-                            Icon(Icons.terminal_rounded, size: 16, color: Colors.white54),
-                            SizedBox(width: 8),
-                            Text(
-                              "tty1 - system logs",
-                              style: TextStyle(fontSize: 12, color: Colors.white54, fontFamily: 'monospace'),
-                            ),
-                          ],
-                        ),
-                        const Padding(
-                          padding: EdgeInsets.symmetric(vertical: 8.0),
-                          child: Divider(color: Colors.white10, height: 1),
-                        ),
-                        Expanded(
-                          child: ListView.builder(
-                            physics: const NeverScrollableScrollPhysics(),
-                            itemCount: _terminalLogs.length + 1,
-                            itemBuilder: (context, index) {
-                              if (index == _terminalLogs.length) {
-                                return Text(
-                                  "root@tracer:~# " + (_showCursor ? "_" : ""),
-                                  style: const TextStyle(
-                                    fontFamily: 'monospace',
-                                    fontSize: 12,
-                                    color: Color(0xFF34D399),
-                                    height: 1.5,
-                                  ),
-                                );
-                              }
+                // Linux Commanding Terminal Bottom Panel
+                GlassCard(
+                  height: 240,
+                  borderRadius: 16,
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      const Row(
+                        children: [
+                          Icon(Icons.terminal_rounded, size: 16, color: Colors.white54),
+                          SizedBox(width: 8),
+                          Text(
+                            "tty1 - OS event trace",
+                            style: TextStyle(fontSize: 12, color: Colors.white54, fontFamily: 'monospace'),
+                          ),
+                        ],
+                      ),
+                      const Padding(
+                        padding: EdgeInsets.symmetric(vertical: 8.0),
+                        child: Divider(color: Colors.white10, height: 1),
+                      ),
+                      Expanded(
+                        child: ListView.builder(
+                          physics: const BouncingScrollPhysics(),
+                          itemCount: _terminalLogs.length + 1,
+                          itemBuilder: (context, index) {
+                            if (index == _terminalLogs.length) {
                               return Text(
-                                _terminalLogs[index],
+                                "root@tracer:~# " + (_showCursor ? "_" : ""),
                                 style: const TextStyle(
                                   fontFamily: 'monospace',
                                   fontSize: 12,
-                                  color: Color(0xFFA1A1AA),
+                                  color: Color(0xFF34D399),
                                   height: 1.5,
                                 ),
                               );
-                            },
-                          ),
+                            }
+                            return Text(
+                              _terminalLogs[index],
+                              style: const TextStyle(
+                                fontFamily: 'monospace',
+                                fontSize: 12,
+                                color: Color(0xFFA1A1AA),
+                                height: 1.5,
+                              ),
+                            );
+                          },
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
-                ],
-              ),
+                ),
+                const SizedBox(height: 16),
+              ],
             ),
           ),
         ],

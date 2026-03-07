@@ -76,22 +76,27 @@ class CursorOverlay(context: Context) {
                 return
             }
 
-            // Map 0-1 to actual screen px
+            // ---------------------------------------------------------
+            // REDESIGNED PROFESSIONAL CORSOR OVERLAY
+            // ---------------------------------------------------------
             val px = Math.max(0f, Math.min(1f, nX)) * width
             val py = Math.max(0f, Math.min(1f, nY)) * height
 
-            val isPinch = currentGesture == "PINCH"
+            val isTap = currentGesture == "PEACE"
             
-            // Draw outer glow or click indicator
-            if (isPinch) {
-                highlightPaint.color = Color.parseColor("#dc2626") // Red on pinch
-                canvas.drawCircle(px, py, 60f, highlightPaint)
-                canvas.drawCircle(px, py, 25f, cursorPaint)
-            } else {
-                highlightPaint.color = Color.parseColor("#7c6aff") // Purple glow
-                canvas.drawCircle(px, py, 40f, highlightPaint)
-                canvas.drawCircle(px, py, 15f, cursorPaint)
-            }
+            // Outer semi-transparent ring for visibility
+            highlightPaint.color = Color.parseColor("#1c1917") // Dark border
+            highlightPaint.alpha = 150
+            canvas.drawCircle(px, py, if (isTap) 30f else 24f, highlightPaint)
+            
+            // Sleek inner cursor (white standard, electric blue on tap)
+            cursorPaint.color = if (isTap) Color.parseColor("#0ea5e9") else Color.WHITE
+            canvas.drawCircle(px, py, if (isTap) 22f else 18f, cursorPaint)
+            
+            // Precise minimal dot
+            highlightPaint.color = Color.BLACK
+            highlightPaint.alpha = 255
+            canvas.drawCircle(px, py, 4f, highlightPaint)
         }
     }
 }
