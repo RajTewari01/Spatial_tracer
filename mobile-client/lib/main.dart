@@ -7,6 +7,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'theme.dart';
+import 'screens/creator_profile.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -486,52 +487,64 @@ class _DashboardScreenState extends State<DashboardScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               // Beautiful Sidebar Profile Header
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      width: 80,
-                      height: 80,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(color: const Color(0xFF34D399).withOpacity(0.3), blurRadius: 20, spreadRadius: 2)
-                        ],
-                        border: Border.all(color: const Color(0xFF34D399), width: 2),
+              InkWell(
+                onTap: () {
+                  Navigator.pop(context); // close drawer
+                  Navigator.push(
+                    context, 
+                    MaterialPageRoute(builder: (_) => const CreatorProfileScreen())
+                  );
+                },
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Hero(
+                        tag: 'creator_avatar',
+                        child: Container(
+                          width: 80,
+                          height: 80,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            boxShadow: [
+                              BoxShadow(color: const Color(0xFF34D399).withOpacity(0.3), blurRadius: 20, spreadRadius: 2)
+                            ],
+                            border: Border.all(color: const Color(0xFF34D399), width: 2),
+                          ),
+                          child: ClipOval(
+                            child: Image.asset("assets/images/app_icon.png", fit: BoxFit.cover),
+                          ),
+                        ),
                       ),
-                      child: ClipOval(
-                        child: Image.asset("assets/images/app_icon.png", fit: BoxFit.cover),
+                      const SizedBox(height: 16),
+                      Text(
+                        "Biswadeep Tewari",
+                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                          fontSize: 22,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: -0.5,
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      "Biswadeep Tewari",
-                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                        fontSize: 22,
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: -0.5,
+                      const SizedBox(height: 4),
+                      Text(
+                        "Full-Stack Engineer\nAI/ML Architect\nMobile Developer",
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          fontSize: 14,
+                          height: 1.4,
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      "Full-Stack Engineer\nAI/ML Architect\nMobile Developer",
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        fontSize: 14,
-                        height: 1.4,
+                      const SizedBox(height: 12),
+                      const Text(
+                        "build → ship → learn → repeat",
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xFF58A6FF),
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 12),
-                    const Text(
-                      "build → ship → learn → repeat",
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                        color: Color(0xFF58A6FF),
-                      ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
               const Divider(color: Colors.white10, height: 1),

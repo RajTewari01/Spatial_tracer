@@ -32,6 +32,8 @@ import android.widget.Toast
 import io.flutter.embedding.engine.FlutterEngineCache
 import io.flutter.plugin.common.EventChannel
 
+import android.content.pm.ServiceInfo
+
 class TrackerService : LifecycleService() {
 
     private lateinit var cameraExecutor: ExecutorService
@@ -51,7 +53,12 @@ class TrackerService : LifecycleService() {
         super.onCreate()
         cameraExecutor = Executors.newSingleThreadExecutor()
         createNotificationChannel()
-        startForeground(NOTIFICATION_ID, buildNotification())
+        
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            startForeground(NOTIFICATION_ID, buildNotification(), ServiceInfo.FOREGROUND_SERVICE_TYPE_CAMERA)
+        } else {
+            startForeground(NOTIFICATION_ID, buildNotification())
+        }
         
         cursorOverlay = CursorOverlay(this)
         cursorOverlay?.show()
