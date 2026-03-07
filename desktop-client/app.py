@@ -559,6 +559,19 @@ class OverlayWindow(QMainWindow):
                 }
             ''')
 
+        # Forward finger position to keyboard if open
+        if self._keyboard_window and self._keyboard_window.isVisible():
+            kb = self._keyboard_window.centralWidget()
+            if hands and kb:
+                # Use index fingertip (landmark 8) normalized position
+                lms = hands[0].get('landmarks', [])
+                if len(lms) > 8:
+                    fx = lms[8]['x']
+                    fy = lms[8]['y']
+                    kb.highlight_at_position(fx, fy)
+            elif kb:
+                kb.clear_cursor()
+
     # ── Camera minimize ──────────────────────────────────────────
     def _toggle_camera_minimize(self):
         self._camera_minimized = not self._camera_minimized

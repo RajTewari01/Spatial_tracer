@@ -1,16 +1,20 @@
 '''
 virtual_keyboard.py
 >>> PyQt5 virtual QWERTY keyboard widget.
-    - Full keyboard layout with modifier support
+    - Premium glassmorphic design
     - Gesture-driven key highlighting and activation
+    - Finger cursor overlay for visual feedback
     - Emits keyTapped signal when a key is hit
 '''
 
 from PyQt5.QtWidgets import (
     QWidget, QGridLayout, QPushButton, QSizePolicy, QVBoxLayout
 )
-from PyQt5.QtCore import pyqtSignal, Qt, QSize, QPoint, QPropertyAnimation, QEasingCurve
-from PyQt5.QtGui import QFont, QColor, QPalette
+from PyQt5.QtCore import pyqtSignal, Qt, QSize, QPoint, QTimer, QRectF
+from PyQt5.QtGui import (
+    QFont, QColor, QPalette, QPainter, QPen, QBrush,
+    QRadialGradient, QLinearGradient, QPainterPath
+)
 
 
 # ── Key layout definition ───────────────────────────────────────
@@ -60,29 +64,34 @@ class KeyButton(QPushButton):
         self._setup_style()
 
     def _setup_style(self):
-        base_font_size = 11 if len(self.key_label) <= 2 else 9
+        base_font_size = 10 if len(self.key_label) <= 2 else 8
+        mod_bg = "rgba(60,40,120,0.5)" if self._is_modifier else "rgba(30,28,50,0.7)"
         self._default_style = f"""
             QPushButton {{
-                background-color: #2a2a3e;
-                color: #e0e0e0;
-                border: 1px solid #3a3a5c;
-                border-radius: 6px;
-                padding: 8px 4px;
-                font-family: 'Segoe UI', 'Inter', sans-serif;
+                background-color: {mod_bg};
+                color: rgba(220,215,245,0.9);
+                border: 1px solid rgba(124,106,255,0.12);
+                border-bottom: 2px solid rgba(0,0,0,0.4);
+                border-radius: 5px;
+                padding: 4px 2px;
+                font-family: 'JetBrains Mono', 'Segoe UI', monospace;
                 font-size: {base_font_size}pt;
                 font-weight: 500;
+                letter-spacing: 0.5px;
             }}
             QPushButton:hover {{
-                background-color: #3a3a5c;
-                border-color: #6c63ff;
+                background-color: rgba(124,106,255,0.18);
+                border-color: rgba(124,106,255,0.35);
+                color: white;
             }}
             QPushButton:pressed {{
-                background-color: #6c63ff;
+                background-color: rgba(124,106,255,0.55);
                 color: white;
+                border-bottom: 1px solid rgba(0,0,0,0.2);
             }}
         """
         self.setStyleSheet(self._default_style)
-        self.setMinimumHeight(44)
+        self.setMinimumHeight(36)
         self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         self.setCursor(Qt.PointingHandCursor)
 
@@ -91,16 +100,18 @@ class KeyButton(QPushButton):
         if highlighted == self._is_highlighted:
             return
         self._is_highlighted = highlighted
+        sz = 10 if len(self.key_label) <= 2 else 8
         if highlighted:
             self.setStyleSheet(f"""
                 QPushButton {{
-                    background-color: #6c63ff;
+                    background-color: rgba(124,106,255,0.45);
                     color: white;
-                    border: 2px solid #8b83ff;
-                    border-radius: 6px;
-                    padding: 8px 4px;
-                    font-family: 'Segoe UI', 'Inter', sans-serif;
-                    font-size: {11 if len(self.key_label) <= 2 else 9}pt;
+                    border: 1px solid rgba(139,131,255,0.6);
+                    border-bottom: 2px solid rgba(124,106,255,0.3);
+                    border-radius: 5px;
+                    padding: 4px 2px;
+                    font-family: 'JetBrains Mono', 'Segoe UI', monospace;
+                    font-size: {sz}pt;
                     font-weight: 700;
                 }}
             """)
@@ -110,16 +121,18 @@ class KeyButton(QPushButton):
     def set_active(self, active: bool):
         """Toggle modifier active state."""
         self._is_active = active
+        sz = 10 if len(self.key_label) <= 2 else 8
         if active:
             self.setStyleSheet(f"""
                 QPushButton {{
-                    background-color: #ff6b6b;
+                    background-color: rgba(255,107,107,0.5);
                     color: white;
-                    border: 2px solid #ff8787;
-                    border-radius: 6px;
-                    padding: 8px 4px;
-                    font-family: 'Segoe UI', 'Inter', sans-serif;
-                    font-size: {11 if len(self.key_label) <= 2 else 9}pt;
+                    border: 1px solid rgba(255,135,135,0.5);
+                    border-bottom: 2px solid rgba(200,50,50,0.3);
+                    border-radius: 5px;
+                    padding: 4px 2px;
+                    font-family: 'JetBrains Mono', 'Segoe UI', monospace;
+                    font-size: {sz}pt;
                     font-weight: 700;
                 }}
             """)
@@ -128,26 +141,27 @@ class KeyButton(QPushButton):
 
     def flash_pressed(self):
         """Brief flash effect when key is tapped by gesture."""
+        sz = 10 if len(self.key_label) <= 2 else 8
         self.setStyleSheet(f"""
             QPushButton {{
-                background-color: #00e676;
-                color: #1a1a2e;
-                border: 2px solid #69f0ae;
-                border-radius: 6px;
-                padding: 8px 4px;
-                font-family: 'Segoe UI', 'Inter', sans-serif;
-                font-size: {11 if len(self.key_label) <= 2 else 9}pt;
+                background-color: rgba(52,211,153,0.6);
+                color: #0a0a14;
+                border: 1px solid rgba(105,240,174,0.5);
+                border-bottom: 2px solid rgba(30,150,100,0.3);
+                border-radius: 5px;
+                padding: 4px 2px;
+                font-family: 'JetBrains Mono', 'Segoe UI', monospace;
+                font-size: {sz}pt;
                 font-weight: 700;
             }}
         """)
-        from PyQt5.QtCore import QTimer
         QTimer.singleShot(200, lambda: self.setStyleSheet(self._default_style))
 
 
 class VirtualKeyboard(QWidget):
     """
-    Full QWERTY virtual keyboard widget.
-    
+    Full QWERTY virtual keyboard widget with finger cursor overlay.
+
     Signals:
         keyTapped(str) — emitted when a key is activated (by click or gesture).
     """
@@ -158,16 +172,17 @@ class VirtualKeyboard(QWidget):
         super().__init__(parent)
         self._buttons: dict[str, list[KeyButton]] = {}
         self._all_buttons: list[KeyButton] = []
+        self._cursor_pos = None  # (norm_x, norm_y) for finger cursor
         self._setup_ui()
 
     def _setup_ui(self):
         layout = QVBoxLayout(self)
-        layout.setSpacing(4)
-        layout.setContentsMargins(8, 8, 8, 8)
+        layout.setSpacing(3)
+        layout.setContentsMargins(10, 10, 10, 10)
 
         for row_data in KEYBOARD_ROWS:
             row_layout = QGridLayout()
-            row_layout.setSpacing(4)
+            row_layout.setSpacing(3)
             col = 0
             for label, span in row_data:
                 btn = KeyButton(label)
@@ -187,8 +202,11 @@ class VirtualKeyboard(QWidget):
 
         self.setStyleSheet("""
             QWidget {
-                background-color: #1a1a2e;
+                background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                    stop:0 rgba(12,10,25,240),
+                    stop:1 rgba(8,6,18,250));
                 border-radius: 12px;
+                border: 1px solid rgba(124,106,255,0.08);
             }
         """)
 
@@ -203,11 +221,51 @@ class VirtualKeyboard(QWidget):
         for btn in buttons:
             btn.flash_pressed()
 
+    def set_cursor(self, norm_x: float, norm_y: float):
+        """Set the finger cursor position (0-1 normalized) and repaint."""
+        self._cursor_pos = (norm_x, norm_y)
+        self.update()
+
+    def clear_cursor(self):
+        """Remove the finger cursor."""
+        self._cursor_pos = None
+        self.update()
+
+    def paintEvent(self, event):
+        """Draw the finger cursor overlay on top of keys."""
+        super().paintEvent(event)
+        if self._cursor_pos is None:
+            return
+
+        p = QPainter(self)
+        p.setRenderHint(QPainter.Antialiasing)
+
+        cx = int(self._cursor_pos[0] * self.width())
+        cy = int(self._cursor_pos[1] * self.height())
+
+        # Outer glow
+        grad = QRadialGradient(cx, cy, 18)
+        grad.setColorAt(0, QColor(124, 106, 255, 100))
+        grad.setColorAt(0.5, QColor(124, 106, 255, 30))
+        grad.setColorAt(1, QColor(124, 106, 255, 0))
+        p.setBrush(QBrush(grad))
+        p.setPen(Qt.NoPen)
+        p.drawEllipse(cx - 18, cy - 18, 36, 36)
+
+        # Inner dot
+        p.setBrush(QColor(52, 211, 153, 220))
+        p.setPen(QPen(QColor(255, 255, 255, 150), 1.5))
+        p.drawEllipse(cx - 5, cy - 5, 10, 10)
+
+        p.end()
+
     def highlight_at_position(self, norm_x: float, norm_y: float) -> str | None:
         """
         Highlight the key under the given normalized position (0-1).
         Returns the key label if a key is found, else None.
         """
+        self.set_cursor(norm_x, norm_y)
+
         # Clear all highlights
         for btn in self._all_buttons:
             btn.set_highlighted(False)
@@ -220,7 +278,6 @@ class VirtualKeyboard(QWidget):
         # Find the button at this position
         for btn in self._all_buttons:
             btn_rect = btn.geometry()
-            # Map to parent coordinates
             parent = btn.parentWidget()
             if parent:
                 mapped = parent.mapTo(self, btn_rect.topLeft())
