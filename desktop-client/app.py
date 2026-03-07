@@ -64,7 +64,7 @@ class TrackingThread(QThread):
         self._running = False
         self._tracker = HeadlessHandTracker(
             width=640, height=480,
-            max_hands=1,
+            max_hands=2,
             detection_confidence=0.5,
             tracking_confidence=0.5,
         )
@@ -101,7 +101,7 @@ class TrackingThread(QThread):
         options = HandLandmarkerOptions(
             base_options=BaseOptions(model_asset_path=model_path),
             running_mode=RunningMode.VIDEO,
-            num_hands=1,
+            num_hands=2,
             min_hand_detection_confidence=0.5,
             min_tracking_confidence=0.5,
         )
@@ -322,6 +322,9 @@ class OverlayWindow(QMainWindow):
         self._keyboard_window = None
         self._keyboard_mode = False
         self._last_kb_tap = 0.0
+        self._hold_key = None
+        self._hold_start = 0.0
+        self._active_modifiers = set()
 
         # UI
         self._setup_ui()
@@ -561,32 +564,105 @@ class OverlayWindow(QMainWindow):
                 }
             ''')
 
-        # Forward finger position to keyboard if open & in keyboard mode
+        # ── Two-hand keyboard mode ────────────────────────────────
         if (self._keyboard_mode and self._keyboard_window 
                 and self._keyboard_window.isVisible()):
             kb = self._keyboard_window.centralWidget()
-            if hands and kb:
-                lms = hands[0].get('landmarks', [])
-                if len(lms) > 8:
-                    # PEACE (index+middle up) → move cursor on keyboard
-                    if gesture in ('PEACE', 'POINTING'):
-                        # Use index fingertip for position
-                        fx = lms[8]['x']
-                        fy = lms[8]['y']
-                        kb.highlight_at_position(fx, fy)
-                    
-                    # PINCH → tap the hovered key
-                    if gesture == 'PINCH':
-                        import time as _time
-                        now = _time.time()
-                        if now - self._last_kb_tap > 0.5:  # cooldown
-                            fx = (lms[4]['x'] + lms[8]['x']) / 2
-                            fy = (lms[4]['y'] + lms[8]['y']) / 2
-                            tapped = kb.tap_at_position(fx, fy)
-                            if tapped:
-                                self._last_kb_tap = now
-            elif kb:
-                kb.clear_cursor()
+            if not hands or not kb:
+                if kb:
+                    kb.clear_cursor()
+                self._hold_key = None
+                self._hold_start = 0
+                return
+
+            import time as _time
+            import math
+            now = _time.time()
+            driver = self._tracker_thread._driver
+
+            # Detect gesture for each hand
+            hand_gestures = []
+            for h in hands:
+                lms = h.get('landmarks', [])
+                if len(lms) >= 21:
+                    g = driver._detect_gesture(lms)
+                    hand_gestures.append((g, lms))
+
+            # Find active modifiers from any hand doing PEACE on modifier keys
+            active_modifiers = set()
+            # Check which modifiers are being held (highlighted buttons with modifier labels)
+            for btn in kb._all_buttons:
+                if btn._is_active:
+                    active_modifiers.add(btn.key_label)
+
+            # Process each hand
+            pinch_hand = None
+            for i, (g, lms) in enumerate(hand_gestures):
+                if g in ('PEACE', 'POINTING'):
+                    fx = lms[8]['x']
+                    fy = lms[8]['y']
+                    hovered = kb.highlight_at_position(fx, fy)
+
+                    # If hovering a modifier, activate it visually
+                    if hovered in ('SHIFT', 'SHFT', 'CTRL', 'ALT', 'WIN', 'CAPS'):
+                        for btn_list in kb._buttons.get(hovered, []):
+                            btn_list.set_active(True)
+                        active_modifiers.add(hovered)
+
+                elif g == 'PINCH':
+                    pinch_hand = (i, lms)
+
+            self._active_modifiers = active_modifiers
+
+            # Handle pinch → tap key
+            if pinch_hand:
+                idx, lms = pinch_hand
+                fx = (lms[4]['x'] + lms[8]['x']) / 2
+                fy = (lms[4]['y'] + lms[8]['y']) / 2
+                current_hover = kb.get_key_at_position(fx, fy)
+
+                if now - self._last_kb_tap > 0.4:
+                    tapped = kb.tap_at_position(fx, fy)
+                    if tapped:
+                        self._last_kb_tap = now
+
+                        # Long-press tracking for DEL/BACK
+                        if tapped in ('DEL', 'BACK'):
+                            if self._hold_key == tapped:
+                                # Same key held
+                                if now - self._hold_start >= 4.0:
+                                    # 4 seconds → select all + delete
+                                    self._do_select_all_delete()
+                                    self._hold_key = None
+                                    self._hold_start = 0
+                            else:
+                                self._hold_key = tapped
+                                self._hold_start = now
+                        else:
+                            self._hold_key = None
+                            self._hold_start = 0
+                else:
+                    # Still pinching on cooldown, check long press
+                    # Ensure they are still hovering the hold_key
+                    if self._hold_key and current_hover == self._hold_key:
+                        if self._hold_key in ('DEL', 'BACK') and self._hold_start > 0:
+                            if now - self._hold_start >= 4.0:
+                                self._do_select_all_delete()
+                                self._hold_key = None
+                                self._hold_start = 0
+                    else:
+                        # Hand moved off the key while pinching, cancel hold
+                        self._hold_key = None
+                        self._hold_start = 0
+            else:
+                # Not pinching, reset hold
+                self._hold_key = None
+                self._hold_start = 0
+
+            # Clear modifier visuals at end of frame
+            for btn in kb._all_buttons:
+                if btn._is_modifier and not btn._is_highlighted:
+                    btn.set_active(False)
 
     # ── Camera minimize ──────────────────────────────────────────
     def _toggle_camera_minimize(self):
@@ -633,24 +709,59 @@ class OverlayWindow(QMainWindow):
         self._tracker_thread._driver.paused = self._keyboard_mode
 
     def _on_key_typed(self, label: str):
-        """Send the tapped key label as an actual OS keystroke."""
+        """Send the tapped key label as an actual OS keystroke, with modifier support."""
         from pynput.keyboard import Controller as KbdCtrl, Key
         kbd = KbdCtrl()
 
-        # Map special key labels to pynput keys
         SPECIAL = {
             'SPACE': Key.space, 'ENTER': Key.enter, 'BACK': Key.backspace,
-            'TAB': Key.tab, 'CAPS': Key.caps_lock,
+            'DEL': Key.delete, 'TAB': Key.tab, 'CAPS': Key.caps_lock,
             'SHIFT': Key.shift, 'SHFT': Key.shift,
             'CTRL': Key.ctrl, 'ALT': Key.alt, 'WIN': Key.cmd,
             '^': Key.up, 'v': Key.down, '<': Key.left, '>': Key.right,
         }
 
+        # Don't type modifiers themselves as standalone keys
+        if label in ('SHIFT', 'SHFT', 'CTRL', 'ALT', 'WIN', 'CAPS'):
+            return
+
+        # Build modifier list from active modifiers
+        mod_keys = []
+        MOD_MAP = {
+            'SHIFT': Key.shift, 'SHFT': Key.shift,
+            'CTRL': Key.ctrl, 'ALT': Key.alt, 'WIN': Key.cmd,
+        }
+        for m in self._active_modifiers:
+            if m in MOD_MAP:
+                mod_keys.append(MOD_MAP[m])
+
+        # Press modifiers
+        for mk in mod_keys:
+            kbd.press(mk)
+
+        # Type the key
         if label in SPECIAL:
             kbd.press(SPECIAL[label])
             kbd.release(SPECIAL[label])
         elif len(label) == 1:
             kbd.type(label)
+
+        # Release modifiers
+        for mk in mod_keys:
+            kbd.release(mk)
+
+    def _do_select_all_delete(self):
+        """Ctrl+A then Delete — clear all text."""
+        from pynput.keyboard import Controller as KbdCtrl, Key
+        kbd = KbdCtrl()
+        kbd.press(Key.ctrl)
+        kbd.press('a')
+        kbd.release('a')
+        kbd.release(Key.ctrl)
+        import time as _t
+        _t.sleep(0.05)
+        kbd.press(Key.delete)
+        kbd.release(Key.delete)
 
     # ── Window dragging ─────────────────────────────────────────
     def mousePressEvent(self, event):
