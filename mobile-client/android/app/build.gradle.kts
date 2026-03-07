@@ -39,6 +39,12 @@ android {
 
 dependencies {
     implementation("com.google.mediapipe:tasks-vision:0.10.14")
+    
+    // CameraX for background tracking
+    val camerax_version = "1.3.1"
+    implementation("androidx.camera:camera-core:${camerax_version}")
+    implementation("androidx.camera:camera-camera2:${camerax_version}")
+    implementation("androidx.camera:camera-lifecycle:${camerax_version}")
 }
 
 flutter {
