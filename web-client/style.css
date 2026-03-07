@@ -381,7 +381,7 @@ html, body {
     #camera-panel {
         position: fixed;
         bottom: 10px; left: 10px; top: auto; right: auto;
-        width: 110px; border-radius: 10px;
+        width: 160px; border-radius: 10px;
         z-index: 130;
         box-shadow: 0 4px 20px rgba(0,0,0,0.8),
                     0 0 0 1px rgba(124,106,255,0.2);
@@ -395,13 +395,13 @@ html, body {
     }
     #camera-panel .camera-header span:first-of-type { display: none; }
     #camera-panel .cam-dot { width: 4px; height: 4px; }
-    #camera-panel .camera-body { aspect-ratio: 4/3; }
+    #camera-panel .camera-body { aspect-ratio: 16/9; }
     #camera-panel .btn-icon { padding: 2px 4px; }
     #camera-panel .btn-icon svg { width: 10px; height: 10px; }
 
     /* Expanded PiP — medium size, not full screen */
     #camera-panel.expanded {
-        width: 220px;
+        width: 280px;
         border-radius: 12px;
     }
     #camera-panel.expanded .camera-header span:first-of-type { display: inline; }
