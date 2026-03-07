@@ -813,17 +813,7 @@ document.addEventListener('DOMContentLoaded', function() {
         sheet.addEventListener('touchend', function() {
             if (!sheetDragging) return;
             sheetDragging = false;
-            sheet.style.transition = 'height 0.35s cubic-bezier(0.16,1,0.3,1)';
-            const h = sheet.offsetHeight;
-            const vh = window.innerHeight;
-            // Snap: if above 60% → go full (95vh), else → default (45vh)
-            if (h > vh * 0.6) {
-                sheet.style.height = '95vh';
-                sheet.classList.add('sheet-full');
-            } else {
-                sheet.style.height = '45vh';
-                sheet.classList.remove('sheet-full');
-            }
+            sheet.style.transition = '';
         });
     }
 });
