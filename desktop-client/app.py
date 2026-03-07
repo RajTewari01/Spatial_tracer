@@ -292,6 +292,8 @@ class CameraPanel(QWidget):
 #  MAIN OVERLAY WINDOW
 # ═══════════════════════════════════════════════════════════════
 
+from virtual_keyboard import VirtualKeyboard
+
 class OverlayWindow(QMainWindow):
     """Transparent overlay with camera panel and gesture status."""
 
@@ -314,6 +316,10 @@ class OverlayWindow(QMainWindow):
         # Tracking thread
         self._tracker_thread = TrackingThread()
         self._tracker_thread.frameReady.connect(self._on_frame)
+
+        # State
+        self._camera_minimized = False
+        self._keyboard_window = None
 
         # UI
         self._setup_ui()
@@ -372,6 +378,33 @@ class OverlayWindow(QMainWindow):
             }
         ''')
         top_bar.addWidget(self._status_badge)
+
+        _ICON_BTN_STYLE = '''
+            QPushButton {
+                color: #3c3c4a;
+                background: transparent;
+                border: none;
+                font-size: 14px;
+                font-weight: bold;
+            }
+            QPushButton:hover { color: #7c6aff; }
+        '''
+
+        # Keyboard toggle button
+        btn_keyboard = QPushButton('⌨')
+        btn_keyboard.setFixedSize(20, 20)
+        btn_keyboard.setToolTip('Toggle Virtual Keyboard')
+        btn_keyboard.setStyleSheet(_ICON_BTN_STYLE)
+        btn_keyboard.clicked.connect(self._toggle_keyboard)
+        top_bar.addWidget(btn_keyboard)
+
+        # Camera minimize button
+        self._btn_minimize = QPushButton('─')
+        self._btn_minimize.setFixedSize(20, 20)
+        self._btn_minimize.setToolTip('Minimize / Restore Camera')
+        self._btn_minimize.setStyleSheet(_ICON_BTN_STYLE)
+        self._btn_minimize.clicked.connect(self._toggle_camera_minimize)
+        top_bar.addWidget(self._btn_minimize)
 
         btn_close = QPushButton('×')
         btn_close.setFixedSize(20, 20)
@@ -526,6 +559,40 @@ class OverlayWindow(QMainWindow):
                 }
             ''')
 
+    # ── Camera minimize ──────────────────────────────────────────
+    def _toggle_camera_minimize(self):
+        self._camera_minimized = not self._camera_minimized
+        if self._camera_minimized:
+            self._camera.hide()
+            self._btn_minimize.setText('▢')
+            self.setFixedSize(300, 100)
+        else:
+            self._camera.show()
+            self._btn_minimize.setText('─')
+            self.setFixedSize(300, 280)
+
+    # ── Keyboard toggle ──────────────────────────────────────────
+    def _toggle_keyboard(self):
+        if self._keyboard_window and self._keyboard_window.isVisible():
+            self._keyboard_window.close()
+            self._keyboard_window = None
+        else:
+            self._keyboard_window = QMainWindow()
+            self._keyboard_window.setWindowTitle('Virtual Keyboard')
+            self._keyboard_window.setWindowFlags(
+                Qt.FramelessWindowHint |
+                Qt.WindowStaysOnTopHint |
+                Qt.Tool
+            )
+            self._keyboard_window.setAttribute(Qt.WA_TranslucentBackground)
+            kb = VirtualKeyboard()
+            self._keyboard_window.setCentralWidget(kb)
+            self._keyboard_window.setFixedSize(640, 240)
+            # Position above the overlay
+            pos = self.pos()
+            self._keyboard_window.move(pos.x() - 170, pos.y() - 260)
+            self._keyboard_window.show()
+
     # ── Window dragging ─────────────────────────────────────────
     def mousePressEvent(self, event):
         if event.button() == Qt.LeftButton:
@@ -541,6 +608,8 @@ class OverlayWindow(QMainWindow):
     def closeEvent(self, event):
         if self._tracker_thread.isRunning():
             self._tracker_thread.stop()
+        if self._keyboard_window:
+            self._keyboard_window.close()
         event.accept()
 
 
