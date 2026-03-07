@@ -5,6 +5,8 @@ import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:provider/provider.dart';
+import 'theme.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -15,7 +17,14 @@ void main() async {
     const SystemUiOverlayStyle(statusBarColor: Colors.transparent),
   );
 
-  runApp(SpatialTracerApp(hasSeenOnboarding: hasSeenOnboarding));
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => ThemeProvider()),
+      ],
+      child: SpatialTracerApp(hasSeenOnboarding: hasSeenOnboarding),
+    ),
+  );
 }
 
 class SpatialTracerApp extends StatelessWidget {
@@ -24,21 +33,14 @@ class SpatialTracerApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+
     return MaterialApp(
       title: 'Spatial Tracer',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData.dark().copyWith(
-        scaffoldBackgroundColor: const Color(0xFF09090B), // Deep sleek black
-        colorScheme: const ColorScheme.dark(
-          primary: Color(0xFFF4F4F5),
-          secondary: Color(0xFFA1A1AA),
-          surface: Color(0xFF18181B),
-        ),
-        textTheme: const TextTheme(
-          bodyLarge: TextStyle(fontFamily: 'Roboto', color: Color(0xFFF4F4F5)),
-          bodyMedium: TextStyle(fontFamily: 'Roboto', color: Color(0xFFA1A1AA)),
-        ),
-      ),
+      themeMode: themeProvider.themeMode,
+      theme: AppTheme.lightTheme,
+      darkTheme: AppTheme.darkTheme,
       home: hasSeenOnboarding ? const DashboardScreen() : const OnboardingScreen(),
     );
   }
@@ -446,9 +448,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
         children: [
           Icon(icon, color: const Color(0xFF34D399), size: 18),
           const SizedBox(width: 12),
-          Text(gesture, style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w500)),
+          Text(gesture, style: Theme.of(context).textTheme.bodyMedium!.copyWith(fontSize: 13, fontWeight: FontWeight.w500)),
           const Spacer(),
-          Text(action, style: const TextStyle(color: Colors.white54, fontSize: 12)),
+          Text(action, style: Theme.of(context).textTheme.bodySmall!.copyWith(fontSize: 12)),
         ],
       ),
     );
@@ -477,7 +479,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         ],
       ),
       drawer: Drawer(
-        backgroundColor: const Color(0xFF09090B).withOpacity(0.95),
+        backgroundColor: Theme.of(context).drawerTheme.backgroundColor?.withOpacity(0.95),
         surfaceTintColor: Colors.transparent,
         child: SafeArea(
           child: Column(
@@ -504,21 +506,19 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       ),
                     ),
                     const SizedBox(height: 16),
-                    const Text(
+                    Text(
                       "Biswadeep Tewari",
-                      style: TextStyle(
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
                         fontSize: 22,
                         fontWeight: FontWeight.w700,
-                        color: Colors.white,
                         letterSpacing: -0.5,
                       ),
                     ),
                     const SizedBox(height: 4),
-                    const Text(
+                    Text(
                       "Full-Stack Engineer\nAI/ML Architect\nMobile Developer",
-                      style: TextStyle(
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         fontSize: 14,
-                        color: Color(0xFFA1A1AA),
                         height: 1.4,
                       ),
                     ),
@@ -528,7 +528,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
-                        color: Color(0xFF38BDF8),
+                        color: Color(0xFF58A6FF),
                       ),
                     ),
                   ],
@@ -539,22 +539,40 @@ class _DashboardScreenState extends State<DashboardScreen> {
               
               // External Links
               ListTile(
-                leading: const Icon(Icons.code_rounded, color: Colors.white70),
-                title: const Text("GitHub Project"),
-                subtitle: const Text("RajTewari01/Spatial_tracer", style: TextStyle(fontSize: 12)),
+                leading: Icon(Icons.code_rounded, color: Theme.of(context).iconTheme.color),
+                title: Text("GitHub Project", style: Theme.of(context).textTheme.bodyMedium),
+                subtitle: Text("RajTewari01/Spatial_tracer", style: Theme.of(context).textTheme.bodySmall),
                 onTap: () => _launchURL("https://github.com/RajTewari01/Spatial_tracer"),
               ),
               ListTile(
-                leading: const Icon(Icons.email_rounded, color: Colors.white70),
-                title: const Text("Contact Support"),
-                subtitle: const Text("tewari765@gmail.com", style: TextStyle(fontSize: 12)),
+                leading: Icon(Icons.email_rounded, color: Theme.of(context).iconTheme.color),
+                title: Text("Contact Support", style: Theme.of(context).textTheme.bodyMedium),
+                subtitle: Text("tewari765@gmail.com", style: Theme.of(context).textTheme.bodySmall),
                 onTap: () => _launchURL("mailto:tewari765@gmail.com"),
               ),
-              
-              const SizedBox(height: 16),
               const Padding(
-                padding: EdgeInsets.only(left: 24.0, top: 16, bottom: 8),
-                child: Text("GESTURE LEGEND", style: TextStyle(color: Colors.white54, fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 1.5)),
+                padding: EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
+                child: Divider(color: Colors.grey, height: 1),
+              ),
+              Consumer<ThemeProvider>(
+                builder: (context, themeProvider, child) {
+                  return SwitchListTile(
+                    title: Text(themeProvider.isDarkMode ? "Dark Mode" : "Light Mode", style: Theme.of(context).textTheme.bodyMedium),
+                    subtitle: Text("Manual theme override", style: Theme.of(context).textTheme.bodySmall),
+                    secondary: Icon(themeProvider.isDarkMode ? Icons.dark_mode_rounded : Icons.light_mode_rounded, color: Theme.of(context).iconTheme.color),
+                    value: themeProvider.isDarkMode,
+                    activeColor: const Color(0xFF3FB950),
+                    onChanged: (val) {
+                      themeProvider.toggleTheme(val);
+                    },
+                  );
+                },
+              ),
+              
+              const SizedBox(height: 8),
+              Padding(
+                padding: const EdgeInsets.only(left: 24.0, top: 16, bottom: 8),
+                child: Text("GESTURE LEGEND", style: Theme.of(context).textTheme.bodySmall!.copyWith(fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 1.5)),
               ),
               _buildLegendRow(Icons.pan_tool_alt_rounded, "Index Point", "Move Cursor"),
               _buildLegendRow(Icons.back_hand_rounded, "Peace Sign", "Tap / Click"),
