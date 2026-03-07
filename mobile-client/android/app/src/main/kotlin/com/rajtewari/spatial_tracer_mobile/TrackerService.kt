@@ -26,6 +26,10 @@ import java.io.FileOutputStream
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
+import android.os.Handler
+import android.os.Looper
+import android.widget.Toast
+
 class TrackerService : LifecycleService() {
 
     private lateinit var cameraExecutor: ExecutorService
@@ -57,6 +61,15 @@ class TrackerService : LifecycleService() {
             stopSelf()
             return START_NOT_STICKY
         }
+        
+        // Check if Accessibility Service is bound
+        if (SpatialAccessibilityService.instance == null) {
+            Handler(Looper.getMainLooper()).post {
+                Toast.makeText(this, "⚠️ Spatial Tracer Gestures are DISABLED! Please enable the Accessibility Service in Android Settings.", Toast.LENGTH_LONG).show()
+                Toast.makeText(this, "Only the cursor will work until Accessibility is enabled.", Toast.LENGTH_LONG).show()
+            }
+        }
+        
         return START_STICKY
     }
 
