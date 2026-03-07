@@ -739,55 +739,59 @@ function toggleImmersive() {
     btn.classList.toggle('flipped');
 }
 
-// ── Camera PiP: Touch Drag (mobile) ────────────────────────────
-(function() {
-    const panel = document.getElementById('camera-panel');
-    if (!panel) return;
-
-    let dragging = false, startX = 0, startY = 0, origLeft = 0, origTop = 0;
-
-    panel.addEventListener('touchstart', function(e) {
-        if (e.target.closest('button')) return;
-        if (window.innerWidth > 768) return;
-
-        dragging = true;
-        const touch = e.touches[0];
-        startX = touch.clientX;
-        startY = touch.clientY;
-        const rect = panel.getBoundingClientRect();
-        origLeft = rect.left;
-        origTop = rect.top;
-        panel.style.transition = 'none';
-    }, { passive: true });
-
-    document.addEventListener('touchmove', function(e) {
-        if (!dragging) return;
-        const touch = e.touches[0];
-        let newLeft = origLeft + (touch.clientX - startX);
-        let newTop = origTop + (touch.clientY - startY);
-        const pw = panel.offsetWidth, ph = panel.offsetHeight;
-        newLeft = Math.max(0, Math.min(window.innerWidth - pw, newLeft));
-        newTop = Math.max(0, Math.min(window.innerHeight - ph, newTop));
-        panel.style.left = newLeft + 'px';
-        panel.style.top = newTop + 'px';
-        panel.style.right = 'auto';
-        panel.style.bottom = 'auto';
-    }, { passive: true });
-
-    document.addEventListener('touchend', function() {
-        if (!dragging) return;
-        dragging = false;
-        panel.style.transition = '';
-    });
-})();
-
-// ── Mobile: About Section Toggle ───────────────────────────────
+// ── Camera PiP: Touch Drag + About Toggle (mobile) ─────────────
 document.addEventListener('DOMContentLoaded', function() {
+    // --- Draggable camera PiP ---
+    const panel = document.getElementById('camera-panel');
+    if (panel) {
+        let dragging = false, moved = false;
+        let startX = 0, startY = 0, origLeft = 0, origTop = 0;
+
+        panel.addEventListener('touchstart', function(e) {
+            if (e.target.closest('button')) return;
+            if (window.innerWidth > 768) return;
+
+            dragging = true;
+            moved = false;
+            const touch = e.touches[0];
+            startX = touch.clientX;
+            startY = touch.clientY;
+            const rect = panel.getBoundingClientRect();
+            origLeft = rect.left;
+            origTop = rect.top;
+            panel.style.transition = 'none';
+        }, { passive: false });
+
+        panel.addEventListener('touchmove', function(e) {
+            if (!dragging) return;
+            e.preventDefault(); // prevent page scroll while dragging
+            const touch = e.touches[0];
+            const dx = touch.clientX - startX;
+            const dy = touch.clientY - startY;
+            if (Math.abs(dx) > 3 || Math.abs(dy) > 3) moved = true;
+            let newLeft = origLeft + dx;
+            let newTop = origTop + dy;
+            const pw = panel.offsetWidth, ph = panel.offsetHeight;
+            newLeft = Math.max(0, Math.min(window.innerWidth - pw, newLeft));
+            newTop = Math.max(0, Math.min(window.innerHeight - ph, newTop));
+            panel.style.left = newLeft + 'px';
+            panel.style.top = newTop + 'px';
+            panel.style.right = 'auto';
+            panel.style.bottom = 'auto';
+        }, { passive: false });
+
+        panel.addEventListener('touchend', function() {
+            dragging = false;
+            panel.style.transition = 'width 0.3s ease';
+        });
+    }
+
+    // --- About section tap to expand ---
     const aboutSection = document.querySelector('.about-section');
     if (aboutSection) {
         aboutSection.addEventListener('click', function(e) {
             if (window.innerWidth > 768) return;
-            if (e.target.closest('a')) return; // don't toggle when clicking links
+            if (e.target.closest('a')) return;
             aboutSection.classList.toggle('open');
         });
     }
