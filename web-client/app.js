@@ -732,6 +732,13 @@ function toggleCameraSize() {
     panel.classList.toggle('expanded');
 }
 
+// ── Mobile: Immersive Mode (hide everything except camera + sphere) ─
+function toggleImmersive() {
+    document.body.classList.toggle('immersive');
+    const btn = document.getElementById('btn-immersive');
+    btn.classList.toggle('flipped');
+}
+
 // ── Camera PiP: Touch Drag (mobile) ────────────────────────────
 (function() {
     const panel = document.getElementById('camera-panel');
