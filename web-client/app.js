@@ -740,64 +740,18 @@ function toggleImmersive() {
 }
 
 // ── Camera PiP: Touch Drag (mobile) ────────────────────────────
-(function() {
-    const panel = document.getElementById('camera-panel');
-    if (!panel) return;
+// Disabled — camera is now full-width hero on mobile
+// Drag only applies on screens > 768px with PiP layout
 
-    let dragging = false;
-    let startX = 0, startY = 0;
-    let origLeft = 0, origTop = 0;
-    let hasMoved = false;
+// ── Mobile: About Section Toggle ───────────────────────────────
+document.addEventListener('DOMContentLoaded', function() {
+    const aboutSection = document.querySelector('.about-section');
+    if (aboutSection) {
+        aboutSection.addEventListener('click', function(e) {
+            if (window.innerWidth > 768) return;
+            if (e.target.closest('a')) return; // don't toggle when clicking links
+            aboutSection.classList.toggle('open');
+        });
+    }
+});
 
-    panel.addEventListener('touchstart', function(e) {
-        // Don't drag if tapping a button
-        if (e.target.closest('button')) return;
-        // Only on mobile-sized screens
-        if (window.innerWidth > 768) return;
-        // Don't drag when expanded
-        if (panel.classList.contains('expanded')) return;
-
-        dragging = true;
-        hasMoved = false;
-        const touch = e.touches[0];
-        startX = touch.clientX;
-        startY = touch.clientY;
-
-        const rect = panel.getBoundingClientRect();
-        origLeft = rect.left;
-        origTop = rect.top;
-
-        panel.style.transition = 'none';
-        panel.style.cursor = 'grabbing';
-    }, { passive: true });
-
-    document.addEventListener('touchmove', function(e) {
-        if (!dragging) return;
-
-        const touch = e.touches[0];
-        const dx = touch.clientX - startX;
-        const dy = touch.clientY - startY;
-
-        if (Math.abs(dx) > 4 || Math.abs(dy) > 4) hasMoved = true;
-
-        let newLeft = origLeft + dx;
-        let newTop = origTop + dy;
-
-        // Clamp to screen
-        const pw = panel.offsetWidth, ph = panel.offsetHeight;
-        newLeft = Math.max(0, Math.min(window.innerWidth - pw, newLeft));
-        newTop = Math.max(0, Math.min(window.innerHeight - ph, newTop));
-
-        panel.style.left = newLeft + 'px';
-        panel.style.top = newTop + 'px';
-        panel.style.right = 'auto';
-        panel.style.bottom = 'auto';
-    }, { passive: true });
-
-    document.addEventListener('touchend', function() {
-        if (!dragging) return;
-        dragging = false;
-        panel.style.cursor = 'grab';
-        panel.style.transition = '';
-    });
-})();

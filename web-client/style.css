@@ -361,151 +361,160 @@ html, body {
     #camera-panel { width: 260px; }
 }
 
-/* ── Responsive — Mobile ───────────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════════
+   MOBILE: Professional Redesign
+   Camera hero top · Glass bottom sheet · Immersive toggle
+   ═══════════════════════════════════════════════════════════════ */
 @media (max-width: 768px) {
-    html, body { overflow-y: auto; overflow-x: hidden; }
+    html, body { overflow: hidden; height: 100%; }
 
-    /* Top bar: compact */
-    #top-bar {
-        padding: 0 12px; height: 44px;
-        flex-wrap: nowrap;
-    }
-    .logo-mark { font-size: 10px; padding: 3px 6px; }
-    .typewriter { font-size: 12px; }
-    .cursor-blink { font-size: 14px; }
-    .status-group { gap: 5px; }
-    .indicator { padding: 3px 8px; font-size: 8px; }
-    .stat-pill { padding: 3px 7px; font-size: 8px; }
+    /* ── Top bar: ultra-slim ────────────────────────────────── */
+    #top-bar { padding: 0 10px; height: 38px; }
+    .logo { gap: 6px; }
+    .logo-mark { font-size: 9px; padding: 2px 5px; }
+    .typewriter { font-size: 10px; }
+    .cursor-blink { font-size: 12px; }
+    .status-group { gap: 3px; }
+    .indicator { padding: 2px 6px; font-size: 7px; }
+    .stat-pill { padding: 2px 5px; font-size: 7px; }
 
-    /* Camera panel: tiny floating PiP thumbnail */
+    /* ── Camera: HERO — full width, top portion ────────────── */
     #camera-panel {
-        position: fixed;
-        bottom: 10px; left: 10px; top: auto; right: auto;
-        width: 160px; border-radius: 10px;
-        z-index: 130;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.8),
-                    0 0 0 1px rgba(124,106,255,0.2);
-        touch-action: none;
-        cursor: grab;
-        transition: width 0.3s ease, border-radius 0.3s ease;
-        overflow: hidden;
+        position: fixed !important;
+        top: 38px !important; left: 0 !important; right: 0 !important; bottom: auto !important;
+        width: 100% !important;
+        height: 35vh;
+        border-radius: 0 !important;
+        z-index: 50;
+        box-shadow: 0 2px 20px rgba(0,0,0,0.5);
+        touch-action: auto; cursor: default;
     }
-    #camera-panel .camera-header {
-        padding: 3px 8px; font-size: 7px; letter-spacing: 1px;
+    #camera-panel.expanded { height: 50vh; }
+    .camera-header {
+        padding: 3px 10px; font-size: 7px;
+        background: rgba(0,0,0,0.5);
+        backdrop-filter: blur(6px);
+        position: absolute; top: 0; left: 0; right: 0;
+        z-index: 2; border-bottom: none;
     }
-    #camera-panel .camera-header span:first-of-type { display: none; }
-    #camera-panel .cam-dot { width: 4px; height: 4px; }
-    #camera-panel .camera-body { aspect-ratio: 16/9; }
-    #camera-panel .btn-icon { padding: 2px 4px; }
-    #camera-panel .btn-icon svg { width: 10px; height: 10px; }
+    .cam-dot { width: 5px; height: 5px; }
+    .camera-body { width: 100%; height: 100%; aspect-ratio: auto; }
+    #webcam { width: 100%; height: 100%; object-fit: cover; }
 
-    /* Expanded PiP — medium size, not full screen */
-    #camera-panel.expanded {
-        width: 280px;
-        border-radius: 12px;
-    }
-    #camera-panel.expanded .camera-header span:first-of-type { display: inline; }
-    #camera-panel.expanded .camera-header { padding: 6px 10px; font-size: 8px; }
-
-    /* Info panel: solid dark scrollable area */
+    /* ── Info panel: glass bottom sheet ─────────────────────── */
     #info-panel {
-        position: relative; top: auto; right: auto;
-        width: 100%; max-height: none;
-        border-radius: 0;
-        box-shadow: none;
-        background: var(--bg);
-        backdrop-filter: none;
-        border: none;
-        overflow-y: visible;
-        margin-top: 50px;
-        z-index: 10;
+        position: fixed;
+        bottom: 0; left: 0; right: 0; top: auto;
+        width: 100%; max-height: 50vh;
+        z-index: 60;
+        border-radius: 14px 14px 0 0;
+        background: rgba(3,3,6,0.92);
+        backdrop-filter: blur(30px);
+        -webkit-backdrop-filter: blur(30px);
+        border: 1px solid rgba(124,106,255,0.06);
+        border-bottom: none;
+        box-shadow: 0 -6px 30px rgba(0,0,0,0.35);
+        overflow-y: auto;
+        padding-bottom: env(safe-area-inset-bottom, 6px);
+    }
+    /* Drag handle hint */
+    #info-panel::before {
+        content: '';
+        display: block;
+        width: 32px; height: 3px;
+        background: var(--text-3);
+        border-radius: 3px;
+        margin: 8px auto 4px;
+        opacity: 0.5;
     }
 
+    /* ── About: collapsed by default ───────────────────────── */
+    .about-section {
+        max-height: 30px; overflow: hidden;
+        transition: max-height 0.35s ease;
+        cursor: pointer; position: relative;
+    }
+    .about-section::after {
+        content: '▾'; position: absolute; top: 8px; right: 12px;
+        font-size: 10px; color: var(--text-3);
+        transition: transform 0.3s ease;
+    }
+    .about-section.open { max-height: 180px; }
+    .about-section.open::after { transform: rotate(180deg); }
+
+    /* ── Sections ───────────────────────────────────────────── */
     .panel-section {
-        padding: 12px 16px;
-        background: var(--surface);
-        border-bottom: 1px solid var(--border-2);
+        padding: 8px 14px;
+        border-bottom: 1px solid rgba(255,255,255,0.025);
+        background: transparent;
     }
-    .panel-section:first-child { border-radius: 12px 12px 0 0; }
-    .panel-section:last-child { border-bottom: none; border-radius: 0 0 12px 12px; }
-    .panel-section h3 { font-size: 9px; margin-bottom: 8px; }
-    .about-name { font-size: 13px; }
-    .about-handle { font-size: 10px; }
-    .about-bio { font-size: 10px; }
-    .about-link { font-size: 9px; padding: 2px 6px; }
+    .panel-section:last-child { border-bottom: none; }
+    .panel-section h3 { font-size: 7px; margin-bottom: 5px; letter-spacing: 2px; }
 
+    .gesture-display { min-height: 20px; }
     .gesture-tag { font-size: 9px; padding: 4px 10px; }
-    .finger { font-size: 9px; padding: 4px 6px; }
-    .event-log { max-height: 100px; font-size: 9px; }
 
-    .controls { padding: 14px 16px; }
-    .btn { padding: 10px 14px; font-size: 10px; }
+    .finger-grid { grid-template-columns: repeat(5, 1fr); gap: 3px; }
+    .finger { font-size: 7px; padding: 3px 1px; text-align: center; letter-spacing: 0; }
 
-    /* Gesture flash */
-    .gesture-flash { font-size: 22px; letter-spacing: 2px; }
+    .event-log { max-height: 55px; font-size: 8px; line-height: 1.7; }
 
-    /* 3D canvas behind everything */
+    .controls { flex-direction: row; gap: 6px; padding: 8px 14px; }
+    .btn { padding: 8px 10px; font-size: 9px; flex: 1; }
+
+    .about-name { font-size: 12px; }
+    .about-handle { font-size: 9px; }
+    .about-bio { font-size: 9px; }
+    .about-link { font-size: 8px; padding: 2px 5px; }
+    .about-card { padding: 6px 10px; }
+
+    .gesture-flash { font-size: 18px; letter-spacing: 2px; }
     #canvas-container { z-index: 0; }
 }
 
-/* ── Responsive — Very small phones ────────────────────────── */
+/* ── Very small phones ─────────────────────────────────────── */
 @media (max-width: 360px) {
-    #top-bar { padding: 0 8px; height: 40px; }
-    .logo-mark { font-size: 9px; }
-    .typewriter { font-size: 10px; }
-    .status-group { gap: 3px; }
+    #top-bar { padding: 0 6px; height: 34px; }
+    .logo-mark { font-size: 8px; }
+    .typewriter { font-size: 8px; }
     .indicator { display: none; }
-    .camera-body { aspect-ratio: 16/6; }
-    #info-panel { max-height: 40vh; }
-    .gesture-flash { font-size: 18px; }
+    #camera-panel { height: 30vh !important; }
+    .gesture-flash { font-size: 14px; }
 }
 
-/* ── Immersive Toggle Button ───────────────────────────────── */
-.immersive-toggle {
-    display: none; /* Hidden on desktop */
-}
+/* ── Immersive Toggle ──────────────────────────────────────── */
+.immersive-toggle { display: none; }
 
 @media (max-width: 768px) {
     .immersive-toggle {
-        display: flex;
-        position: fixed;
-        bottom: 12px; right: 12px;
-        z-index: 200;
-        width: 36px; height: 36px;
+        display: flex; position: fixed;
+        z-index: 200; width: 32px; height: 32px;
         align-items: center; justify-content: center;
-        background: var(--elevated);
-        border: 1px solid var(--border-2);
+        background: rgba(8,8,12,0.85);
+        border: 1px solid rgba(124,106,255,0.15);
         border-radius: 50%;
-        color: var(--text-2);
-        cursor: pointer;
+        color: var(--text-2); cursor: pointer;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.4);
         transition: all 0.3s ease;
-        box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+        right: 10px; top: calc(38px + 35vh - 40px);
     }
-    .immersive-toggle:hover,
     .immersive-toggle:active {
-        color: var(--accent);
-        border-color: var(--accent);
+        color: var(--accent); border-color: var(--accent);
+        transform: scale(0.9);
     }
-    .immersive-toggle svg {
-        transition: transform 0.3s ease;
-    }
-    .immersive-toggle.flipped svg {
-        transform: rotate(180deg);
-    }
+    .immersive-toggle svg { transition: transform 0.3s ease; }
+    .immersive-toggle.flipped svg { transform: rotate(180deg); }
 
-    /* When immersive mode is active */
     body.immersive #top-bar {
-        transform: translateY(-100%);
-        opacity: 0;
-        pointer-events: none;
+        transform: translateY(-100%); opacity: 0; pointer-events: none;
     }
     body.immersive #info-panel {
-        transform: translateY(100%);
-        opacity: 0;
-        pointer-events: none;
+        transform: translateY(100%); opacity: 0; pointer-events: none;
     }
-    #top-bar, #info-panel {
-        transition: transform 0.4s cubic-bezier(0.16,1,0.3,1),
-                    opacity 0.3s ease;
+    body.immersive #camera-panel { top: 0 !important; height: 50vh !important; }
+    body.immersive .immersive-toggle { top: auto; bottom: 14px; }
+
+    #top-bar, #info-panel, #camera-panel {
+        transition: all 0.4s cubic-bezier(0.16,1,0.3,1);
     }
 }
