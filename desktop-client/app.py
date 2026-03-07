@@ -617,6 +617,7 @@ class OverlayWindow(QMainWindow):
             )
             self._keyboard_window.setAttribute(Qt.WA_TranslucentBackground)
             kb = VirtualKeyboard()
+            kb.keyTapped.connect(self._on_key_typed)
             self._keyboard_window.setCentralWidget(kb)
             self._keyboard_window.setFixedSize(640, 260)
             # Position above the overlay
@@ -630,6 +631,26 @@ class OverlayWindow(QMainWindow):
         """Toggle keyboard-only mode (disables mouse movement)."""
         self._keyboard_mode = not self._keyboard_mode
         self._tracker_thread._driver.paused = self._keyboard_mode
+
+    def _on_key_typed(self, label: str):
+        """Send the tapped key label as an actual OS keystroke."""
+        from pynput.keyboard import Controller as KbdCtrl, Key
+        kbd = KbdCtrl()
+
+        # Map special key labels to pynput keys
+        SPECIAL = {
+            'SPACE': Key.space, 'ENTER': Key.enter, 'BACK': Key.backspace,
+            'TAB': Key.tab, 'CAPS': Key.caps_lock,
+            'SHIFT': Key.shift, 'SHFT': Key.shift,
+            'CTRL': Key.ctrl, 'ALT': Key.alt, 'WIN': Key.cmd,
+            '^': Key.up, 'v': Key.down, '<': Key.left, '>': Key.right,
+        }
+
+        if label in SPECIAL:
+            kbd.press(SPECIAL[label])
+            kbd.release(SPECIAL[label])
+        elif len(label) == 1:
+            kbd.type(label)
 
     # ── Window dragging ─────────────────────────────────────────
     def mousePressEvent(self, event):
