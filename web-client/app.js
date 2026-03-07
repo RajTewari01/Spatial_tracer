@@ -740,8 +740,46 @@ function toggleImmersive() {
 }
 
 // ── Camera PiP: Touch Drag (mobile) ────────────────────────────
-// Disabled — camera is now full-width hero on mobile
-// Drag only applies on screens > 768px with PiP layout
+(function() {
+    const panel = document.getElementById('camera-panel');
+    if (!panel) return;
+
+    let dragging = false, startX = 0, startY = 0, origLeft = 0, origTop = 0;
+
+    panel.addEventListener('touchstart', function(e) {
+        if (e.target.closest('button')) return;
+        if (window.innerWidth > 768) return;
+
+        dragging = true;
+        const touch = e.touches[0];
+        startX = touch.clientX;
+        startY = touch.clientY;
+        const rect = panel.getBoundingClientRect();
+        origLeft = rect.left;
+        origTop = rect.top;
+        panel.style.transition = 'none';
+    }, { passive: true });
+
+    document.addEventListener('touchmove', function(e) {
+        if (!dragging) return;
+        const touch = e.touches[0];
+        let newLeft = origLeft + (touch.clientX - startX);
+        let newTop = origTop + (touch.clientY - startY);
+        const pw = panel.offsetWidth, ph = panel.offsetHeight;
+        newLeft = Math.max(0, Math.min(window.innerWidth - pw, newLeft));
+        newTop = Math.max(0, Math.min(window.innerHeight - ph, newTop));
+        panel.style.left = newLeft + 'px';
+        panel.style.top = newTop + 'px';
+        panel.style.right = 'auto';
+        panel.style.bottom = 'auto';
+    }, { passive: true });
+
+    document.addEventListener('touchend', function() {
+        if (!dragging) return;
+        dragging = false;
+        panel.style.transition = '';
+    });
+})();
 
 // ── Mobile: About Section Toggle ───────────────────────────────
 document.addEventListener('DOMContentLoaded', function() {
