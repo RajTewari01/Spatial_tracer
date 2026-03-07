@@ -25,7 +25,7 @@ It ships as three clients:
 | Platform | Stack | What It Does |
 |----------|-------|-------------|
 | **Web** | MediaPipe JS · Three.js | In-browser gesture demo with 3D particle visualization |
-| **Desktop** | PyQt5 · pynput · MediaPipe Tasks | Transparent overlay that controls your OS mouse & keyboard |
+| **Desktop** | PyQt5 · pynput · MediaPipe Tasks | Transparent overlay + Virtual Keyboard for air-typing |
 | **Android** | Flutter · Kotlin · MediaPipe Tasks | Mobile gesture recognition with camera feed |
 
 ---
@@ -114,6 +114,19 @@ sequenceDiagram
 │  SPIDERMAN        │  Spiderman         │  ● #f472b6     │
 └───────────────────┴────────────────────┴────────────────┘
 ```
+
+---
+
+## ✨ Virtual Keyboard (Desktop)
+
+The desktop client includes a **premium glassmorphic virtual keyboard** that you can type on using gestures in mid-air.
+
+| Feature | Description |
+|---------|-------------|
+| **Two-Hand Tracking** | Use both hands simultaneously. Hold `SHIFT` or `CTRL` with one hand and type a letter with the other (`Ctrl+C`, etc). |
+| **Hover & Target** | Pointing (`PEACE` or `POINTING` gesture) moves a glowing finger cursor over the keys. |
+| **Air-Typing** | `PINCH` a key to type it (features a visual flash and cooldown to prevent double-typing). |
+| **Quick Clear** | `PINCH` and hold the `DEL` or `BACKSPACE` key for **4 seconds** to trigger a `Ctrl+A` → `Delete` macro, clearing all text instantly. |
 
 ---
 
