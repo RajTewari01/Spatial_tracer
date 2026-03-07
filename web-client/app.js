@@ -785,14 +785,45 @@ document.addEventListener('DOMContentLoaded', function() {
             panel.style.transition = 'width 0.3s ease';
         });
     }
+    // --- Swipeable bottom sheet (Instagram-style) ---
+    const sheet = document.getElementById('info-panel');
+    if (sheet && window.innerWidth <= 768) {
+        let sheetDragging = false, sheetStartY = 0, sheetStartH = 0;
 
-    // --- About section tap to expand ---
-    const aboutSection = document.querySelector('.about-section');
-    if (aboutSection) {
-        aboutSection.addEventListener('click', function(e) {
-            if (window.innerWidth > 768) return;
-            if (e.target.closest('a')) return;
-            aboutSection.classList.toggle('open');
+        sheet.addEventListener('touchstart', function(e) {
+            // only drag from the top 30px (the handle area)
+            const rect = sheet.getBoundingClientRect();
+            const touchY = e.touches[0].clientY;
+            if (touchY - rect.top > 30) return;
+
+            sheetDragging = true;
+            sheetStartY = e.touches[0].clientY;
+            sheetStartH = sheet.offsetHeight;
+            sheet.style.transition = 'none';
+        }, { passive: true });
+
+        sheet.addEventListener('touchmove', function(e) {
+            if (!sheetDragging) return;
+            e.preventDefault();
+            const dy = sheetStartY - e.touches[0].clientY;
+            const newH = Math.max(100, Math.min(window.innerHeight * 0.95, sheetStartH + dy));
+            sheet.style.height = newH + 'px';
+        }, { passive: false });
+
+        sheet.addEventListener('touchend', function() {
+            if (!sheetDragging) return;
+            sheetDragging = false;
+            sheet.style.transition = 'height 0.35s cubic-bezier(0.16,1,0.3,1)';
+            const h = sheet.offsetHeight;
+            const vh = window.innerHeight;
+            // Snap: if above 60% → go full (95vh), else → default (45vh)
+            if (h > vh * 0.6) {
+                sheet.style.height = '95vh';
+                sheet.classList.add('sheet-full');
+            } else {
+                sheet.style.height = '45vh';
+                sheet.classList.remove('sheet-full');
+            }
         });
     }
 });
