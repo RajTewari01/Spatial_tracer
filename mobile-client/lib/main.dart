@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -144,11 +145,16 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   Future<void> _startTrackerForOnboarding() async {
     try {
       // Must have permissions to demonstrate the cursor
-      await _methodChannel.invokeMethod('startService');
-      
-      _gestureSubscription = _eventChannel.receiveBroadcastStream().listen((gesture) {
-        _handleLiveGesture(gesture.toString());
-      });
+      final status = await Permission.camera.request();
+      if (status.isGranted) {
+        await _methodChannel.invokeMethod('startService');
+        
+        _gestureSubscription = _eventChannel.receiveBroadcastStream().listen((gesture) {
+          _handleLiveGesture(gesture.toString());
+        });
+      } else {
+        debugPrint("Camera permission denied during onboarding.");
+      }
     } catch (e) {
       debugPrint("Onboarding Tracker Error: $e");
     }
@@ -401,9 +407,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
         setState(() => _isActive = false);
         _addLog("Service stopped successfully. (exit 0)");
       } else {
-        _addLog("Verifying overlay & accessibility permissions...");
+        _addLog("Verifying camera & overlay permissions...");
         
-        // Let the Android code request permissions if needed.
+        // Ensure camera is granted before starting Android 14+ FGS
+        final cameraStatus = await Permission.camera.request();
+        if (!cameraStatus.isGranted) {
+          _addLog("ERR: Camera permission denied.");
+          return;
+        }
+
+        // Let the Android code request overlay permissions if needed.
         await _methodChannel.invokeMethod('startService');
         setState(() => _isActive = true);
         _addLog("Process forked. Tracker daemon running...");
@@ -413,7 +426,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       if (e.code == 'PERMISSION_DENIED') {
         _addLog("ERR: Overlay permission missing.");
       } else {
-        _addLog("ERR: Failed to start hardware stream.");
+        _addLog("ERR: Failed to start hardware stream: ${e.message}");
       }
     }
   }
@@ -426,9 +439,25 @@ class _DashboardScreenState extends State<DashboardScreen> {
     }
   }
 
+  Widget _buildLegendRow(IconData icon, String gesture, String action) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
+      child: Row(
+        children: [
+          Icon(icon, color: const Color(0xFF34D399), size: 18),
+          const SizedBox(width: 12),
+          Text(gesture, style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w500)),
+          const Spacer(),
+          Text(action, style: const TextStyle(color: Colors.white54, fontSize: 12)),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -465,11 +494,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       height: 80,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(color: const Color(0xFF34D399).withOpacity(0.3), blurRadius: 20, spreadRadius: 2)
+                        ],
                         border: Border.all(color: const Color(0xFF34D399), width: 2),
-                        image: const DecorationImage(
-                          image: AssetImage("assets/images/app_icon.png"), // Generated icon
-                          fit: BoxFit.cover,
-                        ),
+                      ),
+                      child: ClipOval(
+                        child: Image.asset("assets/images/app_icon.png", fit: BoxFit.cover),
                       ),
                     ),
                     const SizedBox(height: 16),
@@ -519,6 +550,18 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 subtitle: const Text("tewari765@gmail.com", style: TextStyle(fontSize: 12)),
                 onTap: () => _launchURL("mailto:tewari765@gmail.com"),
               ),
+              
+              const SizedBox(height: 16),
+              const Padding(
+                padding: EdgeInsets.only(left: 24.0, top: 16, bottom: 8),
+                child: Text("GESTURE LEGEND", style: TextStyle(color: Colors.white54, fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 1.5)),
+              ),
+              _buildLegendRow(Icons.pan_tool_alt_rounded, "Index Point", "Move Cursor"),
+              _buildLegendRow(Icons.back_hand_rounded, "Peace Sign", "Tap / Click"),
+              _buildLegendRow(Icons.swipe_rounded, "Closed Fist", "Recent Apps"),
+              _buildLegendRow(Icons.pinch_rounded, "Pinch", "Go Back"),
+              _buildLegendRow(Icons.swap_vert_rounded, "Thumbs Up/Down", "Scroll Page"),
+              
               const Spacer(),
               const Padding(
                 padding: EdgeInsets.all(24.0),
