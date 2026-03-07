@@ -30,6 +30,7 @@ class TrackerService : LifecycleService() {
 
     private lateinit var cameraExecutor: ExecutorService
     private var handLandmarker: HandLandmarker? = null
+    private var cursorOverlay: CursorOverlay? = null
 
     companion object {
         const val TAG = "TrackerService"
@@ -43,6 +44,9 @@ class TrackerService : LifecycleService() {
         createNotificationChannel()
         startForeground(NOTIFICATION_ID, buildNotification())
         
+        cursorOverlay = CursorOverlay(this)
+        cursorOverlay?.show()
+
         initHandLandmarker()
         startCamera()
     }
@@ -58,6 +62,7 @@ class TrackerService : LifecycleService() {
 
     override fun onDestroy() {
         super.onDestroy()
+        cursorOverlay?.hide()
         cameraExecutor.shutdown()
         handLandmarker?.close()
     }

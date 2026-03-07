@@ -1,19 +1,5 @@
 package com.rajtewari.spatial_tracer_mobile
 
-import io.flutter.embedding.android.FlutterActivity
-import io.flutter.embedding.engine.FlutterEngine
-import io.flutter.plugin.common.MethodChannel
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.util.Log
-import com.google.mediapipe.framework.image.BitmapImageBuilder
-import com.google.mediapipe.tasks.core.BaseOptions
-import com.google.mediapipe.tasks.vision.handlandmarker.HandLandmarker
-import com.google.mediapipe.tasks.vision.handlandmarker.HandLandmarkerResult
-import com.google.mediapipe.tasks.vision.core.RunningMode
-import java.io.File
-import java.io.FileOutputStream
-
 import android.content.Intent
 import android.net.Uri
 import android.provider.Settings

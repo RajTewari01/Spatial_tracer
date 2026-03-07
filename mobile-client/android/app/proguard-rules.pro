@@ -1,0 +1,5 @@
+-dontwarn javax.lang.model.**
+-dontwarn com.google.auto.value.**
+-dontwarn autovalue.shaded.**
+-dontwarn javax.annotation.**
+-keep class com.google.mediapipe.** { *; }
