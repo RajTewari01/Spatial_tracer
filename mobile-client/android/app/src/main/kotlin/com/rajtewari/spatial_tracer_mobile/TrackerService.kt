@@ -227,28 +227,28 @@ class TrackerService : LifecycleService() {
                     val sh = displayMetrics.heightPixels
                     
                     // PEACE -> Taps the screen at pointer location
-                    acc.performTap(px, py, sw, sh)
+                    Handler(Looper.getMainLooper()).post { acc.performTap(px, py, sw, sh) }
                     lastActionTime = now
                 }
             }
             "PINCH" -> {
                 if (now - lastActionTime > 1000) {
                     // PINCH -> Goes Back
-                    acc.performBackAction()
+                    Handler(Looper.getMainLooper()).post { acc.performBackAction() }
                     lastActionTime = now
                 }
             }
             "FIST" -> {
                 if (now - lastActionTime > 1000) {
                     // FIST -> Opens Recent Apps menu
-                    acc.performRecentsAction()
+                    Handler(Looper.getMainLooper()).post { acc.performRecentsAction() }
                     lastActionTime = now
                 }
             }
             "THREE" -> {
                 if (now - lastActionTime > 1000) {
                     // THREE fingers -> Go Home
-                    acc.performHomeAction()
+                    Handler(Looper.getMainLooper()).post { acc.performHomeAction() }
                     lastActionTime = now
                 }
             }
@@ -258,12 +258,14 @@ class TrackerService : LifecycleService() {
                     val resources = resources
                     val sw = resources.displayMetrics.widthPixels
                     val sh = resources.displayMetrics.heightPixels
-                    if (gesture == "THUMBS_UP") {
-                        // Scroll down (Swipe up)
-                        acc.performSwipe(0.5f, 0.7f, 0.5f, 0.3f, sw, sh)
-                    } else {
-                        // Scroll up (Swipe down)
-                        acc.performSwipe(0.5f, 0.3f, 0.5f, 0.7f, sw, sh)
+                    Handler(Looper.getMainLooper()).post {
+                        if (gesture == "THUMBS_UP") {
+                            // Scroll down (Swipe up)
+                            acc.performSwipe(0.5f, 0.7f, 0.5f, 0.3f, sw, sh)
+                        } else {
+                            // Scroll up (Swipe down)
+                            acc.performSwipe(0.5f, 0.3f, 0.5f, 0.7f, sw, sh)
+                        }
                     }
                     lastActionTime = now
                 }
