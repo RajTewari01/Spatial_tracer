@@ -377,17 +377,26 @@ html, body {
     .indicator { padding: 3px 8px; font-size: 8px; }
     .stat-pill { padding: 3px 7px; font-size: 8px; }
 
-    /* Camera panel: full width strip at top */
+    /* Camera panel: small floating PiP */
     #camera-panel {
         position: fixed;
-        top: 44px; left: 0; right: 0; bottom: auto;
-        width: 100%; border-radius: 0;
-        z-index: 110;
-        box-shadow: 0 8px 40px rgba(0,0,0,0.6);
+        top: 52px; right: 10px; left: auto; bottom: auto;
+        width: 140px; border-radius: 10px;
+        z-index: 130;
+        box-shadow: 0 8px 30px rgba(0,0,0,0.7);
+        touch-action: none;
+        cursor: grab;
+        transition: width 0.3s cubic-bezier(0.16,1,0.3,1),
+                    height 0.3s cubic-bezier(0.16,1,0.3,1);
     }
-    #camera-panel.expanded { width: 100%; }
-    .camera-body { aspect-ratio: 16/7; }
-    .camera-header { padding: 6px 12px; font-size: 9px; }
+    #camera-panel.expanded {
+        width: calc(100vw - 20px);
+        right: 10px; left: 10px;
+        border-radius: var(--r);
+    }
+    .camera-body { aspect-ratio: 4/3; }
+    .camera-header { padding: 4px 10px; font-size: 8px; letter-spacing: 1.5px; }
+    .cam-dot { width: 5px; height: 5px; }
 
     /* Info panel: bottom sheet */
     #info-panel {
