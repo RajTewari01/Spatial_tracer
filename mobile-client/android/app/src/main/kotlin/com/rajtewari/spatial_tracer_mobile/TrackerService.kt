@@ -76,10 +76,7 @@ class TrackerService : LifecycleService() {
         
         // Check if Accessibility Service is bound
         if (SpatialAccessibilityService.instance == null) {
-            Handler(Looper.getMainLooper()).post {
-                Toast.makeText(this, "⚠️ Spatial Tracer Gestures are DISABLED! Please enable the Accessibility Service in Android Settings.", Toast.LENGTH_LONG).show()
-                Toast.makeText(this, "Only the cursor will work until Accessibility is enabled.", Toast.LENGTH_LONG).show()
-            }
+            Log.w(TAG, "Accessibility Service is not bound but tracker started.")
         }
         
         return START_STICKY
