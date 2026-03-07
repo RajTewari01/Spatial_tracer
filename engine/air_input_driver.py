@@ -86,6 +86,7 @@ class AirInputDriver:
         # Active state
         self.active_gesture = 'IDLE'
         self.cursor_pos = (screen_w // 2, screen_h // 2)
+        self.paused = False  # When True, detect gesture but skip mouse/kbd actions
 
     # ── Finger State Detection ──────────────────────────────────
 
@@ -277,6 +278,13 @@ class AirInputDriver:
 
         # Index fingertip for cursor
         idx_tip = lm[INDEX_TIP]
+
+        # If paused (keyboard mode), skip all mouse/keyboard actions
+        if self.paused:
+            self._last_gesture = gesture
+            result['cursor_x'] = self.cursor_pos[0]
+            result['cursor_y'] = self.cursor_pos[1]
+            return result
 
         # ── Act on gesture ──────────────────────────────────────
 

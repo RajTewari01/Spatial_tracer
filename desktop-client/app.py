@@ -320,6 +320,8 @@ class OverlayWindow(QMainWindow):
         # State
         self._camera_minimized = False
         self._keyboard_window = None
+        self._keyboard_mode = False
+        self._last_kb_tap = 0.0
 
         # UI
         self._setup_ui()
@@ -559,16 +561,30 @@ class OverlayWindow(QMainWindow):
                 }
             ''')
 
-        # Forward finger position to keyboard if open
-        if self._keyboard_window and self._keyboard_window.isVisible():
+        # Forward finger position to keyboard if open & in keyboard mode
+        if (self._keyboard_mode and self._keyboard_window 
+                and self._keyboard_window.isVisible()):
             kb = self._keyboard_window.centralWidget()
             if hands and kb:
-                # Use index fingertip (landmark 8) normalized position
                 lms = hands[0].get('landmarks', [])
                 if len(lms) > 8:
-                    fx = lms[8]['x']
-                    fy = lms[8]['y']
-                    kb.highlight_at_position(fx, fy)
+                    # PEACE (index+middle up) → move cursor on keyboard
+                    if gesture in ('PEACE', 'POINTING'):
+                        # Use index fingertip for position
+                        fx = lms[8]['x']
+                        fy = lms[8]['y']
+                        kb.highlight_at_position(fx, fy)
+                    
+                    # PINCH → tap the hovered key
+                    if gesture == 'PINCH':
+                        import time as _time
+                        now = _time.time()
+                        if now - self._last_kb_tap > 0.5:  # cooldown
+                            fx = (lms[4]['x'] + lms[8]['x']) / 2
+                            fy = (lms[4]['y'] + lms[8]['y']) / 2
+                            tapped = kb.tap_at_position(fx, fy)
+                            if tapped:
+                                self._last_kb_tap = now
             elif kb:
                 kb.clear_cursor()
 
@@ -589,6 +605,8 @@ class OverlayWindow(QMainWindow):
         if self._keyboard_window and self._keyboard_window.isVisible():
             self._keyboard_window.close()
             self._keyboard_window = None
+            self._keyboard_mode = False
+            self._tracker_thread._driver.paused = False
         else:
             self._keyboard_window = QMainWindow()
             self._keyboard_window.setWindowTitle('Virtual Keyboard')
@@ -600,11 +618,18 @@ class OverlayWindow(QMainWindow):
             self._keyboard_window.setAttribute(Qt.WA_TranslucentBackground)
             kb = VirtualKeyboard()
             self._keyboard_window.setCentralWidget(kb)
-            self._keyboard_window.setFixedSize(640, 240)
+            self._keyboard_window.setFixedSize(640, 260)
             # Position above the overlay
             pos = self.pos()
-            self._keyboard_window.move(pos.x() - 170, pos.y() - 260)
+            self._keyboard_window.move(pos.x() - 170, pos.y() - 280)
             self._keyboard_window.show()
+            self._keyboard_mode = True
+            self._tracker_thread._driver.paused = True
+
+    def _toggle_keyboard_mode(self):
+        """Toggle keyboard-only mode (disables mouse movement)."""
+        self._keyboard_mode = not self._keyboard_mode
+        self._tracker_thread._driver.paused = self._keyboard_mode
 
     # ── Window dragging ─────────────────────────────────────────
     def mousePressEvent(self, event):

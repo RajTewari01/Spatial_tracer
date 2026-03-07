@@ -2,7 +2,7 @@
 virtual_keyboard.py
 >>> PyQt5 virtual QWERTY keyboard widget.
     - Premium glassmorphic design
-    - Gesture-driven key highlighting and activation
+        - Gesture-driven key highlighting and activation
     - Finger cursor overlay for visual feedback
     - Emits keyTapped signal when a key is hit
 '''
