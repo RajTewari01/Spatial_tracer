@@ -377,35 +377,47 @@ html, body {
     .indicator { padding: 3px 8px; font-size: 8px; }
     .stat-pill { padding: 3px 7px; font-size: 8px; }
 
-    /* Camera panel: small floating PiP */
+    /* Camera panel: tiny floating PiP thumbnail */
     #camera-panel {
         position: fixed;
-        top: 52px; right: 10px; left: auto; bottom: auto;
-        width: 140px; border-radius: 10px;
+        bottom: 10px; left: 10px; top: auto; right: auto;
+        width: 110px; border-radius: 10px;
         z-index: 130;
-        box-shadow: 0 8px 30px rgba(0,0,0,0.7);
+        box-shadow: 0 4px 20px rgba(0,0,0,0.8),
+                    0 0 0 1px rgba(124,106,255,0.2);
         touch-action: none;
         cursor: grab;
-        transition: width 0.3s cubic-bezier(0.16,1,0.3,1),
-                    height 0.3s cubic-bezier(0.16,1,0.3,1);
+        transition: width 0.3s ease, border-radius 0.3s ease;
+        overflow: hidden;
     }
-    #camera-panel.expanded {
-        width: calc(100vw - 20px);
-        right: 10px; left: 10px;
-        border-radius: var(--r);
+    #camera-panel .camera-header {
+        padding: 3px 8px; font-size: 7px; letter-spacing: 1px;
     }
-    .camera-body { aspect-ratio: 4/3; }
-    .camera-header { padding: 4px 10px; font-size: 8px; letter-spacing: 1.5px; }
-    .cam-dot { width: 5px; height: 5px; }
+    #camera-panel .camera-header span:first-of-type { display: none; }
+    #camera-panel .cam-dot { width: 4px; height: 4px; }
+    #camera-panel .camera-body { aspect-ratio: 4/3; }
+    #camera-panel .btn-icon { padding: 2px 4px; }
+    #camera-panel .btn-icon svg { width: 10px; height: 10px; }
 
-    /* Info panel: bottom sheet */
+    /* Expanded PiP — medium size, not full screen */
+    #camera-panel.expanded {
+        width: 220px;
+        border-radius: 12px;
+    }
+    #camera-panel.expanded .camera-header span:first-of-type { display: inline; }
+    #camera-panel.expanded .camera-header { padding: 6px 10px; font-size: 8px; }
+
+    /* Info panel: full scrollable area */
     #info-panel {
-        position: fixed;
-        bottom: 0; left: 0; right: 0; top: auto;
-        width: 100%; max-height: 45vh;
-        border-radius: var(--r) var(--r) 0 0;
-        z-index: 120;
-        box-shadow: 0 -12px 40px rgba(0,0,0,0.5);
+        position: relative; top: auto; right: auto;
+        width: 100%; max-height: none;
+        border-radius: 0;
+        box-shadow: none;
+        background: transparent;
+        backdrop-filter: none;
+        border: none;
+        overflow-y: visible;
+        margin-top: 50px;
     }
 
     .panel-section { padding: 10px 14px; }
