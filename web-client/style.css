@@ -407,31 +407,39 @@ html, body {
     #camera-panel.expanded .camera-header span:first-of-type { display: inline; }
     #camera-panel.expanded .camera-header { padding: 6px 10px; font-size: 8px; }
 
-    /* Info panel: full scrollable area */
+    /* Info panel: solid dark scrollable area */
     #info-panel {
         position: relative; top: auto; right: auto;
         width: 100%; max-height: none;
         border-radius: 0;
         box-shadow: none;
-        background: transparent;
+        background: var(--bg);
         backdrop-filter: none;
         border: none;
         overflow-y: visible;
         margin-top: 50px;
+        z-index: 10;
     }
 
-    .panel-section { padding: 10px 14px; }
-    .panel-section h3 { font-size: 8px; margin-bottom: 6px; }
-    .about-name { font-size: 12px; }
+    .panel-section {
+        padding: 12px 16px;
+        background: var(--surface);
+        border-bottom: 1px solid var(--border-2);
+    }
+    .panel-section:first-child { border-radius: 12px 12px 0 0; }
+    .panel-section:last-child { border-bottom: none; border-radius: 0 0 12px 12px; }
+    .panel-section h3 { font-size: 9px; margin-bottom: 8px; }
+    .about-name { font-size: 13px; }
     .about-handle { font-size: 10px; }
     .about-bio { font-size: 10px; }
     .about-link { font-size: 9px; padding: 2px 6px; }
 
     .gesture-tag { font-size: 9px; padding: 4px 10px; }
     .finger { font-size: 9px; padding: 4px 6px; }
-    .event-log { max-height: 80px; font-size: 9px; }
+    .event-log { max-height: 100px; font-size: 9px; }
 
-    .btn { padding: 8px 12px; font-size: 10px; }
+    .controls { padding: 14px 16px; }
+    .btn { padding: 10px 14px; font-size: 10px; }
 
     /* Gesture flash */
     .gesture-flash { font-size: 22px; letter-spacing: 2px; }
