@@ -355,12 +355,78 @@ html, body {
     100% { transform: translate(-50%,-50%) scale(1); opacity: 0; }
 }
 
-/* ── Responsive ─────────────────────────────────────────────── */
+/* ── Responsive — Tablet ────────────────────────────────────── */
+@media (max-width: 1024px) {
+    #info-panel { width: 240px; }
+    #camera-panel { width: 260px; }
+}
+
+/* ── Responsive — Mobile ───────────────────────────────────── */
 @media (max-width: 768px) {
-    #info-panel {
-        position: fixed; bottom: 0; left: 0; right: 0;
-        top: auto; width: 100%; max-height: 38vh;
-        border-radius: var(--r) var(--r) 0 0;
+    html, body { overflow-y: auto; overflow-x: hidden; }
+
+    /* Top bar: compact */
+    #top-bar {
+        padding: 0 12px; height: 44px;
+        flex-wrap: nowrap;
     }
-    #camera-panel { width: 180px; bottom: 10px; left: 10px; }
+    .logo-mark { font-size: 10px; padding: 3px 6px; }
+    .typewriter { font-size: 12px; }
+    .cursor-blink { font-size: 14px; }
+    .status-group { gap: 5px; }
+    .indicator { padding: 3px 8px; font-size: 8px; }
+    .stat-pill { padding: 3px 7px; font-size: 8px; }
+
+    /* Camera panel: full width strip at top */
+    #camera-panel {
+        position: fixed;
+        top: 44px; left: 0; right: 0; bottom: auto;
+        width: 100%; border-radius: 0;
+        z-index: 110;
+        box-shadow: 0 8px 40px rgba(0,0,0,0.6);
+    }
+    #camera-panel.expanded { width: 100%; }
+    .camera-body { aspect-ratio: 16/7; }
+    .camera-header { padding: 6px 12px; font-size: 9px; }
+
+    /* Info panel: bottom sheet */
+    #info-panel {
+        position: fixed;
+        bottom: 0; left: 0; right: 0; top: auto;
+        width: 100%; max-height: 45vh;
+        border-radius: var(--r) var(--r) 0 0;
+        z-index: 120;
+        box-shadow: 0 -12px 40px rgba(0,0,0,0.5);
+    }
+
+    .panel-section { padding: 10px 14px; }
+    .panel-section h3 { font-size: 8px; margin-bottom: 6px; }
+    .about-name { font-size: 12px; }
+    .about-handle { font-size: 10px; }
+    .about-bio { font-size: 10px; }
+    .about-link { font-size: 9px; padding: 2px 6px; }
+
+    .gesture-tag { font-size: 9px; padding: 4px 10px; }
+    .finger { font-size: 9px; padding: 4px 6px; }
+    .event-log { max-height: 80px; font-size: 9px; }
+
+    .btn { padding: 8px 12px; font-size: 10px; }
+
+    /* Gesture flash */
+    .gesture-flash { font-size: 22px; letter-spacing: 2px; }
+
+    /* 3D canvas behind everything */
+    #canvas-container { z-index: 0; }
+}
+
+/* ── Responsive — Very small phones ────────────────────────── */
+@media (max-width: 360px) {
+    #top-bar { padding: 0 8px; height: 40px; }
+    .logo-mark { font-size: 9px; }
+    .typewriter { font-size: 10px; }
+    .status-group { gap: 3px; }
+    .indicator { display: none; }
+    .camera-body { aspect-ratio: 16/6; }
+    #info-panel { max-height: 40vh; }
+    .gesture-flash { font-size: 18px; }
 }
