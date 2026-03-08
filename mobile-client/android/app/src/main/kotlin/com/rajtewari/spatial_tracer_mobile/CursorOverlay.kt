@@ -66,7 +66,7 @@ class CursorOverlay(context: Context) {
             nX = normX
             nY = normY
             currentGesture = gesture
-            invalidate()
+            postInvalidate()
         }
 
         override fun onDraw(canvas: Canvas) {

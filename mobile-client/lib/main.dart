@@ -71,6 +71,11 @@ class GlassCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final effectiveBorderColor = borderColor == Colors.white10 
+        ? (isDark ? Colors.white10 : Colors.black12) 
+        : borderColor;
+
     return ClipRRect(
       borderRadius: BorderRadius.circular(borderRadius),
       child: BackdropFilter(
@@ -80,10 +85,10 @@ class GlassCard extends StatelessWidget {
           height: height,
           padding: padding,
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.05),
+            color: Colors.black.withOpacity(0.8),
             borderRadius: BorderRadius.circular(borderRadius),
             border: Border.all(
-              color: borderColor,
+              color: effectiveBorderColor,
               width: 1.0,
             ),
           ),
@@ -217,6 +222,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textColor = isDark ? Colors.white : Colors.black87;
+    final subtitleColor = isDark ? const Color(0xFFA1A1AA) : Colors.black54;
+
     return Scaffold(
       body: Stack(
         children: [
@@ -253,7 +262,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   alignment: Alignment.topRight,
                   child: TextButton(
                     onPressed: _completeOnboarding,
-                    child: const Text('Skip', style: TextStyle(color: Colors.white, fontSize: 16)),
+                    child: Text('Skip', style: TextStyle(color: textColor, fontSize: 16)),
                   ),
                 ),
                 Expanded(
@@ -278,12 +287,12 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                 height: 140,
                                 padding: EdgeInsets.zero,
                                 borderRadius: 40,
-                                borderColor: _isSuccessAnim ? page['accent'] : Colors.white10,
+                                borderColor: _isSuccessAnim ? page['accent'] : (isDark ? Colors.white10 : Colors.black12),
                                 child: Center(
                                   child: Icon(
                                     _isSuccessAnim ? Icons.check_circle_rounded : page['icon'], 
                                     size: 70, 
-                                    color: _isSuccessAnim ? page['accent'] : Colors.white
+                                    color: _isSuccessAnim ? page['accent'] : textColor
                                   ),
                                 ),
                               ),
@@ -297,16 +306,16 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                 height: 1.2,
                                 fontWeight: FontWeight.w600,
                                 letterSpacing: -1,
-                                color: _isSuccessAnim ? page['accent'] : Colors.white,
+                                color: _isSuccessAnim ? page['accent'] : textColor,
                               ),
                             ),
                             const SizedBox(height: 20),
                             Text(
                               _isSuccessAnim ? "Gesture Recognized" : page['subtitle'],
                               textAlign: TextAlign.center,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 16,
-                                color: Color(0xFFA1A1AA),
+                                color: subtitleColor,
                                 height: 1.5,
                               ),
                             ),
@@ -316,13 +325,13 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  const SizedBox(
+                                  SizedBox(
                                     width: 16,
                                     height: 16,
-                                    child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white54),
+                                    child: CircularProgressIndicator(strokeWidth: 2, color: subtitleColor),
                                   ),
                                   const SizedBox(width: 12),
-                                  Text("Awaiting gesture...", style: TextStyle(color: Colors.white54, fontStyle: FontStyle.italic)),
+                                  Text("Awaiting gesture...", style: TextStyle(color: subtitleColor, fontStyle: FontStyle.italic)),
                                 ],
                               )
                           ],
@@ -342,7 +351,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         height: 6,
                         width: _currentPage == index ? 24 : 6,
                         decoration: BoxDecoration(
-                          color: _currentPage == index ? Colors.white : Colors.white24,
+                          color: _currentPage == index ? textColor : subtitleColor.withOpacity(0.3),
                           borderRadius: BorderRadius.circular(3),
                         ),
                       );
@@ -372,33 +381,40 @@ class DashboardScreen extends StatefulWidget {
 class _DashboardScreenState extends State<DashboardScreen> {
   static const _methodChannel = MethodChannel('com.rajtewari/hand_tracker');
   bool _isActive = false;
-  final List<String> _terminalLogs = [];
-  Timer? _cursorBlinkTimer;
+  
+  Timer? _liveTimer;
+  String _currentTime = "";
   bool _showCursor = true;
+  String _latestLog = "STANDBY";
 
   @override
   void initState() {
     super.initState();
-    _addLog("systemctl status spatial-tracer.service");
-    _addLog("Loaded: loaded (/etc/systemd/system/spatial-tracer.service)");
-    _addLog("Active: inactive (dead)");
-    
-    _cursorBlinkTimer = Timer.periodic(const Duration(milliseconds: 500), (timer) {
-      if (mounted) setState(() => _showCursor = !_showCursor);
+    _updateTime();
+    _liveTimer = Timer.periodic(const Duration(milliseconds: 500), (timer) {
+      if (mounted) setState(() {
+        _updateTime();
+        _showCursor = !_showCursor;
+      });
     });
+  }
+
+  void _updateTime() {
+    final t = DateTime.now();
+    _currentTime = "${t.year}-${t.month.toString().padLeft(2,'0')}-${t.day.toString().padLeft(2,'0')} "
+                   "${t.hour.toString().padLeft(2,'0')}:${t.minute.toString().padLeft(2,'0')}:${t.second.toString().padLeft(2,'0')}";
   }
 
   @override
   void dispose() {
-    _cursorBlinkTimer?.cancel();
+    _liveTimer?.cancel();
     super.dispose();
   }
 
   void _addLog(String msg) {
     if (!mounted) return;
     setState(() {
-      _terminalLogs.add("[root@spatial_tracer] ~ # $msg");
-      if (_terminalLogs.length > 8) _terminalLogs.removeAt(0);
+      _latestLog = msg;
     });
   }
 
@@ -408,28 +424,25 @@ class _DashboardScreenState extends State<DashboardScreen> {
         _addLog("Sending SIGTERM to tracker process...");
         await _methodChannel.invokeMethod('stopService');
         setState(() => _isActive = false);
-        _addLog("Service stopped successfully. (exit 0)");
+        _addLog("Service stopped. (exit 0)");
       } else {
-        _addLog("Verifying camera & overlay permissions...");
+        _addLog("Verifying camera permissions...");
         
-        // Ensure camera is granted before starting Android 14+ FGS
         final cameraStatus = await Permission.camera.request();
         if (!cameraStatus.isGranted) {
           _addLog("ERR: Camera permission denied.");
           return;
         }
 
-        // Let the Android code request overlay permissions if needed.
         await _methodChannel.invokeMethod('startService');
         setState(() => _isActive = true);
-        _addLog("Process forked. Tracker daemon running...");
-        _addLog("Global Cursor Overlay initialized.");
+        _addLog("Daemon running. Intercepting inputs.");
       }
     } on PlatformException catch (e) {
       if (e.code == 'PERMISSION_DENIED') {
         _addLog("ERR: Overlay permission missing.");
       } else {
-        _addLog("ERR: Failed to start hardware stream: ${e.message}");
+        _addLog("ERR: Start failed - ${e.message}");
       }
     }
   }
@@ -459,19 +472,23 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textColor = isDark ? Colors.white : Colors.black87;
+    final subtitleColor = isDark ? Colors.white54 : Colors.black54;
+
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        iconTheme: const IconThemeData(color: Colors.white),
-        title: const Text(
+        iconTheme: IconThemeData(color: textColor),
+        title: Text(
           "Spatial Tracer",
-          style: TextStyle(fontWeight: FontWeight.w700, letterSpacing: -1, color: Colors.white),
+          style: TextStyle(fontWeight: FontWeight.w700, letterSpacing: -1, color: textColor),
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.settings_accessibility_rounded, color: Colors.white54),
+            icon: Icon(Icons.settings_accessibility_rounded, color: subtitleColor),
             onPressed: () {
               _methodChannel.invokeMethod('openAccessibilitySettings');
               _addLog("Opened Accessibility settings intent.");
@@ -486,86 +503,51 @@ class _DashboardScreenState extends State<DashboardScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Beautiful Sidebar Profile Header
-              InkWell(
-                onTap: () {
-                  Navigator.pop(context); // close drawer
-                  Navigator.push(
-                    context, 
-                    MaterialPageRoute(builder: (_) => const CreatorProfileScreen())
-                  );
-                },
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Hero(
-                        tag: 'creator_avatar',
-                        child: Container(
-                          width: 80,
-                          height: 80,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            boxShadow: [
-                              BoxShadow(color: const Color(0xFF34D399).withOpacity(0.3), blurRadius: 20, spreadRadius: 2)
-                            ],
-                            border: Border.all(color: const Color(0xFF34D399), width: 2),
-                          ),
-                          child: ClipOval(
-                            child: Image.asset("assets/images/app_icon.png", fit: BoxFit.cover),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        "Biswadeep Tewari",
-                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                          fontSize: 22,
-                          fontWeight: FontWeight.w700,
-                          letterSpacing: -0.5,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        "Full-Stack Engineer\nAI/ML Architect\nMobile Developer",
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          fontSize: 14,
-                          height: 1.4,
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      const Text(
-                        "build → ship → learn → repeat",
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                          color: Color(0xFF58A6FF),
-                        ),
-                      ),
-                    ],
+              // Beautiful Sidebar Minimal Header
+              Container(
+                padding: const EdgeInsets.fromLTRB(24, 48, 24, 24),
+                child: Text(
+                  "Spatial Tracer",
+                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                    fontSize: 28,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: -1,
+                    color: const Color(0xFF34D399),
                   ),
                 ),
               ),
               const Divider(color: Colors.white10, height: 1),
-              const SizedBox(height: 16),
               
-              // External Links
+              // 4 Specific Navigation Links
               ListTile(
-                leading: Icon(Icons.code_rounded, color: Theme.of(context).iconTheme.color),
-                title: Text("GitHub Project", style: Theme.of(context).textTheme.bodyMedium),
-                subtitle: Text("RajTewari01/Spatial_tracer", style: Theme.of(context).textTheme.bodySmall),
-                onTap: () => _launchURL("https://github.com/RajTewari01/Spatial_tracer"),
+                leading: Icon(Icons.school_rounded, color: Theme.of(context).iconTheme.color),
+                title: Text("Tutorial", style: Theme.of(context).textTheme.bodyMedium),
+                onTap: () {
+                  Navigator.pop(context); // close drawer
+                  Navigator.push(context, MaterialPageRoute(builder: (_) => const OnboardingScreen()));
+                },
+              ),
+              ListTile(
+                leading: Icon(Icons.live_tv_rounded, color: Theme.of(context).iconTheme.color),
+                title: Text("Live Tutorials", style: Theme.of(context).textTheme.bodyMedium),
+                onTap: () => _launchURL("https://youtube.com/RajTewari01"),
+              ),
+              ListTile(
+                leading: Icon(Icons.person_rounded, color: Theme.of(context).iconTheme.color),
+                title: Text("About Creator", style: Theme.of(context).textTheme.bodyMedium),
+                onTap: () {
+                  Navigator.pop(context); // close drawer
+                  Navigator.push(context, MaterialPageRoute(builder: (_) => const CreatorProfileScreen()));
+                },
               ),
               ListTile(
                 leading: Icon(Icons.email_rounded, color: Theme.of(context).iconTheme.color),
                 title: Text("Contact Support", style: Theme.of(context).textTheme.bodyMedium),
-                subtitle: Text("tewari765@gmail.com", style: Theme.of(context).textTheme.bodySmall),
                 onTap: () => _launchURL("mailto:tewari765@gmail.com"),
               ),
               const Padding(
                 padding: EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
-                child: Divider(color: Colors.grey, height: 1),
+                child: Divider(color: Colors.white10, height: 1),
               ),
               Consumer<ThemeProvider>(
                 builder: (context, themeProvider, child) {
@@ -650,12 +632,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       color: _isActive 
-                        ? Colors.white.withOpacity(0.1) 
-                        : Colors.black.withOpacity(0.3),
+                        ? (isDark ? Colors.white.withOpacity(0.1) : Colors.black.withOpacity(0.05))
+                        : (isDark ? Colors.black.withOpacity(0.3) : Colors.white.withOpacity(0.5)),
                       border: Border.all(
                         color: _isActive 
                           ? const Color(0xFF34D399) 
-                          : Colors.white.withOpacity(0.1),
+                          : (isDark ? Colors.white.withOpacity(0.1) : Colors.black.withOpacity(0.1)),
                         width: _isActive ? 4 : 1,
                       ),
                       boxShadow: [
@@ -680,7 +662,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           Icon(
                             _isActive ? Icons.power_rounded : Icons.power_settings_new_rounded,
                             size: 64,
-                            color: _isActive ? const Color(0xFF34D399) : Colors.white54,
+                            color: _isActive ? const Color(0xFF34D399) : subtitleColor,
                           ),
                           const SizedBox(height: 16),
                           Text(
@@ -689,7 +671,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                               fontSize: 18,
                               fontWeight: FontWeight.w700,
                               letterSpacing: 2,
-                              color: _isActive ? const Color(0xFF34D399) : Colors.white54,
+                              color: _isActive ? const Color(0xFF34D399) : subtitleColor,
                             ),
                           ),
                         ],
@@ -702,52 +684,54 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
                 // Linux Commanding Terminal Bottom Panel
                 GlassCard(
-                  height: 240,
+                  height: 180,
                   borderRadius: 16,
-                  padding: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.all(24),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      const Row(
+                      Row(
                         children: [
-                          Icon(Icons.terminal_rounded, size: 16, color: Colors.white54),
-                          SizedBox(width: 8),
-                          Text(
-                            "tty1 - OS event trace",
-                            style: TextStyle(fontSize: 12, color: Colors.white54, fontFamily: 'monospace'),
+                          Icon(Icons.terminal_rounded, size: 16, color: Colors.white70),
+                          const SizedBox(width: 8),
+                          const Text(
+                            "LIVE SYSTEM CLOCK",
+                            style: TextStyle(fontSize: 11, color: Colors.white70, fontFamily: 'monospace', letterSpacing: 1.5),
                           ),
                         ],
                       ),
                       const Padding(
-                        padding: EdgeInsets.symmetric(vertical: 8.0),
-                        child: Divider(color: Colors.white10, height: 1),
+                        padding: EdgeInsets.symmetric(vertical: 12.0),
+                        child: Divider(color: Colors.white24, height: 1),
                       ),
                       Expanded(
-                        child: ListView.builder(
-                          physics: const BouncingScrollPhysics(),
-                          itemCount: _terminalLogs.length + 1,
-                          itemBuilder: (context, index) {
-                            if (index == _terminalLogs.length) {
-                              return Text(
-                                "root@tracer:~# " + (_showCursor ? "_" : ""),
-                                style: const TextStyle(
-                                  fontFamily: 'monospace',
-                                  fontSize: 12,
-                                  color: Color(0xFF34D399),
-                                  height: 1.5,
-                                ),
-                              );
-                            }
-                            return Text(
-                              _terminalLogs[index],
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              "$_currentTime" + (_showCursor ? "_" : ""),
                               style: const TextStyle(
                                 fontFamily: 'monospace',
-                                fontSize: 12,
-                                color: Color(0xFFA1A1AA),
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xFF34D399),
+                                height: 1.2,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              "Status: $_latestLog",
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                fontFamily: 'monospace',
+                                fontSize: 11,
+                                color: Colors.white54,
                                 height: 1.5,
                               ),
-                            );
-                          },
+                            ),
+                          ],
                         ),
                       ),
                     ],

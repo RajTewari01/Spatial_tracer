@@ -157,7 +157,8 @@ class TrackerService : LifecycleService() {
                         bitmap.copyPixelsFromBuffer(imageProxy.planes[0].buffer)
                         
                         val mpImage = BitmapImageBuilder(bitmap).build()
-                        handLandmarker?.detectAsync(mpImage, imageProxy.imageInfo.timestamp)
+                        val timestampMs = imageProxy.imageInfo.timestamp / 1_000_000
+                        handLandmarker?.detectAsync(mpImage, timestampMs)
                         
                         imageProxy.close()
                     }
