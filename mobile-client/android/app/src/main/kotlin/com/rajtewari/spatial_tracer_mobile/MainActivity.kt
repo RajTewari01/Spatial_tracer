@@ -29,7 +29,13 @@ class MainActivity : FlutterActivity() {
                         return@setMethodCallHandler
                     }
 
-                    val serviceIntent = Intent(this, TrackerService::class.java)
+                    val useHand = call.argument<Boolean>("useHand") ?: true
+                    val useFace = call.argument<Boolean>("useFace") ?: false
+
+                    val serviceIntent = Intent(this, TrackerService::class.java).apply {
+                        putExtra("USE_HAND", useHand)
+                        putExtra("USE_FACE", useFace)
+                    }
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                         startForegroundService(serviceIntent)
                     } else {

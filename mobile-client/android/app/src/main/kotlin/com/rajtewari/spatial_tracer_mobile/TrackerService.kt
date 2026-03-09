@@ -21,6 +21,8 @@ import com.google.mediapipe.tasks.core.BaseOptions
 import com.google.mediapipe.tasks.vision.core.RunningMode
 import com.google.mediapipe.tasks.vision.handlandmarker.HandLandmarker
 import com.google.mediapipe.tasks.vision.handlandmarker.HandLandmarkerResult
+import com.google.mediapipe.tasks.vision.facelandmarker.FaceLandmarker
+import com.google.mediapipe.tasks.vision.facelandmarker.FaceLandmarkerResult
 import java.io.File
 import java.io.FileOutputStream
 import java.util.concurrent.ExecutorService
@@ -38,7 +40,12 @@ class TrackerService : LifecycleService() {
 
     private lateinit var cameraExecutor: ExecutorService
     private var handLandmarker: HandLandmarker? = null
+    private var faceLandmarker: FaceLandmarker? = null
     private var cursorOverlay: CursorOverlay? = null
+
+    // Track which streams to process
+    private var useHandTracking = true
+    private var useFaceTracking = false
 
     // Smoothing state
     private var smoothedX = -1f
@@ -69,6 +76,7 @@ class TrackerService : LifecycleService() {
         cursorOverlay?.show()
 
         initHandLandmarker()
+        initFaceLandmarker()
         startCamera()
     }
 
@@ -79,6 +87,10 @@ class TrackerService : LifecycleService() {
             return START_NOT_STICKY
         }
         
+        // Update active trackers based on UI toggles
+        useHandTracking = intent?.getBooleanExtra("USE_HAND", true) ?: true
+        useFaceTracking = intent?.getBooleanExtra("USE_FACE", false) ?: false
+
         // Check if Accessibility Service is bound
         if (SpatialAccessibilityService.instance == null) {
             Log.w(TAG, "Accessibility Service is not bound but tracker started.")
@@ -92,6 +104,7 @@ class TrackerService : LifecycleService() {
         cursorOverlay?.hide()
         cameraExecutor.shutdown()
         handLandmarker?.close()
+        faceLandmarker?.close()
     }
 
     private fun createNotificationChannel() {
@@ -143,6 +156,35 @@ class TrackerService : LifecycleService() {
         handLandmarker = HandLandmarker.createFromOptions(this, options)
     }
 
+    private fun initFaceLandmarker() {
+        val modelFile = File(cacheDir, "face_landmarker.task")
+        if (!modelFile.exists()) {
+            assets.open("face_landmarker.task").use { input ->
+                FileOutputStream(modelFile).use { output ->
+                    input.copyTo(output)
+                }
+            }
+        }
+
+        val baseOptions = BaseOptions.builder()
+            .setModelAssetPath(modelFile.absolutePath)
+            .build()
+
+        val options = FaceLandmarker.FaceLandmarkerOptions.builder()
+            .setBaseOptions(baseOptions)
+            .setRunningMode(RunningMode.LIVE_STREAM)
+            .setNumFaces(1)
+            .setMinFaceDetectionConfidence(0.5f)
+            .setMinTrackingConfidence(0.5f)
+            .setResultListener(this::onFaceLandmarkerResult)
+            .setErrorListener { error ->
+                Log.e(TAG, "MediaPipe face error: ${error.message}")
+            }
+            .build()
+
+        faceLandmarker = FaceLandmarker.createFromOptions(this, options)
+    }
+
     private fun startCamera() {
         val cameraProviderFuture = ProcessCameraProvider.getInstance(this)
 
@@ -163,7 +205,13 @@ class TrackerService : LifecycleService() {
                         
                         val mpImage = BitmapImageBuilder(bitmap).build()
                         val timestampMs = imageProxy.imageInfo.timestamp / 1_000_000
-                        handLandmarker?.detectAsync(mpImage, timestampMs)
+                        
+                        if (useHandTracking) {
+                            handLandmarker?.detectAsync(mpImage, timestampMs)
+                        }
+                        if (useFaceTracking) {
+                            faceLandmarker?.detectAsync(mpImage, timestampMs)
+                        }
                         
                         imageProxy.close()
                     }
@@ -181,8 +229,27 @@ class TrackerService : LifecycleService() {
         }, ContextCompat.getMainExecutor(this))
     }
 
+    private fun onFaceLandmarkerResult(result: FaceLandmarkerResult, mpImage: MPImage) {
+        if (!useFaceTracking || result.faceLandmarks().isEmpty()) {
+            FaceDetector.reset()
+            return
+        }
+
+        val lmRaw = mutableListOf<Map<String, Double>>()
+        result.faceLandmarks()[0].forEach { lm ->
+            lmRaw.add(mapOf("x" to lm.x().toDouble(), "y" to lm.y().toDouble()))
+        }
+
+        val action = FaceDetector.detectAction(lmRaw)
+        
+        val accService = SpatialAccessibilityService.instance
+        if (accService != null && action != "IDLE") {
+            handleFaceAction(accService, action)
+        }
+    }
+
     private fun onHandLandmarkerResult(result: HandLandmarkerResult, mpImage: MPImage) {
-        if (result.landmarks().isEmpty()) {
+        if (!useHandTracking || result.landmarks().isEmpty()) {
             GestureDetector.reset()
             smoothedX = -1f
             smoothedY = -1f
@@ -222,13 +289,67 @@ class TrackerService : LifecycleService() {
 
         // Dispatch to Accessibility Service
         val accService = SpatialAccessibilityService.instance
-        if (accService != null && gesture != "IDLE") {
+        if (accService != null && gesture != "IDLE" && gesture != "NONE") {
             handleGestureAction(accService, gesture, lmRaw, smoothedX, smoothedY)
         }
     }
 
     // Cooldown state
     private var lastActionTime = 0L
+    private var lastFaceActionTime = 0L
+
+    private fun handleFaceAction(acc: SpatialAccessibilityService, action: String) {
+        val now = System.currentTimeMillis()
+        
+        // Broadcast the active face state back to the Flutter UI layer if needed
+        Handler(Looper.getMainLooper()).post {
+            gestureEventSink?.success(action)
+        }
+
+        when (action) {
+            "BLINK" -> {
+                if (now - lastFaceActionTime > 1500) {
+                    // BLINK -> Opens Recent Apps menu to close apps
+                    Handler(Looper.getMainLooper()).post { acc.performRecentsAction() }
+                    lastFaceActionTime = now
+                }
+            }
+            "TILT_UP", "TILT_DOWN" -> {
+                if (now - lastFaceActionTime > 500) {
+                    val resources = resources
+                    val sw = resources.displayMetrics.widthPixels
+                    val sh = resources.displayMetrics.heightPixels
+                    Handler(Looper.getMainLooper()).post {
+                        if (action == "TILT_UP") {
+                            // Scroll up (Swipe down)
+                            acc.performSwipe(0.5f, 0.3f, 0.5f, 0.7f, sw, sh)
+                        } else {
+                            // Scroll down (Swipe up)
+                            acc.performSwipe(0.5f, 0.7f, 0.5f, 0.3f, sw, sh)
+                        }
+                    }
+                    lastFaceActionTime = now
+                }
+            }
+            "TILT_LEFT", "TILT_RIGHT" -> {
+                if (now - lastFaceActionTime > 500) {
+                    val resources = resources
+                    val sw = resources.displayMetrics.widthPixels
+                    val sh = resources.displayMetrics.heightPixels
+                    Handler(Looper.getMainLooper()).post {
+                        if (action == "TILT_LEFT") {
+                            // Swipe Right
+                            acc.performSwipe(0.2f, 0.5f, 0.8f, 0.5f, sw, sh)
+                        } else {
+                            // Swipe Left
+                            acc.performSwipe(0.8f, 0.5f, 0.2f, 0.5f, sw, sh)
+                        }
+                    }
+                    lastFaceActionTime = now
+                }
+            }
+        }
+    }
 
     private fun handleGestureAction(acc: SpatialAccessibilityService, gesture: String, lm: List<Map<String, Double>>, px: Float, py: Float) {
         val now = System.currentTimeMillis()

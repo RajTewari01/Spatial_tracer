@@ -138,9 +138,23 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     {
       'icon': Icons.swipe_rounded,
       'title': 'System Control',
-      'subtitle': 'Form a closed FIST to view Recent Apps. Do it now to finish setup.',
+      'subtitle': 'Form a closed FIST to view Recent Apps. Do it now to continue.',
       'requiredGesture': 'FIST',
       'accent': const Color(0xFF10B981),
+    },
+    {
+      'icon': Icons.swap_vert_rounded,
+      'title': 'Face Scroll',
+      'subtitle': 'Tilt your head UP or DOWN to scroll pages hands-free. Try tilting your head firmly now.',
+      'requiredGesture': ['TILT_UP', 'TILT_DOWN'],
+      'accent': const Color(0xFFF59E0B),
+    },
+    {
+      'icon': Icons.visibility_off_rounded,
+      'title': 'Blink to Close',
+      'subtitle': 'A firm, intentional blink acts as a "Close" or "Recents" action. Blink fully now to finish setup.',
+      'requiredGesture': 'BLINK',
+      'accent': const Color(0xFFEF4444),
     },
   ];
 
@@ -155,7 +169,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       // Must have permissions to demonstrate the cursor
       final status = await Permission.camera.request();
       if (status.isGranted) {
-        await _methodChannel.invokeMethod('startService');
+        await _methodChannel.invokeMethod('startService', {
+          'useHand': true,
+          'useFace': true,
+        });
         
         _gestureSubscription = _eventChannel.receiveBroadcastStream().listen((gesture) {
           _handleLiveGesture(gesture.toString());
@@ -172,8 +189,14 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     if (_isSuccessAnim) return; // Prevent double-triggers during transition
 
     final requiredGesture = _pages[_currentPage]['requiredGesture'];
-    if (gesture == requiredGesture) {
-      _triggerSuccessAndAdvance();
+    if (requiredGesture is List) {
+      if (requiredGesture.contains(gesture)) {
+        _triggerSuccessAndAdvance();
+      }
+    } else {
+      if (gesture == requiredGesture) {
+        _triggerSuccessAndAdvance();
+      }
     }
   }
 
@@ -381,6 +404,8 @@ class DashboardScreen extends StatefulWidget {
 class _DashboardScreenState extends State<DashboardScreen> {
   static const _methodChannel = MethodChannel('com.rajtewari/hand_tracker');
   bool _isActive = false;
+  bool _useHandTracking = true;
+  bool _useFaceTracking = false;
   
   Timer? _liveTimer;
   String _currentTime = "";
@@ -390,6 +415,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   @override
   void initState() {
     super.initState();
+    _loadPreferences();
     _updateTime();
     _liveTimer = Timer.periodic(const Duration(milliseconds: 500), (timer) {
       if (mounted) setState(() {
@@ -397,6 +423,21 @@ class _DashboardScreenState extends State<DashboardScreen> {
         _showCursor = !_showCursor;
       });
     });
+  }
+
+  Future<void> _loadPreferences() async {
+    final prefs = await SharedPreferences.getInstance();
+    if (mounted) {
+      setState(() {
+        _useHandTracking = prefs.getBool('use_hand_tracking') ?? true;
+        _useFaceTracking = prefs.getBool('use_face_tracking') ?? false;
+      });
+    }
+  }
+
+  Future<void> _savePreference(String key, bool value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(key, value);
   }
 
   void _updateTime() {
@@ -434,7 +475,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
           return;
         }
 
-        await _methodChannel.invokeMethod('startService');
+        await _methodChannel.invokeMethod('startService', {
+          'useHand': _useHandTracking,
+          'useFace': _useFaceTracking,
+        });
         setState(() => _isActive = true);
         _addLog("Daemon running. Intercepting inputs.");
       }
@@ -597,6 +641,44 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     ),
                     const SizedBox(height: 8),
                     
+                    // Independent Engine Toggles
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                      child: SwitchListTile(
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                        title: Text("Hand Tracking", style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
+                        subtitle: Text("Point, Tap, Snap", style: Theme.of(context).textTheme.bodySmall),
+                        secondary: Icon(Icons.back_hand_rounded, size: 20, color: textColor),
+                        value: _useHandTracking,
+                        activeColor: const Color(0xFF34D399),
+                        onChanged: (val) {
+                          setState(() => _useHandTracking = val);
+                          _savePreference('use_hand_tracking', val);
+                          // Restart service if already running
+                          if (_isActive) _toggleService().then((_) => _toggleService());
+                        },
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                      child: SwitchListTile(
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                        title: Text("Face Tracking", style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
+                        subtitle: Text("Tilt to scroll, Blink to close", style: Theme.of(context).textTheme.bodySmall),
+                        secondary: Icon(Icons.face_rounded, size: 20, color: textColor),
+                        value: _useFaceTracking,
+                        activeColor: const Color(0xFF34D399),
+                        onChanged: (val) {
+                          setState(() => _useFaceTracking = val);
+                          _savePreference('use_face_tracking', val);
+                          // Restart service if already running
+                          if (_isActive) _toggleService().then((_) => _toggleService());
+                        },
+                      ),
+                    ),
+
                     Consumer<ThemeProvider>(
                       builder: (context, themeProvider, child) {
                         return Padding(
