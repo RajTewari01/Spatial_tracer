@@ -237,7 +237,7 @@ class TrackerService : LifecycleService() {
 
         val lmRaw = mutableListOf<Map<String, Double>>()
         result.faceLandmarks()[0].forEach { lm ->
-            lmRaw.add(mapOf("x" to lm.x().toDouble(), "y" to lm.y().toDouble()))
+            lmRaw.add(mapOf("x" to lm.x().toDouble(), "y" to lm.y().toDouble(), "z" to lm.z().toDouble()))
         }
 
         val action = FaceDetector.detectAction(lmRaw)
