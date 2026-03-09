@@ -797,6 +797,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
         ],
       ),
     );
+  }
+
   // ---------------------------------------------------------------------------
   // Build Sidebar List Tile Helper (IDE Styled)
   // ---------------------------------------------------------------------------
