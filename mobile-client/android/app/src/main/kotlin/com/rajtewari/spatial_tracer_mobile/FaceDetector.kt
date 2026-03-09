@@ -5,60 +5,56 @@ import kotlin.math.sqrt
 object FaceDetector {
     private var lastAction = "IDLE"
     private var actionCount = 0
-    private const val STABLE_FRAMES = 4 // Increased slightly for stability to avoid jitter
+    private const val STABLE_FRAMES = 4 
 
-    data class Point(val x: Double, val y: Double, val z: Double = 0.0)
+    data class Point(val x: Double, val y: Double)
 
     private fun dist(a: Point, b: Point): Double {
         return sqrt(Math.pow(a.x - b.x, 2.0) + Math.pow(a.y - b.y, 2.0))
     }
 
     fun detectAction(lmRaw: List<Map<String, Double>>): String {
-        // FaceLandmarker outputs 478 points
         if (lmRaw.size < 400) return "IDLE"
 
-        val lm = lmRaw.map { Point(it["x"] ?: 0.0, it["y"] ?: 0.0, it["z"] ?: 0.0) }
+        val lm = lmRaw.map { Point(it["x"] ?: 0.0, it["y"] ?: 0.0) }
 
         // Eye Aspect Ratio (EAR) for Blinking
-        // Left eye: Top 159, Bottom 145. Corners 33, 133
         val leftEyeHeight = dist(lm[159], lm[145])
         val leftEyeWidth = dist(lm[33], lm[133])
         val leftEar = if (leftEyeWidth > 0) leftEyeHeight / leftEyeWidth else 0.0
 
-        // Right eye: Top 386, Bottom 374. Corners 362, 263
         val rightEyeHeight = dist(lm[386], lm[374])
         val rightEyeWidth = dist(lm[362], lm[263])
         val rightEar = if (rightEyeWidth > 0) rightEyeHeight / rightEyeWidth else 0.0
 
         val ear = (leftEar + rightEar) / 2.0
 
-        // Blink threshold
-        if (ear < 0.17) {
+        // Blink threshold loosened to 0.20 to capture blinks more easily
+        if (ear < 0.20) {
             return stabilize("BLINK")
         }
 
-        // Head tilt UP/DOWN (Using 3D Z-Depth)
-        // Top of forehead (10), Chin (152)
-        // In MediaPipe, smaller Z is closer to the camera.
-        val foreheadZ = lm[10].z
-        val chinZ = lm[152].z
-        val pitchDelta = chinZ - foreheadZ 
+        // --- 2D Geometry Tilts (More robust than Z-Depth for varying face structures) ---
         
-        // If chin is much CLOSER (-) than forehead (+), head is tilted UP
-        if (pitchDelta < -0.04) return stabilize("TILT_UP")
-        // If forehead is much CLOSER (-) than chin (+), head is tilted DOWN
-        if (pitchDelta > 0.035) return stabilize("TILT_DOWN")
+        // PITCH (Up/Down) - Nose (1) relative to Forehead (10) and Chin (152)
+        val faceHeight = dist(lm[10], lm[152])
+        val noseToTop = dist(lm[1], lm[10])
+        val pitchRatio = if (faceHeight > 0) noseToTop / faceHeight else 0.5
+        
+        // Neutral pitch ratio is usually ~0.45-0.55.
+        // We require a significant tilt backward (< 0.35) or forward (> 0.65)
+        if (pitchRatio < 0.35) return stabilize("TILT_UP")
+        if (pitchRatio > 0.65) return stabilize("TILT_DOWN")
 
-        // Head tilt LEFT/RIGHT (Using 3D Z-Depth)
-        // Left cheek (234), Right cheek (454) -- Note: Left side of image vs left side of face
-        val leftCheekZ = lm[234].z
-        val rightCheekZ = lm[454].z
-        val yawDelta = rightCheekZ - leftCheekZ
+        // YAW (Left/Right) - Nose (1) relative to Left Cheek (234) and Right Cheek (454)
+        val faceWidth = dist(lm[234], lm[454])
+        val noseToLeft = dist(lm[1], lm[234])
+        val yawRatio = if (faceWidth > 0) noseToLeft / faceWidth else 0.5
         
-        // If right cheek is further away (+) and left cheek is closer (-), head is turned to the user's right
-        if (yawDelta > 0.04) return stabilize("TILT_RIGHT")
-        // If left cheek is further away (+) and right cheek is closer (-), head is turned to the user's left
-        if (yawDelta < -0.04) return stabilize("TILT_LEFT")
+        // Neutral yaw ratio is ~0.50.
+        // Require significant head turn.
+        if (yawRatio < 0.25) return stabilize("TILT_LEFT")
+        if (yawRatio > 0.75) return stabilize("TILT_RIGHT")
 
         return stabilize("IDLE")
     }
