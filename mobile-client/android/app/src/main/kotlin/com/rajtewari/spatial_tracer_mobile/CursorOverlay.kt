@@ -72,7 +72,7 @@ class CursorOverlay(context: Context) {
         override fun onDraw(canvas: Canvas) {
             super.onDraw(canvas)
 
-            if (currentGesture == "IDLE" || currentGesture == "OPEN_PALM") {
+            if (currentGesture == "NONE") {
                 return
             }
 

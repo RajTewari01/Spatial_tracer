@@ -43,7 +43,7 @@ class TrackerService : LifecycleService() {
     // Smoothing state
     private var smoothedX = -1f
     private var smoothedY = -1f
-    private val SMOOTHING_FACTOR = 0.25f // 0.0 - 1.0, lower is smoother
+    private val SMOOTHING_FACTOR = 0.45f // Increased from 0.25 to make cursor tracking snappier
 
     companion object {
         const val TAG = "TrackerService"
@@ -186,7 +186,7 @@ class TrackerService : LifecycleService() {
             GestureDetector.reset()
             smoothedX = -1f
             smoothedY = -1f
-            cursorOverlay?.updatePosition(0.5f, 0.5f, "IDLE")
+            cursorOverlay?.updatePosition(0.5f, 0.5f, "NONE")
             return
         }
 
@@ -243,7 +243,7 @@ class TrackerService : LifecycleService() {
                 // Overlay updates automatically above
             }
             "PEACE" -> {
-                if (now - lastActionTime > 1000) { // Increased tap cooldown
+                if (now - lastActionTime > 600) { // Reduced tap cooldown from 1000
                     val resources = resources
                     val displayMetrics = resources.displayMetrics
                     val sw = displayMetrics.widthPixels
@@ -255,21 +255,21 @@ class TrackerService : LifecycleService() {
                 }
             }
             "PINCH" -> {
-                if (now - lastActionTime > 1500) { // Harder back cooldown
+                if (now - lastActionTime > 1000) { // Reduced from 1500
                     // PINCH -> Goes Back
                     Handler(Looper.getMainLooper()).post { acc.performBackAction() }
                     lastActionTime = now
                 }
             }
             "FIST" -> {
-                if (now - lastActionTime > 1500) {
+                if (now - lastActionTime > 1000) {
                     // FIST -> Opens Recent Apps menu
                     Handler(Looper.getMainLooper()).post { acc.performRecentsAction() }
                     lastActionTime = now
                 }
             }
             "THREE" -> {
-                if (now - lastActionTime > 1500) {
+                if (now - lastActionTime > 1000) {
                     // THREE fingers -> Go Home
                     Handler(Looper.getMainLooper()).post { acc.performHomeAction() }
                     lastActionTime = now

@@ -32,9 +32,8 @@ object GestureDetector {
 
     private var lastGesture = "IDLE"
     private var gestureCount = 0
-    // Increasing stable frames: gestures must be held for longer to register
-    // This stops everything from triggering accidentally while hands are moving
-    private const val STABLE_FRAMES = 5
+    // Decreasing stable frames to 2 for ultra-snappiness as requested
+    private const val STABLE_FRAMES = 2
 
     // Simple point structure
     data class Point(val x: Double, val y: Double)
