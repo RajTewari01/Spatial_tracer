@@ -32,7 +32,9 @@ object GestureDetector {
 
     private var lastGesture = "IDLE"
     private var gestureCount = 0
-    private const val STABLE_FRAMES = 2
+    // Increasing stable frames: gestures must be held for longer to register
+    // This stops everything from triggering accidentally while hands are moving
+    private const val STABLE_FRAMES = 5
 
     // Simple point structure
     data class Point(val x: Double, val y: Double)
@@ -71,23 +73,36 @@ object GestureDetector {
 
         val palmY = (lm[WRIST].y + lm[INDEX_MCP].y + lm[PINKY_MCP].y) / 3.0
 
-        // Pinch: thumb + index close
+        // FIST: All fingers rigidly folded
+        if (thuF && idxF && midF && rngF && pnkF) {
+            // Only count if thumb is physically tucked in
+            if (dist(lm[THUMB_TIP], lm[PINKY_MCP]) < dist(lm[THUMB_TIP], lm[INDEX_MCP])) {
+                return stabilize("FIST")
+            }
+        }
+
+        // Pinch: thumb + index very close, others ideally folded or out of the way
         val pinchDist = dist(lm[THUMB_TIP], lm[INDEX_TIP])
-        if (pinchDist < 0.07) return stabilize("PINCH")
+        if (pinchDist < 0.05) return stabilize("PINCH") // tightened threshold
 
         // Thumbs UP/DOWN
         if (thuE && idxF && midF && rngF && pnkF) {
-            if (lm[THUMB_TIP].y < palmY - 0.03) return stabilize("THUMBS_UP")
-            if (lm[THUMB_TIP].y > palmY + 0.03) return stabilize("THUMBS_DOWN")
+            if (lm[THUMB_TIP].y < palmY - 0.04) return stabilize("THUMBS_UP")
+            if (lm[THUMB_TIP].y > palmY + 0.04) return stabilize("THUMBS_DOWN")
         }
 
         // Middle finger
         if (midE && idxF && rngF && pnkF) return stabilize("MIDDLE_FINGER")
 
-        // Peace
-        if (idxE && midE && rngF && pnkF) return stabilize("PEACE")
+        // Peace - ensure index and middle are distinctly separated
+        if (idxE && midE && rngF && pnkF) {
+             val peaceDist = dist(lm[INDEX_TIP], lm[MIDDLE_TIP])
+             if (peaceDist > 0.05) {
+                 return stabilize("PEACE")
+             }
+        }
 
-        // Pointing
+        // Pointing: Only index extended, others rigidly folded
         if (idxE && midF && rngF && pnkF) return stabilize("POINTING")
 
         // Spider-man
@@ -95,9 +110,6 @@ object GestureDetector {
 
         // Three
         if (idxE && midE && rngE && pnkF) return stabilize("THREE")
-
-        // Fist
-        if (thuF && idxF && midF && rngF && pnkF) return stabilize("FIST")
 
         // Open Palm
         if (thuE && idxE && midE && rngE && pnkE) return stabilize("OPEN_PALM")

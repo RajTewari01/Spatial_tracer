@@ -40,6 +40,11 @@ class TrackerService : LifecycleService() {
     private var handLandmarker: HandLandmarker? = null
     private var cursorOverlay: CursorOverlay? = null
 
+    // Smoothing state
+    private var smoothedX = -1f
+    private var smoothedY = -1f
+    private val SMOOTHING_FACTOR = 0.25f // 0.0 - 1.0, lower is smoother
+
     companion object {
         const val TAG = "TrackerService"
         const val NOTIFICATION_ID = 12345
@@ -179,6 +184,8 @@ class TrackerService : LifecycleService() {
     private fun onHandLandmarkerResult(result: HandLandmarkerResult, mpImage: MPImage) {
         if (result.landmarks().isEmpty()) {
             GestureDetector.reset()
+            smoothedX = -1f
+            smoothedY = -1f
             cursorOverlay?.updatePosition(0.5f, 0.5f, "IDLE")
             return
         }
@@ -197,15 +204,26 @@ class TrackerService : LifecycleService() {
         val midX = ((idx["x"]!! + thumb["x"]!!) / 2).toFloat()
         val midY = ((idx["y"]!! + thumb["y"]!!) / 2).toFloat()
         
-        val pointX = if (gesture == "PINCH") 1f - midX else 1f - idx["x"]!!.toFloat()
-        val pointY = if (gesture == "PINCH") midY else idx["y"]!!.toFloat()
+        val targetX = if (gesture == "PINCH") 1f - midX else 1f - idx["x"]!!.toFloat()
+        val targetY = if (gesture == "PINCH") midY else idx["y"]!!.toFloat()
 
-        cursorOverlay?.updatePosition(pointX, pointY, gesture)
+        // Apply Exponential Moving Average (EMA) Smoothing
+        if (smoothedX == -1f && smoothedY == -1f) {
+            // First frame tracking, snap directly
+            smoothedX = targetX
+            smoothedY = targetY
+        } else {
+            // Interpolate for smooth glide
+            smoothedX = smoothedX + SMOOTHING_FACTOR * (targetX - smoothedX)
+            smoothedY = smoothedY + SMOOTHING_FACTOR * (targetY - smoothedY)
+        }
+
+        cursorOverlay?.updatePosition(smoothedX, smoothedY, gesture)
 
         // Dispatch to Accessibility Service
         val accService = SpatialAccessibilityService.instance
         if (accService != null && gesture != "IDLE") {
-            handleGestureAction(accService, gesture, lmRaw, pointX, pointY)
+            handleGestureAction(accService, gesture, lmRaw, smoothedX, smoothedY)
         }
     }
 
@@ -225,7 +243,7 @@ class TrackerService : LifecycleService() {
                 // Overlay updates automatically above
             }
             "PEACE" -> {
-                if (now - lastActionTime > 500) {
+                if (now - lastActionTime > 1000) { // Increased tap cooldown
                     val resources = resources
                     val displayMetrics = resources.displayMetrics
                     val sw = displayMetrics.widthPixels
@@ -237,21 +255,21 @@ class TrackerService : LifecycleService() {
                 }
             }
             "PINCH" -> {
-                if (now - lastActionTime > 1000) {
+                if (now - lastActionTime > 1500) { // Harder back cooldown
                     // PINCH -> Goes Back
                     Handler(Looper.getMainLooper()).post { acc.performBackAction() }
                     lastActionTime = now
                 }
             }
             "FIST" -> {
-                if (now - lastActionTime > 1000) {
+                if (now - lastActionTime > 1500) {
                     // FIST -> Opens Recent Apps menu
                     Handler(Looper.getMainLooper()).post { acc.performRecentsAction() }
                     lastActionTime = now
                 }
             }
             "THREE" -> {
-                if (now - lastActionTime > 1000) {
+                if (now - lastActionTime > 1500) {
                     // THREE fingers -> Go Home
                     Handler(Looper.getMainLooper()).post { acc.performHomeAction() }
                     lastActionTime = now

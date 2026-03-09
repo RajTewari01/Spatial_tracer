@@ -1,8 +1,33 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class CreatorProfileScreen extends StatelessWidget {
+class CreatorProfileScreen extends StatefulWidget {
   const CreatorProfileScreen({super.key});
+
+  @override
+  State<CreatorProfileScreen> createState() => _CreatorProfileScreenState();
+}
+
+class _CreatorProfileScreenState extends State<CreatorProfileScreen> {
+  final ScrollController _scrollController = ScrollController();
+  double _scrollOffset = 0.0;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(() {
+      setState(() {
+        _scrollOffset = _scrollController.offset;
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
 
   Future<void> _launchURL(String urlString) async {
     final Uri url = Uri.parse(urlString);
@@ -14,196 +39,368 @@ class CreatorProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    
+    // Aesthetic colors
+    final bgDark = const Color(0xFF0F172A);
+    final bgLight = const Color(0xFFF1F5F9);
+    final accent = const Color(0xFF34D399);
 
     return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      body: CustomScrollView(
-        physics: const BouncingScrollPhysics(),
-        slivers: [
-          SliverAppBar(
-            expandedHeight: 320,
-            pinned: true,
-            stretch: true,
-            backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
-            iconTheme: Theme.of(context).iconTheme,
-            flexibleSpace: FlexibleSpaceBar(
-              titlePadding: const EdgeInsets.only(left: 16, bottom: 16),
-              background: Stack(
-                fit: StackFit.expand,
-                children: [
-                  Container(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: isDark 
-                          ? [const Color(0xFF0D1117), const Color(0xFF161B22)] 
-                          : [Colors.white, const Color(0xFFF3F4F6)],
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                      )
-                    ),
-                  ),
-                  Positioned(
-                    top: -100, right: -50,
-                    child: Container(
-                      width: 250, height: 250,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Theme.of(context).colorScheme.primary.withOpacity(isDark ? 0.15 : 0.05)
-                      )
-                    )
-                  ),
-                  Center(
-                    child: Hero(
-                      tag: 'creator_avatar',
-                      child: Container(
-                        width: 140, height: 140,
+      backgroundColor: isDark ? bgDark : bgLight,
+      body: Stack(
+        children: [
+          // Background 3-Layer Chinese Mirror Mountains Parallax
+          _buildParallaxMountains(isDark),
+
+          // Scrollable Content
+          CustomScrollView(
+            controller: _scrollController,
+            physics: const BouncingScrollPhysics(),
+            slivers: [
+              SliverAppBar(
+                expandedHeight: 380,
+                pinned: true,
+                stretch: true,
+                backgroundColor: Colors.transparent,
+                elevation: 0,
+                iconTheme: Theme.of(context).iconTheme.copyWith(
+                  color: isDark ? Colors.white : Colors.black87
+                ),
+                flexibleSpace: FlexibleSpaceBar(
+                  stretchModes: const [StretchMode.zoomBackground, StretchMode.blurBackground],
+                  background: Stack(
+                    fit: StackFit.expand,
+                    children: [
+                      // Subdued gradient behind avatar
+                      Container(
                         decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          border: Border.all(color: Theme.of(context).colorScheme.primary, width: 3),
-                          image: const DecorationImage(
-                            image: AssetImage('assets/images/app_icon.png'),
-                            fit: BoxFit.cover,
-                          ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Theme.of(context).colorScheme.primary.withOpacity(0.4),
-                              blurRadius: 40, spreadRadius: 5
+                          gradient: LinearGradient(
+                            colors: [
+                              Colors.transparent,
+                              (isDark ? bgDark : bgLight).withOpacity(0.9),
+                            ],
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                          )
+                        ),
+                      ),
+                      
+                      // Floating Chinese Characters Parallax
+                      Positioned(
+                        top: 100 - (_scrollOffset * 0.4),
+                        right: 40,
+                        child: Text("禅", style: TextStyle(fontSize: 80, color: (isDark ? Colors.white : Colors.black).withOpacity(0.05), fontWeight: FontWeight.bold)),
+                      ),
+                      Positioned(
+                        top: 200 - (_scrollOffset * 0.6),
+                        left: 30,
+                        child: Text("道", style: TextStyle(fontSize: 100, color: (isDark ? Colors.white : Colors.black).withOpacity(0.03), fontWeight: FontWeight.bold)),
+                      ),
+
+                      // Avatar & Name Container
+                      Positioned(
+                        bottom: 40,
+                        left: 0, right: 0,
+                        child: Column(
+                          children: [
+                            Hero(
+                              tag: 'creator_avatar',
+                              child: Container(
+                                width: 140, height: 140,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  border: Border.all(color: Colors.white.withOpacity(0.8), width: 3),
+                                  image: const DecorationImage(
+                                    image: AssetImage('assets/images/raj_profile.jpg'),
+                                    fit: BoxFit.cover,
+                                  ),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: accent.withOpacity(isDark ? 0.3 : 0.4),
+                                      blurRadius: 30, spreadRadius: 5
+                                    )
+                                  ]
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            Text(
+                              "Biswadeep TEwari (Raj)",
+                              style: TextStyle(
+                                fontSize: 28,
+                                fontWeight: FontWeight.w900,
+                                letterSpacing: -0.5,
+                                color: isDark ? Colors.white : Colors.black87,
+                                shadows: [
+                                  Shadow(color: isDark ? Colors.black54 : Colors.white70, blurRadius: 10)
+                                ]
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              "CREATE • ITERATE • TRANSCEND",
+                              style: TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w700,
+                                letterSpacing: 3.0,
+                                color: accent,
+                              ),
+                            ),
+                          ],
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+              ),
+              
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                  child: Column(
+                    children: [
+                      const SizedBox(height: 20),
+                      // iPhone Premium Glass Layer 1
+                      _buildIphoneGlassCard(
+                        context: context,
+                        isDark: isDark,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _buildSectionHeader(context, "The Architect", Icons.auto_awesome_rounded),
+                            const SizedBox(height: 16),
+                            Text(
+                              "I am Biswadeep TEwari, an AI/ML and Full-Stack innovator. I weave the fabric between human intention and raw machine logic, replacing traditional interfaces with spatial air gestures and localized neural networks. This engine is a step toward zero-latency thought-to-screen pipelines.",
+                              style: TextStyle(height: 1.6, fontSize: 15, color: isDark ? Colors.white70 : Colors.black87),
+                            ),
+                            const SizedBox(height: 20),
+                            Wrap(
+                              spacing: 8, runSpacing: 8,
+                              children: ["LangChain", "Flutter", "Python", "MediaPipe", "Kotlin", "FastAPI"].map((e) => _buildGlassChip(context, e, isDark)).toList(),
                             )
                           ]
                         ),
                       ),
-                    ),
-                  )
-                ],
-              ),
-            ),
-          ),
-          
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.all(24.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Layer 1
-                  AnimatedOpacity(
-                    opacity: 1.0, duration: const Duration(milliseconds: 500),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _buildSectionHeader(context, "About the Creator", Icons.person_rounded),
-                        const SizedBox(height: 16),
-                        _buildGlassCard(context, [
-                          Text("Full-Stack & AI/ML Engineer based in West Bengal, India. Specializing in LangChain systems, Local LLMs, and multi-platform Flutter apps.", style: Theme.of(context).textTheme.bodyMedium?.copyWith(height: 1.6)),
-                          const SizedBox(height: 16),
-                          Wrap(
-                            spacing: 8, runSpacing: 8,
-                            children: ["Python", "Dart", "Kotlin", "FastAPI", "TensorFlow", "Kubernetes"].map((e) => _buildChip(context, e)).toList(),
-                          )
-                        ]),
-                      ]
-                    )
-                  ),
-                  
-                  const SizedBox(height: 32),
-                  
-                  // Layer 2
-                  AnimatedOpacity(
-                    opacity: 1.0, duration: const Duration(milliseconds: 700),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _buildSectionHeader(context, "The Builds", Icons.architecture_rounded),
-                        const SizedBox(height: 16),
-                        _buildGlassCard(context, [
-                          Text("Spatial Tracer Engine", style: Theme.of(context).textTheme.titleLarge),
-                          const SizedBox(height: 8),
-                          Text("A multi-platform air gesture engine executing 13 unique ML-accelerated gestures across Android, Desktop, and Web. Replaces the mouse and keyboard entirely using MediaPipe Hand Tracking.", style: Theme.of(context).textTheme.bodyMedium?.copyWith(height: 1.6)),
-                        ]),
-                      ]
-                    )
-                  ),
-                  
-                  const SizedBox(height: 32),
-                  
-                  // Layer 3
-                  AnimatedOpacity(
-                    opacity: 1.0, duration: const Duration(milliseconds: 900),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _buildSectionHeader(context, "Accomplishments & Vision", Icons.auto_awesome_rounded),
-                        const SizedBox(height: 16),
-                        _buildGlassCard(context, [
-                          Text("Control your computer and phone with nothing but your hands. No hardware. No gloves.", style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontStyle: FontStyle.italic)),
-                          const SizedBox(height: 32),
-                          Center(
-                            child: Text("build > ship > learn > repeat", style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Theme.of(context).colorScheme.primary, fontWeight: FontWeight.bold, fontSize: 16, letterSpacing: 1.2)),
-                          )
-                        ]),
-                      ]
-                    )
-                  ),
-                  
-                  const SizedBox(height: 64),
-                  
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      IconButton(icon: Icon(Icons.code_rounded, color: Theme.of(context).iconTheme.color), onPressed: () => _launchURL("https://github.com/RajTewari01")),
-                      IconButton(icon: Icon(Icons.email_rounded, color: Theme.of(context).iconTheme.color), onPressed: () => _launchURL("mailto:tewari765@gmail.com")),
-                      IconButton(icon: Icon(Icons.language_rounded, color: Theme.of(context).iconTheme.color), onPressed: () => _launchURL("https://biswadeep.pythonanywhere.com")),
+                      
+                      const SizedBox(height: 24),
+                      // Layer 2
+                      _buildIphoneGlassCard(
+                        context: context,
+                        isDark: isDark,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _buildSectionHeader(context, "Spatial Engine Core", Icons.memory_rounded),
+                            const SizedBox(height: 16),
+                            Text(
+                              "An ultra-premium tracking heuristic using raw OS-level accessibility injection and daemon-managed pipelines. No hardware. No gloves. Just pure geometric logic and EMA filtering.",
+                              style: TextStyle(height: 1.6, fontSize: 15, color: isDark ? Colors.white70 : Colors.black87),
+                            ),
+                          ]
+                        ),
+                      ),
+
+                      const SizedBox(height: 24),
+                      // Layer 3
+                      _buildIphoneGlassCard(
+                        context: context,
+                        isDark: isDark,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Text(
+                              "悟",
+                              style: TextStyle(fontSize: 48, color: accent.withOpacity(0.5)),
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              "Stay Empty. Stay Infinite.",
+                              style: TextStyle(
+                                fontStyle: FontStyle.italic,
+                                color: isDark ? Colors.white60 : Colors.black54
+                              ),
+                            ),
+                          ]
+                        ),
+                      ),
+
+                      const SizedBox(height: 40),
+                      
+                      // Action Row
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          _buildGlassIconButton(Icons.code_rounded, () => _launchURL("https://github.com/RajTewari01"), isDark),
+                          _buildGlassIconButton(Icons.email_rounded, () => _launchURL("mailto:tewari765@gmail.com"), isDark),
+                          _buildGlassIconButton(Icons.language_rounded, () => _launchURL("https://biswadeep.pythonanywhere.com"), isDark),
+                        ],
+                      ),
+                      const SizedBox(height: 80),
                     ],
                   ),
-                  const SizedBox(height: 48),
-                ],
-              ),
-            ),
+                ),
+              )
+            ],
           )
         ],
-      )
+      ),
+    );
+  }
+
+  // -------------------------------------------------------------
+  // CUSTOM PREMIUM IPHONE GLASS UI COMPONENTS
+  // -------------------------------------------------------------
+
+  Widget _buildIphoneGlassCard({required BuildContext context, required bool isDark, required Widget child}) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(28),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(28),
+          decoration: BoxDecoration(
+            color: isDark ? Colors.white.withOpacity(0.04) : Colors.white.withOpacity(0.4),
+            borderRadius: BorderRadius.circular(28),
+            border: Border.all(
+              color: isDark ? Colors.white.withOpacity(0.1) : Colors.white.withOpacity(0.6),
+              width: 1.5,
+            ),
+            boxShadow: isDark ? [] : [
+              BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 20, spreadRadius: -5)
+            ]
+          ),
+          child: child,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildGlassChip(BuildContext context, String label, bool isDark) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+      decoration: BoxDecoration(
+        color: isDark ? Colors.white.withOpacity(0.05) : Colors.black.withOpacity(0.04),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: isDark ? Colors.white.withOpacity(0.1) : Colors.black.withOpacity(0.1))
+      ),
+      child: Text(label, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 12)),
     );
   }
 
   Widget _buildSectionHeader(BuildContext context, String title, IconData icon) {
     return Row(
       children: [
-        Icon(icon, color: Theme.of(context).colorScheme.primary),
-        const SizedBox(width: 12),
-        Text(title, style: Theme.of(context).textTheme.titleLarge?.copyWith(fontSize: 22, letterSpacing: -0.5)),
+        Icon(icon, color: const Color(0xFF34D399), size: 22),
+        const SizedBox(width: 10),
+        Text(title, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, letterSpacing: -0.5)),
       ],
     );
   }
-
-  Widget _buildGlassCard(BuildContext context, List<Widget> children) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(28),
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface.withOpacity(isDark ? 0.6 : 1.0),
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: isDark ? Colors.white10 : Colors.black.withOpacity(0.05)),
-        boxShadow: isDark ? [] : [
-          BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 20, spreadRadius: 5)
-        ]
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: children,
+  
+  Widget _buildGlassIconButton(IconData icon, VoidCallback onTap, bool isDark) {
+    return GestureDetector(
+      onTap: onTap,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(20),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+          child: Container(
+            height: 64, width: 64,
+            decoration: BoxDecoration(
+              color: isDark ? Colors.white.withOpacity(0.05) : Colors.white.withOpacity(0.5),
+              border: Border.all(color: isDark ? Colors.white.withOpacity(0.1) : Colors.white),
+              borderRadius: BorderRadius.circular(20)
+            ),
+            child: Icon(icon, size: 28, color: isDark ? Colors.white : Colors.black87),
+          ),
+        ),
       ),
     );
   }
 
-  Widget _buildChip(BuildContext context, String label) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: Theme.of(context).colorScheme.primary.withOpacity(0.3))
+  // -------------------------------------------------------------
+  // PARALLAX MIRROR MOUNTAIN GENERATOR
+  // -------------------------------------------------------------
+  Widget _buildParallaxMountains(bool isDark) {
+    // Math to slowly move the mountains based on scroll
+    // Layer 1 is back (moves slowest), Layer 3 is front (moves fastest)
+    double l1Offset = _scrollOffset * -0.1;
+    double l2Offset = _scrollOffset * -0.25;
+    double l3Offset = _scrollOffset * -0.4;
+    
+    final mountainColor = isDark ? const Color(0xFF1E293B) : const Color(0xFFCBD5E1);
+
+    return SizedBox.expand(
+      child: Stack(
+        children: [
+          // Deepest Layer
+          Positioned(
+            top: 200 + l1Offset, left: -50, right: -50,
+            height: 400,
+            child: CustomPaint(painter: _MountainPainter(color: mountainColor.withOpacity(0.3))),
+          ),
+          // Middle Layer
+          Positioned(
+            top: 250 + l2Offset, left: -100, right: 0,
+            height: 350,
+            child: CustomPaint(painter: _MountainPainter(color: mountainColor.withOpacity(0.6))),
+          ),
+          // Foreground Mirror Lake & Reflection
+          Positioned(
+            top: 320 + l3Offset, left: -20, right: -120,
+            height: 300,
+            child: Column(
+              children: [
+                Expanded(child: CustomPaint(painter: _MountainPainter(color: mountainColor))),
+                // The mirror effect via reversed painter and blur
+                Expanded(
+                  child: Opacity(
+                    opacity: 0.3,
+                    child: Transform(
+                      alignment: Alignment.center,
+                      transform: Matrix4.rotationX(3.14159), // Flip Upside Down
+                      child: ClipRect(
+                        child: BackdropFilter(
+                          filter: ImageFilter.blur(sigmaX: 2.0, sigmaY: 5.0), // Mirror blur
+                          child: CustomPaint(painter: _MountainPainter(color: mountainColor)),
+                        ),
+                      ),
+                    ),
+                  )
+                )
+              ],
+            ),
+          ),
+        ],
       ),
-      child: Text(label, style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Theme.of(context).colorScheme.primary, fontWeight: FontWeight.bold)),
     );
   }
 }
+
+class _MountainPainter extends CustomPainter {
+  final Color color;
+  _MountainPainter({required this.color});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..style = PaintingStyle.fill;
+    
+    final path = Path();
+    path.moveTo(0, size.height);
+    path.lineTo(0, size.height * 0.5);
+    // Draw mountain peaks using bezier curves
+    path.quadraticBezierTo(size.width * 0.2, size.height * 0.1, size.width * 0.4, size.height * 0.6);
+    path.quadraticBezierTo(size.width * 0.7, size.height * 0.2, size.width, size.height * 0.8);
+    path.lineTo(size.width, size.height);
+    path.close();
+
+    canvas.drawPath(path, paint);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+

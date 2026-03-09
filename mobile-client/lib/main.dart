@@ -496,93 +496,146 @@ class _DashboardScreenState extends State<DashboardScreen> {
           )
         ],
       ),
-      drawer: Drawer(
-        backgroundColor: Theme.of(context).drawerTheme.backgroundColor?.withOpacity(0.95),
-        surfaceTintColor: Colors.transparent,
-        child: SafeArea(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
+      drawer: Theme(
+        data: Theme.of(context).copyWith(
+          canvasColor: Colors.transparent, // Required for the glass effect
+        ),
+        child: Drawer(
+          width: 320,
+          child: Stack(
             children: [
-              // Beautiful Sidebar Minimal Header
-              Container(
-                padding: const EdgeInsets.fromLTRB(24, 48, 24, 24),
-                child: Text(
-                  "Spatial Tracer",
-                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    fontSize: 28,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: -1,
-                    color: const Color(0xFF34D399),
+              // Premium iPhone Glass Blur Backdrop
+              Positioned.fill(
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: isDark ? const Color(0xFF0F172A).withOpacity(0.65) : Colors.white.withOpacity(0.75),
+                      border: Border(right: BorderSide(color: isDark ? Colors.white10 : Colors.black.withOpacity(0.05))),
+                    ),
                   ),
                 ),
               ),
-              const Divider(color: Colors.white10, height: 1),
               
-              // 4 Specific Navigation Links
-              ListTile(
-                leading: Icon(Icons.school_rounded, color: Theme.of(context).iconTheme.color),
-                title: Text("Tutorial", style: Theme.of(context).textTheme.bodyMedium),
-                onTap: () {
-                  Navigator.pop(context); // close drawer
-                  Navigator.push(context, MaterialPageRoute(builder: (_) => const OnboardingScreen()));
-                },
-              ),
-              ListTile(
-                leading: Icon(Icons.live_tv_rounded, color: Theme.of(context).iconTheme.color),
-                title: Text("Live Tutorials", style: Theme.of(context).textTheme.bodyMedium),
-                onTap: () => _launchURL("https://youtube.com/RajTewari01"),
-              ),
-              ListTile(
-                leading: Icon(Icons.person_rounded, color: Theme.of(context).iconTheme.color),
-                title: Text("About Creator", style: Theme.of(context).textTheme.bodyMedium),
-                onTap: () {
-                  Navigator.pop(context); // close drawer
-                  Navigator.push(context, MaterialPageRoute(builder: (_) => const CreatorProfileScreen()));
-                },
-              ),
-              ListTile(
-                leading: Icon(Icons.email_rounded, color: Theme.of(context).iconTheme.color),
-                title: Text("Contact Support", style: Theme.of(context).textTheme.bodyMedium),
-                onTap: () => _launchURL("mailto:tewari765@gmail.com"),
-              ),
-              const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
-                child: Divider(color: Colors.white10, height: 1),
-              ),
-              Consumer<ThemeProvider>(
-                builder: (context, themeProvider, child) {
-                  return SwitchListTile(
-                    title: Text(themeProvider.isDarkMode ? "Dark Mode" : "Light Mode", style: Theme.of(context).textTheme.bodyMedium),
-                    subtitle: Text("Manual theme override", style: Theme.of(context).textTheme.bodySmall),
-                    secondary: Icon(themeProvider.isDarkMode ? Icons.dark_mode_rounded : Icons.light_mode_rounded, color: Theme.of(context).iconTheme.color),
-                    value: themeProvider.isDarkMode,
-                    activeColor: const Color(0xFF3FB950),
-                    onChanged: (val) {
-                      themeProvider.toggleTheme(val);
-                    },
-                  );
-                },
-              ),
-              
-              const SizedBox(height: 8),
-              Padding(
-                padding: const EdgeInsets.only(left: 24.0, top: 16, bottom: 8),
-                child: Text("GESTURE LEGEND", style: Theme.of(context).textTheme.bodySmall!.copyWith(fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 1.5)),
-              ),
-              _buildLegendRow(Icons.pan_tool_alt_rounded, "Index Point", "Move Cursor"),
-              _buildLegendRow(Icons.back_hand_rounded, "Peace Sign", "Tap / Click"),
-              _buildLegendRow(Icons.swipe_rounded, "Closed Fist", "Recent Apps"),
-              _buildLegendRow(Icons.pinch_rounded, "Pinch", "Go Back"),
-              _buildLegendRow(Icons.swap_vert_rounded, "Thumbs Up/Down", "Scroll Page"),
-              
-              const Spacer(),
-              const Padding(
-                padding: EdgeInsets.all(24.0),
-                child: Text(
-                  "Spatial_Tracer Core v1.0\nLinux Engine Hooked",
-                  style: TextStyle(color: Colors.white38, fontSize: 11, fontFamily: 'monospace'),
+              SafeArea(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    // Premium User Profile Header
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(24, 32, 24, 24),
+                      child: Row(
+                        children: [
+                          Container(
+                            width: 50, height: 50,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              border: Border.all(color: const Color(0xFF34D399).withOpacity(0.5), width: 2),
+                              image: const DecorationImage(
+                                image: AssetImage('assets/images/raj_profile.jpg'),
+                                fit: BoxFit.cover,
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: const Color(0xFF34D399).withOpacity(0.2),
+                                  blurRadius: 15, spreadRadius: 2
+                                )
+                              ]
+                            ),
+                          ),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  "Biswadeep TEwari",
+                                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                    fontWeight: FontWeight.w800,
+                                    letterSpacing: -0.5,
+                                    color: textColor,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                Text(
+                                  "System Architect",
+                                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                    color: const Color(0xFF34D399),
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          )
+                        ],
+                      ),
+                    ),
+                    const Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 24),
+                      child: Divider(color: Colors.white10, height: 1),
+                    ),
+                    
+                    const SizedBox(height: 16),
+                    
+                    // 4 Specific Navigation Links (Styled like IDE tabs)
+                    _buildSidebarItem(context, Icons.rocket_launch_rounded, "Engine Tutorial", () {
+                      Navigator.pop(context);
+                      Navigator.push(context, MaterialPageRoute(builder: (_) => const OnboardingScreen()));
+                    }, isDark),
+                    _buildSidebarItem(context, Icons.video_library_rounded, "Live Broadcasts", () => _launchURL("https://youtube.com/RajTewari01"), isDark),
+                    _buildSidebarItem(context, Icons.space_dashboard_rounded, "Creator Hub", () {
+                      Navigator.pop(context);
+                      Navigator.push(context, MaterialPageRoute(builder: (_) => const CreatorProfileScreen()));
+                    }, isDark),
+                    _buildSidebarItem(context, Icons.support_agent_rounded, "Deploy Support", () => _launchURL("mailto:tewari765@gmail.com"), isDark),
+                    
+                    const Spacer(),
+                    
+                    const Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 24.0),
+                      child: Divider(color: Colors.white10, height: 1),
+                    ),
+                    const SizedBox(height: 8),
+                    
+                    Consumer<ThemeProvider>(
+                      builder: (context, themeProvider, child) {
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                          child: SwitchListTile(
+                            contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                            title: Text(themeProvider.isDarkMode ? "Dark Editor" : "Light Editor", style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
+                            subtitle: Text("Theme Override", style: Theme.of(context).textTheme.bodySmall),
+                            secondary: Container(
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: isDark ? Colors.white10 : Colors.black.withOpacity(0.05),
+                                borderRadius: BorderRadius.circular(10)
+                              ),
+                              child: Icon(themeProvider.isDarkMode ? Icons.dark_mode_rounded : Icons.light_mode_rounded, size: 20, color: textColor),
+                            ),
+                            value: themeProvider.isDarkMode,
+                            activeColor: const Color(0xFF34D399),
+                            onChanged: (val) {
+                              themeProvider.toggleTheme(val);
+                            },
+                          ),
+                        );
+                      },
+                    ),
+                    
+                    const SizedBox(height: 16),
+                    
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 32.0, vertical: 16),
+                      child: Text(
+                        "SPATIAL.TRACER.CORE v1.0\nDAEMON INITIALIZED",
+                        style: TextStyle(color: subtitleColor.withOpacity(0.5), fontSize: 10, fontFamily: 'monospace', height: 1.5, letterSpacing: 1.0),
+                      ),
+                    )
+                  ],
                 ),
-              )
+              ),
             ],
           ),
         ),
@@ -742,6 +795,38 @@ class _DashboardScreenState extends State<DashboardScreen> {
             ),
           ),
         ],
+      ),
+    );
+  // ---------------------------------------------------------------------------
+  // Build Sidebar List Tile Helper (IDE Styled)
+  // ---------------------------------------------------------------------------
+  Widget _buildSidebarItem(BuildContext context, IconData icon, String title, VoidCallback onTap, bool isDark) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(12),
+          hoverColor: (isDark ? Colors.white : Colors.black).withOpacity(0.05),
+          splashColor: const Color(0xFF34D399).withOpacity(0.1),
+          onTap: onTap,
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            child: Row(
+              children: [
+                Icon(icon, size: 22, color: isDark ? Colors.white70 : Colors.black87),
+                const SizedBox(width: 16),
+                Text(
+                  title,
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    fontWeight: FontWeight.w600,
+                    letterSpacing: -0.2,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }
