@@ -73,8 +73,8 @@ flowchart TD
     B -->|Frame N| C[HandLandmarker]
     B -->|Frame N+1| D[FaceLandmarker]
     
-    C --> E[Extract 21 (x,y,z) Landmarks]
-    D --> F[Extract 478 (x,y,z) Landmarks]
+    C --> E["Extract 21 (x,y,z) Landmarks"]
+    D --> F["Extract 478 (x,y,z) Landmarks"]
     
     E --> G[Mathematical Geometry Check]
     F --> H[Z-Depth & EAR Check]
