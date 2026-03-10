@@ -74,10 +74,7 @@ object GestureDetector {
 
         // FIST: All fingers rigidly folded
         if (thuF && idxF && midF && rngF && pnkF) {
-            // Only count if thumb is physically tucked in
-            if (dist(lm[THUMB_TIP], lm[PINKY_MCP]) < dist(lm[THUMB_TIP], lm[INDEX_MCP])) {
-                return stabilize("FIST")
-            }
+            return stabilize("FIST")
         }
 
         // Pinch: thumb + index very close, others ideally folded or out of the way

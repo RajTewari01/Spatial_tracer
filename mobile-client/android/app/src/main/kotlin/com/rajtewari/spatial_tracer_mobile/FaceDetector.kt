@@ -5,7 +5,7 @@ import kotlin.math.sqrt
 object FaceDetector {
     private var lastAction = "IDLE"
     private var actionCount = 0
-    private const val STABLE_FRAMES = 4 
+    private const val STABLE_FRAMES = 2 // Lowered to 2 for much snappier face response
 
     data class Point(val x: Double, val y: Double)
 
@@ -29,32 +29,26 @@ object FaceDetector {
 
         val ear = (leftEar + rightEar) / 2.0
 
-        // Blink threshold loosened to 0.20 to capture blinks more easily
-        if (ear < 0.20) {
+        // Blink threshold loosened to 0.24 to capture blinks extremely easily
+        if (ear < 0.24) {
             return stabilize("BLINK")
         }
 
-        // --- 2D Geometry Tilts (More robust than Z-Depth for varying face structures) ---
-        
-        // PITCH (Up/Down) - Nose (1) relative to Forehead (10) and Chin (152)
+        // --- 2D Geometry Tilts ---
         val faceHeight = dist(lm[10], lm[152])
         val noseToTop = dist(lm[1], lm[10])
         val pitchRatio = if (faceHeight > 0) noseToTop / faceHeight else 0.5
         
-        // Neutral pitch ratio is usually ~0.45-0.55.
-        // We require a significant tilt backward (< 0.35) or forward (> 0.65)
-        if (pitchRatio < 0.35) return stabilize("TILT_UP")
-        if (pitchRatio > 0.65) return stabilize("TILT_DOWN")
+        // Tilt thresholds relaxed to make it easier to trigger
+        if (pitchRatio < 0.40) return stabilize("TILT_UP")
+        if (pitchRatio > 0.60) return stabilize("TILT_DOWN")
 
-        // YAW (Left/Right) - Nose (1) relative to Left Cheek (234) and Right Cheek (454)
         val faceWidth = dist(lm[234], lm[454])
         val noseToLeft = dist(lm[1], lm[234])
         val yawRatio = if (faceWidth > 0) noseToLeft / faceWidth else 0.5
         
-        // Neutral yaw ratio is ~0.50.
-        // Require significant head turn.
-        if (yawRatio < 0.25) return stabilize("TILT_LEFT")
-        if (yawRatio > 0.75) return stabilize("TILT_RIGHT")
+        if (yawRatio < 0.35) return stabilize("TILT_LEFT")
+        if (yawRatio > 0.65) return stabilize("TILT_RIGHT")
 
         return stabilize("IDLE")
     }

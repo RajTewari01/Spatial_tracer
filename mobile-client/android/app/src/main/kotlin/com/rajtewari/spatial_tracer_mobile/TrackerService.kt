@@ -42,6 +42,9 @@ class TrackerService : LifecycleService() {
     private var handLandmarker: HandLandmarker? = null
     private var faceLandmarker: FaceLandmarker? = null
     private var cursorOverlay: CursorOverlay? = null
+    
+    // Frame alternator
+    private var frameCounter = 0
 
     // Track which streams to process
     private var useHandTracking = true
@@ -206,10 +209,18 @@ class TrackerService : LifecycleService() {
                         val mpImage = BitmapImageBuilder(bitmap).build()
                         val timestampMs = imageProxy.imageInfo.timestamp / 1_000_000
                         
-                        if (useHandTracking) {
+                        frameCounter++
+                        
+                        if (useHandTracking && useFaceTracking) {
+                            // Alternate frames to prevent overwhelming the device and causing massive lag
+                            if (frameCounter % 2 == 0) {
+                                handLandmarker?.detectAsync(mpImage, timestampMs)
+                            } else {
+                                faceLandmarker?.detectAsync(mpImage, timestampMs)
+                            }
+                        } else if (useHandTracking) {
                             handLandmarker?.detectAsync(mpImage, timestampMs)
-                        }
-                        if (useFaceTracking) {
+                        } else if (useFaceTracking) {
                             faceLandmarker?.detectAsync(mpImage, timestampMs)
                         }
                         
