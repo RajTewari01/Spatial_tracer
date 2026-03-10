@@ -326,7 +326,7 @@ class TrackerService : LifecycleService() {
                 }
             }
             "TILT_UP", "TILT_DOWN" -> {
-                if (now - lastFaceActionTime > 500) {
+                if (now - lastFaceActionTime > 1000) {
                     val resources = resources
                     val sw = resources.displayMetrics.widthPixels
                     val sh = resources.displayMetrics.heightPixels
@@ -343,7 +343,7 @@ class TrackerService : LifecycleService() {
                 }
             }
             "TILT_LEFT", "TILT_RIGHT" -> {
-                if (now - lastFaceActionTime > 500) {
+                if (now - lastFaceActionTime > 1000) {
                     val resources = resources
                     val sw = resources.displayMetrics.widthPixels
                     val sh = resources.displayMetrics.heightPixels
