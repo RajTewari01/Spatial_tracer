@@ -26,36 +26,40 @@ It ships as three clients:
 |----------|-------|-------------|
 | **Web** | MediaPipe JS · Three.js | In-browser gesture demo with 3D particle visualization |
 | **Desktop** | PyQt5 · pynput · MediaPipe Tasks | Transparent overlay + Virtual Keyboard for air-typing |
-| **Android** | Flutter · Kotlin · MediaPipe Tasks | Mobile gesture recognition with camera feed |
+| **Android (Mobile)** | Flutter · Kotlin · MediaPipe | Background service, System OS Air Gestures, **Face Tracking (Tilt/Blink)** |
 
 ---
 
 ## Architecture
 
 ```mermaid
-graph TB
-    subgraph Input["Input Layer"]
-        CAM["Camera Feed"]
+flowchart TB
+    subgraph Input["Camera Stream"]
+        CAM["Live Video Feed"]
     end
 
-    subgraph Engine["Processing Engine"]
-        MP["MediaPipe Hand Landmarker"]
-        GD["Gesture Detector - 13 Gestures"]
-        AID["Air Input Driver - OS Control"]
+    subgraph Models["AI AI Models"]
+        HM["HandLandmarker (21 Points)"]
+        FM["FaceLandmarker (478 Points)"]
     end
 
-    subgraph Output["Output Layer"]
-        MOUSE["Mouse: Move, Click, Scroll"]
-        KBD["Keyboard: Enter, Back, Tab, Esc"]
-        VIZ["3D Particle Visualization"]
+    subgraph Logic["Processing Engine"]
+        GD["Gesture Detector (Fingers/Angles)"]
+        FD["Face Detector (Z-Depth/EAR)"]
     end
 
-    CAM --> MP
-    MP -->|"21 Landmarks"| GD
-    GD -->|"Gesture Events"| AID
-    AID --> MOUSE
-    AID --> KBD
-    GD --> VIZ
+    subgraph Output["OS Interaction"]
+        MOUSE["Mouse Control / Touch Injection"]
+        KBD["Keyboard / Nav (Back, Recents)"]
+        SYS["System Actions (Scroll, Swipe)"]
+    end
+
+    CAM -.->|"Alternating Frames"| HM
+    CAM -.->|"Alternating Frames"| FM
+    HM --> GD
+    FM --> FD
+    GD -->|"Actions"| Output
+    FD -->|"Actions"| Output
 ```
 
 ---
@@ -63,56 +67,58 @@ graph TB
 ## System Flow
 
 ```mermaid
-sequenceDiagram
-    participant C as Camera
-    participant MP as MediaPipe
-    participant GD as GestureDetector
-    participant D as AirInputDriver
-    participant OS as OperatingSystem
-
-    C->>MP: Video Frame at 30fps
-    MP->>GD: 21 Hand Landmarks x y z
-    GD->>GD: Finger State Analysis
-    GD->>GD: 2-Frame Stability Buffer
-    GD->>D: Gesture Event
-
-    alt POINTING
-        D->>OS: Move mouse cursor with EMA smoothing
-    else PINCH
-        D->>OS: Left click
-    else PEACE
-        D->>OS: Double click
-    else FIST
-        D->>OS: Right click
-    else THUMBS UP
-        D->>OS: Press Enter key
-    else SWIPE
-        D->>OS: Scroll 3 lines
-    end
+flowchart TD
+    A[Camera Capture 30fps] --> B{AI Model Allocator}
+    
+    B -->|Frame N| C[HandLandmarker]
+    B -->|Frame N+1| D[FaceLandmarker]
+    
+    C --> E[Extract 21 (x,y,z) Landmarks]
+    D --> F[Extract 478 (x,y,z) Landmarks]
+    
+    E --> G[Mathematical Geometry Check]
+    F --> H[Z-Depth & EAR Check]
+    
+    G --> I{Stable for X Frames?}
+    H --> I
+    
+    I -->|Yes| J{Execute Trigger}
+    
+    J -->|PEACE| K[Simulate Tap/Click]
+    J -->|FIST / BLINK| L[Open Recent Apps]
+    J -->|HEAD TILT| M[System Touch Swipe / Scroll]
+    J -->|POINT| N[Move Cursor Overlay]
 ```
 
 ---
 
 ## Gesture Map
 
+### ✋ Hand Gestures
+```text
+┌────────────────────────────────────────────────────────┐
+│  GESTURE         │  ACTION            │  MODULE        │
+├──────────────────┼────────────────────┼────────────────┤
+│  POINTING        │  Move cursor       │  Desktop/Mobile│
+│  PINCH           │  Go Back           │  Mobile        │
+│  PINCH           │  Left click / Type │  Desktop       │
+│  PEACE           │  Tap / Click       │  Desktop/Mobile│
+│  FIST            │  Recent Apps       │  Mobile        │
+│  THUMBS UP/DOWN  │  Scroll / Return   │  Desktop/Mobile│
+└──────────────────┴────────────────────┴────────────────┘
 ```
-┌─────────────────────────────────────────────────────────┐
-│  GESTURE          │  ACTION            │  COLOR         │
-├───────────────────┼────────────────────┼────────────────┤
-│  POINTING         │  Move cursor       │  ● #34d399     │
-│  PINCH            │  Left click        │  ● #fbbf24     │
-│  PEACE            │  Double click      │  ● #7c6aff     │
-│  FIST             │  Right click       │  ● #ef4444     │
-│  THUMBS UP        │  Enter key         │  ● #34d399     │
-│  THUMBS DOWN      │  Backspace key     │  ● #f472b6     │
-│  THREE            │  Tab key           │  ● #a393ff     │
-│  ROCK             │  Escape key        │  ● #fbbf24     │
-│  OPEN PALM        │  Idle / Release    │  ● #22d3ee     │
-│  OK SIGN          │  OK gesture        │  ● #38bdf8     │
-│  MIDDLE FINGER    │  Middle finger     │  ● #fb923c     │
-│  CALL ME          │  Call me           │  ● #22d3ee     │
-│  SPIDERMAN        │  Spiderman         │  ● #f472b6     │
-└───────────────────┴────────────────────┴────────────────┘
+
+### 👁️ Face Gestures (Mobile Only)
+```text
+┌────────────────────────────────────────────────────────┐
+│  GESTURE         │  ACTION            │  TRIGGER       │
+├──────────────────┼────────────────────┼────────────────┤
+│  HEAD TILT UP    │  Scroll Up         │  Z-Depth Pitch │
+│  HEAD TILT DOWN  │  Scroll Down       │  Z-Depth Pitch │
+│  HEAD TILT LEFT  │  Swipe Left        │  Z-Depth Yaw   │
+│  HEAD TILT RIGHT │  Swipe Right       │  Z-Depth Yaw   │
+│  FIRM BLINK      │  Recent Apps/Close │  EAR < 0.24    │
+└──────────────────┴────────────────────┴────────────────┘
 ```
 
 ---
@@ -204,33 +210,33 @@ spatial_tracer/
 ## Multi-Platform Architecture
 
 ```mermaid
-graph LR
+flowchart LR
     subgraph Web["Web Client"]
         W1["MediaPipe JS in-browser"]
         W2["Three.js 4000 Particles"]
-        W3["Gesture Tags + Event Log"]
     end
 
     subgraph Desktop["Desktop Client"]
         D1["HeadlessHandTracker in-process"]
         D2["AirInputDriver via pynput"]
-        D3["PyQt5 Overlay + Camera Panel"]
+        D3["PyQt5 Overlay + Virtual KBD"]
     end
 
-    subgraph Mobile["Mobile Client"]
-        M1["Kotlin MediaPipe platform channel"]
-        M2["Dart Gesture Detection"]
-        M3["Flutter UI + Skeleton Painter"]
+    subgraph Mobile["Mobile Client (Android)"]
+        M1["Kotlin MediaPipe Foreground Service"]
+        M4["FaceLandmarker + Z-Depth"]
+        M2["Accessibility System Interaction"]
+        M3["Flutter UI + Dashboard"]
     end
 
-    subgraph Shared["Shared Gesture Engine"]
-        S1["Gesture Logic - same algorithm"]
-        S2["13 Gestures MCP-based"]
+    subgraph Shared["Shared Physics / Math"]
+        S1["EMA Cursor Smoothing"]
+        S2["21-Point Vector Processing"]
     end
 
-    S1 -.->|"Dart port"| M2
-    S1 -.->|"JS port"| W1
-    S1 -.->|"Python"| D1
+    S1 -.->|"Dart port"| Mobile
+    S1 -.->|"JS port"| Web
+    S1 -.->|"Python"| Desktop
 ```
 
 ---
