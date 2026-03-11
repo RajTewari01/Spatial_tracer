@@ -132,7 +132,7 @@ class TrackerService : LifecycleService() {
 
     private fun initHandLandmarker() {
         val modelFile = File(cacheDir, "hand_landmarker.task")
-        if (!modelFile.exists()) {
+        if (!modelFile.exists() || modelFile.length() < 1000L) {
             assets.open("hand_landmarker.task").use { input ->
                 FileOutputStream(modelFile).use { output ->
                     input.copyTo(output)
@@ -161,7 +161,7 @@ class TrackerService : LifecycleService() {
 
     private fun initFaceLandmarker() {
         val modelFile = File(cacheDir, "face_landmarker.task")
-        if (!modelFile.exists()) {
+        if (!modelFile.exists() || modelFile.length() < 1000L) {
             assets.open("face_landmarker.task").use { input ->
                 FileOutputStream(modelFile).use { output ->
                     input.copyTo(output)
@@ -200,31 +200,37 @@ class TrackerService : LifecycleService() {
                 .build()
                 .also {
                     it.setAnalyzer(cameraExecutor) { imageProxy ->
-                        val bitmap = android.graphics.Bitmap.createBitmap(
-                            imageProxy.width, imageProxy.height, android.graphics.Bitmap.Config.ARGB_8888
-                        )
-                        imageProxy.planes[0].buffer.rewind()
-                        bitmap.copyPixelsFromBuffer(imageProxy.planes[0].buffer)
-                        
-                        val mpImage = BitmapImageBuilder(bitmap).build()
-                        val timestampMs = imageProxy.imageInfo.timestamp / 1_000_000
-                        
-                        frameCounter++
-                        
-                        if (useHandTracking && useFaceTracking) {
-                            // Alternate frames to prevent overwhelming the device and causing massive lag
-                            if (frameCounter % 2 == 0) {
+                        try {
+                            val bitmap = android.graphics.Bitmap.createBitmap(
+                                imageProxy.width, imageProxy.height, android.graphics.Bitmap.Config.ARGB_8888
+                            )
+                            imageProxy.planes[0].buffer.rewind()
+                            bitmap.copyPixelsFromBuffer(imageProxy.planes[0].buffer)
+                            
+                            val mpImage = BitmapImageBuilder(bitmap).build()
+                            // Force strict monotonically increasing timestamp to prevent silent MediaPipe crashes
+                            val timestampMs = android.os.SystemClock.uptimeMillis()
+                            
+                            frameCounter++
+                            
+                            if (useHandTracking && useFaceTracking) {
+                                // Alternate frames to prevent overwhelming the device and causing massive lag
+                                if (frameCounter % 2 == 0) {
+                                    handLandmarker?.detectAsync(mpImage, timestampMs)
+                                } else {
+                                    faceLandmarker?.detectAsync(mpImage, timestampMs)
+                                }
+                            } else if (useHandTracking) {
                                 handLandmarker?.detectAsync(mpImage, timestampMs)
-                            } else {
+                            } else if (useFaceTracking) {
                                 faceLandmarker?.detectAsync(mpImage, timestampMs)
                             }
-                        } else if (useHandTracking) {
-                            handLandmarker?.detectAsync(mpImage, timestampMs)
-                        } else if (useFaceTracking) {
-                            faceLandmarker?.detectAsync(mpImage, timestampMs)
+                        } catch (e: Exception) {
+                            Log.e(TAG, "Frame processing error: ${e.message}")
+                        } finally {
+                            // CRITICAL: Always close the image proxy to prevent CameraX from freezing forever
+                            imageProxy.close()
                         }
-                        
-                        imageProxy.close()
                     }
                 }
 
