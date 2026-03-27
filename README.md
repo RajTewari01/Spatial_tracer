@@ -72,438 +72,491 @@ https://github.com/RajTewari01/Spatial_tracer/raw/main/proofs/gesture_tracking_d
 
 ## 🌟 The Vision
 
+`Spatial_Tracer` is a cross-platform kinematic control engine that converts live camera feeds into real Operating System inputs — mouse movement, keyboard presses, scrolling, and Android navigation — using pure algorithmic heuristics. No ML classifiers. No training data. Just geometry.
 
-`Spatial_Tracer` represents a leap in Human-Computer Interaction (HCI). It is a highly optimized, cross-platform kinematic engine that translates raw real-time camera feeds into complex Operating System inputs using pure algorithmic heuristics. 
-
-By analyzing **21 independent 3D hand joints** and mapping out **478 facial micro-landmarks** simultaneously at 60Hz, it allows you to literally drag-and-drop the digital world around you.
-
-### Platform Matrix
-
-The engine effortlessly spans three unique ecosystems:
-
-| Ecosystem | Technological Stack | Primary Functionality |
-| :--- | :--- | :--- |
-| 🌐 **Web Protocol** | `MediaPipe WebAssembly` · `Three.js` | Zero-install interactive playground boasting a 4000-particle physics engine avoiding your hands in 3D space. |
-| 💻 **Desktop Kernel** | `Python 3` · `PyQt5` · `pynput` · `win32api` | Frameless, transparent hovering glassmorphic Virtual Keyboard capturing precise mid-air keystrokes and native OS mouse events. |
-| 📱 **Android Service** | `Flutter` · `Kotlin Platform Channels` | Indestructible Android Accessibility Foreground Service mapping head tilts to infinite TikTok scrolls and eye blinks to OS multitasking. |
+The engine analyzes **21 independent 3D hand joints** via MediaPipe and maps them against **478 facial micro-landmarks** simultaneously at native camera FPS, enabling you to control any device with nothing but air gestures.
 
 ---
 
-## Architecture
+## 🏗️ System Architecture
 
 ```mermaid
 flowchart TB
-    subgraph Input["Camera Stream"]
+    subgraph Input["📷 Camera Stream"]
         CAM["Live Video Feed"]
     end
 
-    subgraph Models["AI AI Models"]
-        HM["HandLandmarker (21 Points)"]
-        FM["FaceLandmarker (478 Points)"]
+    subgraph Engine["🧠 Vision Engine"]
+        MP["MediaPipe\n21 Hand Landmarks\n478 Face Landmarks"]
+        GD["Gesture Detector\nDeterministic Heuristics"]
+        EMA["EMA Smoothing\nDesktop α=0.6 · Android α=0.45"]
     end
 
-    subgraph Logic["Processing Engine"]
-        GD["Gesture Detector (Fingers/Angles)"]
-        FD["Face Detector (Z-Depth/EAR)"]
+    subgraph Clients["🖥️ Platform Clients"]
+        direction LR
+        DESK["Desktop Client\nPyQt5 + pynput\nTransparent Overlay + Virtual KB"]
+        MOB["Android Client\nFlutter + Kotlin\nAccessibility Service"]
+        WEB["Web Client\nThree.js + MediaPipe WASM\nStatic — Zero Backend"]
     end
 
-    subgraph Output["OS Interaction"]
-        MOUSE["Mouse Control / Touch Injection"]
-        KBD["Keyboard / Nav (Back, Recents)"]
-        SYS["System Actions (Scroll, Swipe)"]
+    subgraph OS["⚡ OS Actions"]
+        MOUSE["Mouse Control"]
+        KEYS["Keyboard Input"]
+        TAP["Android Tap/Swipe"]
+        SCROLL["Scroll / Navigate"]
     end
 
-    CAM -.->|"Alternating Frames"| HM
-    CAM -.->|"Alternating Frames"| FM
-    HM --> GD
-    FM --> FD
-    GD -->|"Actions"| Output
-    FD -->|"Actions"| Output
+    CAM --> MP
+    MP --> GD
+    GD --> EMA
+    EMA --> DESK
+    EMA --> MOB
+    CAM --> WEB
+
+    DESK --> MOUSE
+    DESK --> KEYS
+    MOB --> TAP
+    MOB --> SCROLL
 ```
 
-### Component Breakdown
-- **Input (Camera Stream)**: Grabs frames continuously at native webcam/phone camera resolution.
-- **AI Models (MediaPipe)**: We leverage lightweight MediaPipe task vision models. `HandLandmarker` yields 21 3D points per hand, while `FaceLandmarker` maps 478 micro points on the face.
-- **Processing Engine**: The core logic layer that translates raw 3D vectors into semantic meanings. It calculates finger joint angles, face tilt pitch/yaw, and eye aspect ratio (EAR).
-- **OS Interaction**: Acts as the driver layer bridging gesture intent to actual host system commands (using `pynput` for virtual clicks on Desktop, and Accessibility Services on Mobile).
+> **Critical distinction:** The Web Client runs 100% in-browser using MediaPipe WASM — it does **not** connect to the Python server. Desktop and Mobile are completely independent executables. All three share the same gesture detection *algorithm* but implement it in their own language (Python, Kotlin, JavaScript).
 
 ---
 
-## System Flow
+## 🌐 Three Independent Platforms
 
-```mermaid
-flowchart TD
-    A[Camera Capture 30fps] --> B{AI Model Allocator}
-    
-    B -->|Frame N| C[HandLandmarker]
-    B -->|Frame N+1| D[FaceLandmarker]
-    
-    C --> E["Extract 21 (x,y,z) Landmarks"]
-    D --> F["Extract 478 (x,y,z) Landmarks"]
-    
-    E --> G[Mathematical Geometry Check]
-    F --> H[Z-Depth & EAR Check]
-    
-    G --> I{Stable for X Frames?}
-    H --> I
-    
-    I -->|Yes| J{Execute Trigger}
-    
-    J -->|PEACE| K[Simulate Tap/Click]
-    J -->|FIST / BLINK| L[Open Recent Apps]
-    J -->|HEAD TILT| M[System Touch Swipe / Scroll]
-    J -->|POINT| N[Move Cursor Overlay]
-```
+| Platform | Stack | How It Runs | Connects to Python Server? |
+|:---------|:------|:------------|:---------------------------|
+| 🖥️ **Desktop** | Python 3.10 · PyQt5 · pynput · OpenCV | `python main.py desktop` | ❌ Runs in-process |
+| 📱 **Android** | Flutter 3.x · Kotlin · Google ML Kit | `flutter run` (APK) | ❌ Fully standalone |
+| 🌐 **Web** | Three.js · MediaPipe WASM · Vanilla JS/CSS | Open in browser (Vercel) | ❌ 100% client-side |
+| 🔌 **API Server** | FastAPI · Uvicorn · WebSocket | `python main.py server` | — *It IS the server* |
 
 ---
 
-## Gesture Map
-
-### ✋ Hand Gestures
-```text
-┌────────────────────────────────────────────────────────┐
-│  GESTURE         │  ACTION            │  MODULE        │
-├──────────────────┼────────────────────┼────────────────┤
-│  POINTING        │  Move cursor       │  Desktop/Mobile│
-│  PINCH           │  Go Back           │  Mobile        │
-│  PINCH           │  Left click / Type │  Desktop       │
-│  PEACE           │  Tap / Click       │  Desktop/Mobile│
-│  FIST            │  Recent Apps       │  Mobile        │
-│  THUMBS UP/DOWN  │  Scroll / Return   │  Desktop/Mobile│
-└──────────────────┴────────────────────┴────────────────┘
-```
-
-### 👁️ Face Gestures (Mobile Only)
-```text
-┌────────────────────────────────────────────────────────┐
-│  GESTURE         │  ACTION            │  TRIGGER       │
-├──────────────────┼────────────────────┼────────────────┤
-│  HEAD TILT UP    │  Scroll Up         │  Z-Depth Pitch │
-│  HEAD TILT DOWN  │  Scroll Down       │  Z-Depth Pitch │
-│  HEAD TILT LEFT  │  Swipe Left        │  Z-Depth Yaw   │
-│  HEAD TILT RIGHT │  Swipe Right       │  Z-Depth Yaw   │
-│  FIRM BLINK      │  Recent Apps/Close │  EAR < 0.22    │
-└──────────────────┴────────────────────┴────────────────┘
-```
-
----
-
-## ✨ Virtual Keyboard (Desktop)
-
-The desktop client includes a **premium glassmorphic virtual keyboard** that you can type on using gestures in mid-air.
-
-| Feature | Description |
-|---------|-------------|
-| **Two-Hand Tracking** | Use both hands simultaneously. Hold `SHIFT` or `CTRL` with one hand and type a letter with the other (`Ctrl+C`, etc). |
-| **Hover & Target** | Pointing (`PEACE` or `POINTING` gesture) moves a glowing finger cursor over the keys. |
-| **Air-Typing** | `PINCH` a key to type it (features a visual flash and cooldown to prevent double-typing). |
-| **Quick Clear** | `PINCH` and hold the `DEL` or `BACKSPACE` key for **4 seconds** to trigger a `Ctrl+A` → `Delete` macro, clearing all text instantly. |
-
----
-
-## Gesture Detection Pipeline
-
-```mermaid
-flowchart LR
-    subgraph Detect["Finger State"]
-        A["isExtended fn"] --> B["Tip.y below MCP.y"]
-        C["isFolded fn"] --> D["Tip.y above PIP.y"]
-    end
-
-    subgraph Classify["Gesture Classification"]
-        B --> E{"Pattern Match"}
-        D --> E
-        E -->|"idx up, rest down"| F["POINTING"]
-        E -->|"thumb-index close"| G["PINCH"]
-        E -->|"idx+mid up, rest down"| H["PEACE"]
-        E -->|"all down"| I["FIST"]
-        E -->|"all up"| J["OPEN PALM"]
-    end
-
-    subgraph Stable["Stability"]
-        F --> K["2-Frame Buffer"]
-        G --> K
-        H --> K
-        I --> K
-        J --> K
-        K --> L["Emit Gesture"]
-    end
-```
-
----
-
-## Project Structure
+## 📁 Repository Structure
 
 ```
-spatial_tracer/
+Spatial_tracer/
 │
-├── engine/                          # Core processing
-│   ├── headless_hand_tracer.py      # MediaPipe Tasks API tracker
-│   ├── simple_hand_tracer.py        # OpenCV debug view with skeleton
-│   ├── gesture_detector.py          # Pinch, tap, swipe, palm detection
-│   └── air_input_driver.py          # pynput mouse/keyboard control
+├── main.py                          # CLI entry point (server/desktop/web/debug)
+├── requirements.txt                 # Python dependencies
+├── vercel.json                      # Vercel deploy config (routes to web-client/)
+├── LICENSE                          # MIT
 │
-├── api/                             # Server layer
-│   ├── fastapi_main.py              # FastAPI + WebSocket server
-│   └── input_controller.py          # Keyboard input via pynput
+├── engine/                          # 🧠 Core Vision Engine (Python)
+│   ├── __init__.py                  # Exports HeadlessHandTracker, GestureDetector
+│   ├── simple_hand_tracer.py        # OpenCV debug view — renders skeleton on camera
+│   ├── headless_hand_tracer.py      # Headless tracker — yields frame data (no GUI)
+│   ├── gesture_detector.py          # Deterministic gesture classification (13 gestures)
+│   └── air_input_driver.py          # Translates gestures → OS inputs (pynput)
 │
-├── web-client/                      # Browser client
-│   ├── index.html                   # Premium dark UI
-│   ├── style.css                    # Pitch-black dev theme
-│   └── app.js                       # MediaPipe JS + Three.js + gestures
+├── api/                             # 🔌 FastAPI Server
+│   ├── __init__.py
+│   ├── fastapi_main.py              # WebSocket streaming + REST endpoints
+│   └── input_controller.py          # Remote keystroke injection via pynput
 │
-├── desktop-client/                  # PyQt5 overlay
-│   ├── app.py                       # Transparent overlay + camera panel
-│   └── camera_widget.py             # Hand skeleton renderer
-│
-├── mobile-client/                   # Flutter Android
-│   ├── lib/main.dart                # Full app (camera, gestures, UI)
-│   ├── android/.../MainActivity.kt  # MediaPipe Kotlin platform channel
-│   └── pubspec.yaml                 # Dependencies
+├── desktop-client/                  # 🖥️ PyQt5 Desktop Overlay
+│   ├── app.py                       # Frameless transparent window + gesture HUD
+│   ├── camera_widget.py             # Embedded camera feed with landmark drawing
+│   └── virtual_keyboard.py          # Floating air keyboard (maps fingertip to keys)
 │
 ├── config/
-│   ├── hand_landmarker.task         # MediaPipe model weights
-│   └── mapping.json                 # Key mapping config
+│   ├── hand_landmarker.task         # MediaPipe TFLite model (7.8 MB)
+│   └── mapping.json                 # Virtual keyboard layout (69 keys, QWERTY)
 │
-├── main.py                          # CLI entry point
-├── requirements.txt                 # Python dependencies
-└── LICENSE                          # MIT
+├── mobile-client/                   # 📱 Flutter + Kotlin Android App
+│   ├── pubspec.yaml                 # Flutter deps (camera, google_mlkit, provider, shared_prefs)
+│   ├── lib/
+│   │   ├── main.dart                # 37KB — App entry, onboarding flow, dashboard, settings UI
+│   │   ├── theme.dart               # Dark/Light theme definitions (emerald accent)
+│   │   └── screens/
+│   │       └── creator_profile.dart # 17KB — Developer profile with glassmorphic cards
+│   ├── android/app/src/main/kotlin/com/rajtewari/spatial_tracer_mobile/
+│   │   ├── MainActivity.kt          # Flutter↔Kotlin MethodChannel + EventChannel bridge
+│   │   ├── TrackerService.kt        # 437-line LifecycleService (CameraX + MediaPipe LIVE_STREAM)
+│   │   ├── GestureDetector.kt       # Hand gesture classifier (Kotlin port)
+│   │   ├── FaceDetector.kt          # Face EAR blink + Z-depth tilt detection
+│   │   ├── CursorOverlay.kt         # System overlay — draws cursor on screen
+│   │   └── SpatialAccessibilityService.kt  # AccessibilityService for OS-level taps/swipes
+│   └── test/
+│       └── widget_test.dart         # Basic render smoke test
+│
+├── web-client/                      # 🌐 Static Web Client (Vercel-deployed)
+│   ├── index.html                   # Entry HTML — loads Three.js + MediaPipe CDN
+│   ├── app.js                       # Gesture detection + 4000-particle sphere physics
+│   └── style.css                    # Glassmorphic dark theme
+│
+├── proofs/                          # 🎬 Live proof screenshots & demo recordings
+│
+├── wiki/                            # 📚 Deep-dive documentation
+│
+└── .github/workflows/               # ⚙️ CI/CD Pipelines
+    ├── python-engine.yml            # flake8 syntax linting
+    ├── flutter-mobile.yml           # flutter analyze + build APK
+    └── web-client.yml               # jshint + file integrity checks
 ```
 
 ---
 
-## Multi-Platform Architecture
+## 🚀 Getting Started
 
-```mermaid
-flowchart LR
-    subgraph Web["Web Client"]
-        W1["MediaPipe JS in-browser"]
-        W2["Three.js 4000 Particles"]
-    end
+### Platform A: Desktop Client (Windows)
 
-    subgraph Desktop["Desktop Client"]
-        D1["HeadlessHandTracker in-process"]
-        D2["AirInputDriver via pynput"]
-        D3["PyQt5 Overlay + Virtual KBD"]
-    end
+> Runs a transparent PyQt5 overlay with an air-controlled cursor and floating virtual keyboard.
 
-    subgraph Mobile["Mobile Client (Android)"]
-        M1["Kotlin MediaPipe Foreground Service"]
-        M4["FaceLandmarker + Z-Depth"]
-        M2["Accessibility System Interaction"]
-        M3["Flutter UI + Dashboard"]
-    end
-
-    subgraph Shared["Shared Physics / Math"]
-        S1["EMA Cursor Smoothing"]
-        S2["21-Point Vector Processing"]
-    end
-
-    S1 -.->|"Dart port"| Mobile
-    S1 -.->|"JS port"| Web
-    S1 -.->|"Python"| Desktop
-```
-
----
-
-## Quick Start
-
-### Prerequisites
+**Requirements:** Python 3.10+, webcam, Windows OS (required for `pynput`/`win32api`)
 
 ```bash
-Python 3.10+
-Flutter 3.x (for mobile)
-Webcam / Camera
-```
-
-### Install
-
-```bash
+# 1. Clone
 git clone https://github.com/RajTewari01/Spatial_tracer.git
 cd Spatial_tracer
+
+# 2. Create virtual environment (recommended)
+python -m venv venv
+.\venv\Scripts\activate
+
+# 3. Install dependencies
 pip install -r requirements.txt
+
+# 4. Run — choose your mode:
+python main.py desktop    # Transparent overlay with air cursor + virtual keyboard
+python main.py debug      # OpenCV window showing hand skeleton (for development)
+python main.py server     # FastAPI server only (WebSocket at ws://localhost:8765/ws/hand-data)
+python main.py web        # Start server + auto-open web client in browser
 ```
 
-### Run
+| CLI Mode | What It Launches |
+|----------|-----------------|
+| `desktop` | PyQt5 transparent overlay → cursor follows index finger, peace sign = click, fist = right-click |
+| `debug` | Raw OpenCV window with drawn hand skeleton — press `q` to quit |
+| `server` | FastAPI on `http://localhost:8765` — streams via WebSocket, serves web client at `/` |
+| `web` | Same as `server` but auto-opens your browser to `localhost:8765` |
+
+---
+
+### Platform B: Android Mobile App (Flutter)
+
+> A standalone Flutter app with native Kotlin camera processing. Does NOT require the Python server.
+
+**Requirements:** Flutter 3.x, Android SDK, Java 17, physical Android device (camera required)
 
 ```bash
-# Web client — open in browser with 3D particle demo
+# 1. Navigate to mobile client
+cd mobile-client
+
+# 2. Install Flutter dependencies
+flutter pub get
+
+# 3. Connect your Android device via USB (enable Developer Options + USB Debugging)
+
+# 4. Build & install
+flutter run                        # Debug build — hot reload enabled
+flutter build apk --release        # Production APK → build/app/outputs/flutter-apk/app-release.apk
+```
+
+**Android Permissions Required:**
+- 📷 **Camera** — for hand/face tracking via Google ML Kit
+- 🖥️ **Overlay** — draws the air cursor on top of all apps
+- ♿ **Accessibility Service** — enables system-wide tap/swipe injection (required for TikTok scrolling, app switching, etc.)
+
+**Architecture:** Flutter (Dart UI) ↔ `MethodChannel('com.rajtewari/hand_tracker')` ↔ Kotlin (Camera + ML Kit + Gesture Detector + CursorOverlay + AccessibilityService)
+
+---
+
+### Platform C: Web Client (Browser — Zero Install)
+
+> A fully client-side Three.js + MediaPipe WASM experience. No server, no install, no backend.
+
+**Live URL:** Deployed via Vercel — just open in any browser with a webcam.
+
+```
+🌐 The web client runs entirely in your browser.
+   No Python server needed. No installation.
+   MediaPipe loads as a WASM module from CDN.
+```
+
+**To run locally (optional):**
+```bash
+# Option 1: Use the FastAPI server to serve it
 python main.py web
 
-# Desktop — transparent overlay, real mouse/keyboard control
-python main.py desktop
-
-# Debug — OpenCV window with hand skeleton
-python main.py debug
-
-# Android — Flutter app
-cd mobile-client && flutter run
+# Option 2: Any static file server works
+cd web-client
+npx serve .
+# or: python -m http.server 3000
 ```
 
+**What it includes:**
+- 🖐️ Real-time hand tracking via MediaPipe Hands WASM (max 2 hands)
+- 🌐 4,000-particle Three.js sphere with inverse-square repulsive force from fingertips
+- ✨ 13 gesture types detected in real-time (peace, fist, rock, pinch, ok, etc.)
+- 📊 Live FPS counter, finger state readout, event log panel
+- 🎨 Typewriter animations, glassmorphic UI, OrbitControls
+
 ---
 
-## Tech Stack
+## 🖐️ Gesture Recognition Engine
 
-```mermaid
-mindmap
-  root((Spatial_Tracer))
-    Vision
-      MediaPipe Hands
-      Hand Landmarker
-      21 Landmarks
-    Backend
-      FastAPI
-      WebSocket
-      Uvicorn
-    Desktop
-      PyQt5
-      pynput
-      OpenCV
-    Web
-      Three.js
-      MediaPipe JS
-      Canvas API
-    Mobile
-      Flutter
-      Kotlin
-      Camera Plugin
-    AI/ML
-      TensorFlow Lite
-      Hand Detection
-      Gesture Classification
+All three platforms use the **same deterministic algorithm** — no machine learning classifiers. Gesture detection works by comparing normalized Y-coordinates of fingertip landmarks against their MCP/PIP joints:
+
+```
+Finger "extended":  tip.y < MCP.y   (tip is ABOVE the knuckle on screen)
+Finger "curled":    tip.y > PIP.y   (tip is BELOW its own mid-joint)
+Thumb:              |tip.x - ref.x| comparison (lateral distance from palm)
 ```
 
+### Hand Gesture Map
+
+| Gesture | Detection Rule | Desktop Action | Android Action |
+|:--------|:---------------|:---------------|:---------------|
+| **POINTING** | Index extended, others folded | Move cursor | Move cursor overlay (EMA smoothed) |
+| **PEACE** ✌️ | Index + middle extended, ring + pinky folded (tip gap > 0.05) | Left click / double-click | Tap at cursor position (600ms cooldown) |
+| **FIST** ✊ | All 5 fingers curled | Right click | Recent Apps (1000ms cooldown) |
+| **OPEN PALM** 🖐️ | All 5 fingers extended | Stop / idle | Stop / idle |
+| **THUMBS UP** 👍 | Only thumb extended, tip > 0.04 above palm center | Scroll up / Enter key | Swipe up (500ms cooldown) |
+| **THUMBS DOWN** 👎 | Only thumb extended, tip > 0.04 below palm center | Scroll down / Backspace | Swipe down (500ms cooldown) |
+| **PINCH** 🤏 | Thumb tip touching index tip (dist < 0.05) | Drag start / Left click | Go Back (1000ms cooldown) |
+| **OK** 👌 | Thumb-index touch + middle/ring/pinky extended | — | — |
+| **ROCK** 🤘 | Index + pinky extended, middle + ring folded | — | — |
+| **CALL ME** 🤙 | Thumb + pinky extended, others folded | — | — |
+| **THREE** | Index + middle + ring extended, thumb + pinky folded | Tab key | Go Home (1000ms cooldown) |
+| **SPIDERMAN** 🕷️ | Thumb + index + pinky extended, middle + ring folded | — | — |
+| **MIDDLE FINGER** | Only middle extended, others folded | — | — |
+
+### Face Gesture Map (Android & Desktop)
+
+| Gesture | Detection Method | Threshold | Action |
+|:--------|:-----------------|:----------|:-------|
+| **TILT UP** | Z-depth: chin.z - forehead.z < -0.045 | 3 stable frames | Scroll up |
+| **TILT DOWN** | Z-depth: chin.z - forehead.z > 0.045 | 3 stable frames | Scroll down |
+| **TILT LEFT** | Z-depth: rightCheek.z - leftCheek.z < -0.045 | 3 stable frames | Swipe left |
+| **TILT RIGHT** | Z-depth: rightCheek.z - leftCheek.z > 0.045 | 3 stable frames | Swipe right |
+| **FIRM BLINK** | EAR (Eye Aspect Ratio) < 0.22 | 3 stable frames | Close / Recent Apps |
+
+### Stability Buffer
+
+All gestures pass through a **frame stability filter** before triggering:
+- **Hand gestures:** 2 consecutive frames required (all platforms)  
+- **Face gestures:** 3 consecutive frames required (Android `FaceDetector.kt`)  
+- **Frame alternation:** When both hand + face tracking are active on Android, frames alternate between detectors (`frameCounter % 2`) to prevent GPU overload
+- **Desktop cooldowns:** 400ms click, 150ms scroll, 500ms key
+- **Android cooldowns:** 600ms tap (PEACE), 1000ms back/recents/home, 500ms scroll, 1500ms blink
+- **Web cooldown:** 1200ms gesture flash display
+
 ---
 
-## Gesture Detection — How It Works
-
-The system uses a **two-phase approach**:
-
-### Phase 1: Finger State Analysis
-
-Each of the 5 fingers is classified independently:
-
-| State | Condition | Description |
-|-------|-----------|-------------|
-| **Extended** | `tip.y < MCP.y` | Fingertip is above its knuckle |
-| **Folded** | `tip.y > PIP.y` | Fingertip is below its middle joint |
-| **Ambiguous** | Between | Partially bent — ignored to prevent false triggers |
-
-For the **thumb**, lateral distance from the index MCP is used instead of Y-axis comparison.
-
-### Phase 2: Pattern Matching with Priority
-
-Gestures are checked **most-specific first**. If a specific gesture matches (like PEACE), the catch-all gestures (FIST, OPEN_PALM) are **blocked** from firing. This prevents the domination problem where generic gestures override specific ones.
-
-A **2-frame stability buffer** prevents single-frame noise from triggering false gestures.
-
----
-
-## Desktop Air Input — How Mouse Control Works
+## 🖥️ Desktop — Cursor Pipeline Deep Dive
 
 ```mermaid
 flowchart LR
-    A["Index Fingertip normalized 0-1"] --> B["Margin Mapping 0.08 dead zone"]
-    B --> C["Screen Mapping 1920x1080"]
-    C --> D["EMA Smoothing alpha 0.22"]
-    D --> E["pynput mouse position"]
+    A["Index Fingertip\n(normalized 0.0—1.0)"] --> B["Margin Clamp\n8% dead zone"]
+    B --> C["Screen Mapping\n× screen_width\n× screen_height"]
+    C --> D["EMA Smoothing\nα = 1.0 - 0.4 = 0.6"]
+    D --> E["pynput\nmouse.position = (x, y)"]
 ```
 
-- **Smoothing**: Exponential Moving Average prevents cursor jitter
-- **Margin**: 8% dead zone at screen edges for comfortable use
-- **Cooldowns**: 400ms click, 150ms scroll, 500ms key — prevents accidental repeats
+| Pipeline Stage | Code Location | Details |
+|:---------------|:-------------|:--------|
+| Landmark extraction | `engine/headless_hand_tracer.py` | MediaPipe TFLite model — default 1280×720, desktop override 640×480 |
+| Gesture classification | `engine/gesture_detector.py` | 13 gestures, `tip.y < MCP.y` heuristic |
+| Cursor smoothing | `engine/air_input_driver.py` | `new = prev + α × (raw − prev)` where α = 1.0 − smoothing (desktop: 0.6) |
+| OS input injection | `engine/air_input_driver.py` | `pynput.mouse.Controller()` + `pynput.keyboard.Controller()` |
+| Virtual keyboard | `desktop-client/virtual_keyboard.py` | 69-key QWERTY layout, `PINCH` gesture hit-tests fingertip midpoint against key grid, 4s long-press DEL/BACK = select-all + delete |
+| Transparent overlay | `desktop-client/app.py` | 814-line PyQt5 app: frameless `Qt.WindowStaysOnTopHint \| Qt.Tool`, `WA_TranslucentBackground`, 300×280px panel, draggable, camera minimizable. Uses `ctypes.windll.user32.GetSystemMetrics` for screen resolution |
 
 ---
 
-## Configuration
+## 📱 Android — Kotlin Native Architecture
 
-| Parameter | Default | Description |
-|-----------|---------|-------------|
-| `smoothing` | `0.4` | Cursor smoothing (0=raw, 1=frozen) |
-| `margin` | `0.1` | Screen edge dead zone |
-| `click_cooldown` | `0.4s` | Min time between clicks |
-| `scroll_cooldown` | `0.15s` | Min time between scrolls |
-| `key_cooldown` | `0.5s` | Min time between key presses |
-| `modelComplexity` | `0` | MediaPipe model (0=fast, 1=accurate) |
-| `maxNumHands` | `2` | Max hands to track |
+```mermaid
+flowchart TB
+    subgraph Flutter["Flutter (Dart)"]
+        UI["main.dart\nDashboard + Onboarding UI"]
+    end
+
+    subgraph Bridge["Platform Channel"]
+        MC["MethodChannel\n'com.rajtewari/hand_tracker'"]
+        EC["EventChannel\n'com.rajtewari/gesture_stream'"]
+    end
+
+    subgraph Kotlin["Kotlin Native Layer"]
+        TS["TrackerService.kt\nForeground Service\nCamera + ML Kit"]
+        GD["GestureDetector.kt\nHand classification"]
+        FD["FaceDetector.kt\nEAR blink + Z-depth tilt"]
+        CO["CursorOverlay.kt\nSystem overlay cursor"]
+        AS["SpatialAccessibilityService.kt\nGestureDescription.Builder\nGLOBAL_ACTION_BACK/HOME/RECENTS"]
+    end
+
+    UI -->|"startService / stopService"| MC
+    MC --> TS
+    TS --> GD
+    TS --> FD
+    GD -->|"gesture events"| EC
+    FD -->|"tilt/blink events"| EC
+    EC --> UI
+    GD --> CO
+    GD --> AS
+    FD --> AS
+```
+
+| Kotlin File | Responsibility |
+|:------------|:--------------|
+| `MainActivity.kt` | Receives Flutter MethodChannel calls, starts/stops `TrackerService`, checks overlay + accessibility permissions |
+| `TrackerService.kt` | 437-line `LifecycleService` — opens CameraX front camera, runs MediaPipe HandLandmarker + FaceLandmarker in `LIVE_STREAM` mode, alternates hand/face frames when both active, dispatches results to GestureDetector/FaceDetector, applies EMA smoothing (α=0.45), sends gesture events to Flutter via `EventChannel` |
+| `GestureDetector.kt` | Kotlin `object` singleton — classifies 21 landmarks using `tip.y < MCP.y` (same algorithm as Python). 10 gestures, pinch threshold `< 0.05`, peace requires tip gap `> 0.05`, `STABLE_FRAMES = 2` |
+| `FaceDetector.kt` | Computes EAR blink (< 0.22 threshold) and 3D Z-depth pitch/yaw for head tilts |
+| `CursorOverlay.kt` | Draws a system overlay cursor (`WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY`) that follows fingertip position |
+| `SpatialAccessibilityService.kt` | Dispatches fake touch events via `GestureDescription.Builder()` + `StrokeDescription(Path(), 0, 100)` and system nav via `performGlobalAction(GLOBAL_ACTION_BACK/HOME/RECENTS)`. Swipes use normalized→pixel coordinate mapping |
 
 ---
 
-## API Endpoints
+## 🌐 Web Client — Three.js Particle Physics
+
+```mermaid
+flowchart LR
+    CAM["Browser Camera"] --> MP["MediaPipe Hands\nWASM Module\nCDN-loaded"]
+    MP --> GD["Gesture Detection\n(app.js)\n13 gestures"]
+    MP --> SP["4000-Particle Sphere\nInverse-square repulsion\nfrom fingertip positions"]
+    GD --> FLASH["Gesture Flash\nTypewriter Effect"]
+    SP --> RENDERER["Three.js Renderer\nOrbitControls\nAdditive Blending"]
+```
+
+**Key constants (from `app.js`):**
+- Particle count: `4000` vertices on a golden-ratio sphere (radius 1.6)
+- Repulsion radius: `2.2` units — particles flee from fingertips
+- Repulsion force: `Math.pow(Math.max(0, 1 - d/2.2), 2) * 0.9` (inverse square)
+- Trail particles: spawned every 3rd frame for index + thumb only (max 80)
+- Gesture stability: 2 consecutive frames required before trigger
+
+---
+
+## 🔌 API Server Endpoints
+
+The FastAPI server is optional — only needed for the `web` and `server` CLI modes.
 
 | Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/` | GET | Serves the web client |
-| `/ws/hand-data` | WebSocket | Real-time hand landmark stream |
-| `/status` | GET | Server status + active connections |
+|:---------|:-------|:------------|
+| `/` | GET | Serves `web-client/index.html` |
+| `/app.js` | GET | Serves the JavaScript bundle |
+| `/style.css` | GET | Serves the CSS stylesheet |
+| `/ws/hand-data` | WebSocket | Streams JSON frames at ~30 FPS: `{ timestamp, fps, hands, gestures }` |
+| `/start` | POST | Starts the headless hand tracker in a background thread |
+| `/stop` | POST | Stops the tracker and releases the camera |
+| `/status` | GET | Returns `{ running, fps, connected_clients }` |
+| `/press-key` | POST | Injects a keystroke via pynput: `{ "key": "A" }` |
 
 ---
 
-## 🚀 CI/CD Pipelines & Workflows
+## ⚙️ Configuration Reference
 
-Spatial_Tracer utilizes GitHub Actions to ensure code quality and build integrity across all platforms.
+### Desktop Engine (`air_input_driver.py` defaults, overridden in `app.py`)
+
+| Parameter | Driver Default | Desktop Override | Description |
+|:----------|:--------------|:-----------------|:------------|
+| `smoothing` | `0.35` (α=0.65) | `0.4` (α=0.6) | EMA smoothing factor — lower = snappier, higher = smoother |
+| `margin` | `0.08` (8%) | `0.1` (10%) | Screen edge dead zone |
+| `click_cooldown` | `0.4s` | `0.4s` | Minimum time between left clicks |
+| `scroll_cooldown` | `0.15s` | `0.15s` | Minimum time between scroll events |
+| `key_cooldown` | `0.5s` | `0.5s` | Minimum time between virtual key presses |
+
+### MediaPipe Settings
+
+| Parameter | Desktop (Python) | Web (JS) | Android (Kotlin) |
+|:----------|:----------------|:---------|:-----------------|
+| `modelComplexity` | `1` (TFLite local) | `0` (WASM CDN) | ML Kit default |
+| `maxNumHands` | `1` | `2` | `1` |
+| `minDetectionConfidence` | `0.7` | `0.6` | ML Kit default |
+| `minTrackingConfidence` | `0.5` | `0.5` | ML Kit default |
+
+### Virtual Keyboard (`config/mapping.json`)
+
+69 keys in standard QWERTY layout. Each key stores normalized screen coordinates:
+```json
+{ "label": "A", "x": 0.270, "y": 0.69, "w": 0.035, "h": 0.06 }
+```
+
+---
+
+## ⚙️ CI/CD Pipelines
 
 ```mermaid
 flowchart LR
-    subgraph GitHub["GitHub Repository"]
-        PR["Push / Pull Request to main"]
+    subgraph Trigger["Push / PR to main"]
+        P["engine/ api/ desktop-client/"] --> PY
+        M["mobile-client/"] --> FL
+        W["web-client/"] --> WC
     end
 
-    subgraph Actions["GitHub Actions CI"]
-        PY["Python Engine Workflow\n(Linting)"]
-        FL["Flutter Mobile Workflow\n(Analyze & Build APK)"]
+    subgraph CI["GitHub Actions"]
+        PY["Python Engine CI\nWindows runner\nflake8 E9,F63,F7,F82"]
+        FL["Flutter Mobile CI\nUbuntu runner\nflutter analyze\nflutter build apk"]
+        WC["Web Client CI\nUbuntu runner\njshint + file checks"]
     end
 
-    subgraph Deploy["Automated Output Deployments"]
-        APK["Release APK Upload"]
-        Vercel["Vercel Web Client Deploy"]
+    subgraph Output["Artifacts"]
+        APK["📦 Release APK\nactions/upload-artifact"]
+        VERCEL["🌐 Vercel Deploy\nAutomatic on push"]
+        WCA["📁 Web Client Bundle\nactions/upload-artifact"]
     end
 
-    PR -->|engine/ path| PY
-    PR -->|mobile-client/ path| FL
-    PR -->|web-client/ path| Vercel
-    
-    FL -->|"On Success"| APK
+    PY -.->|"Lint pass"| PY
+    FL -->|"On success"| APK
+    WC --> WCA
+    W -.->|"Webhook"| VERCEL
 ```
 
-Our continuous integration pipelines are configured in `.github/workflows/`:
-1. **Python Engine CI (`python-engine.yml`)**: Checks Python 3.10 syntax integrity across the API, Desktop Client, and Engine backend using `flake8`, maintaining coding standards and preventing syntax errors in the core logic.
-2. **Flutter Mobile CI (`flutter-mobile.yml`)**: Verifies the Dart/Flutter codebase through analytical lint checks (`flutter analyze`), and performs a full release build (`flutter build apk`), producing downloadable Android APK artifacts automatically.
-3. **Web Client**: Integrates directly with Vercel for continuous deployment, ensuring web-based UI modifications instantly go live.
+| Workflow | Runner | Triggers On | What It Does |
+|:---------|:-------|:------------|:-------------|
+| `python-engine.yml` | `windows-latest` | `engine/` `api/` `desktop-client/` `main.py` | flake8 syntax check (excludes venv, mobile, web) |
+| `flutter-mobile.yml` | `ubuntu-latest` | `mobile-client/` | `flutter analyze --no-fatal-infos --no-fatal-warnings` → `flutter build apk --release` → upload APK artifact |
+| `web-client.yml` | `ubuntu-latest` | `web-client/` | jshint linting + file integrity check (index.html, app.js, style.css exist) |
+| **Vercel** | Managed | `web-client/` | Auto-deploy via GitHub integration — routes defined in `vercel.json` |
 
 ---
 
-## 📚 Comprehensive Wiki
+## 📚 Wiki — Deep Dive Documentation
 
-For deep-dive documentation into every corner of this project, we have fully documented the engine in our [Project Wiki](wiki/Home.md).
+For comprehensive internals documentation, see the [Project Wiki](wiki/Home.md):
 
-- [Architecture Deep Dive](wiki/Architecture-Deep-Dive.md): Mathematical formulas for finger bend detections, EMA smoothing logic.
-- [Python Engine & Desktop](wiki/Python-Engine-&-Desktop.md): Detailed internals of `pynput` and `PyQt5` glassmorphism.
-- [Mobile Client Integration](wiki/Flutter-Mobile-Client.md): Understanding the Kotlin-to-Dart platform channels and Accessibility API.
-- [CI/CD Workflows](wiki/CI-CD-Workflows.md): Infrastructure-as-code documentation.
-
----
-
-## Contributing
-
-```bash
-# Fork → Clone → Branch → Code → PR
-git checkout -b feat/your-feature
-# Make changes
-git commit -m "feat: description"
-git push origin feat/your-feature
-```
+| Wiki Page | What It Covers |
+|:----------|:---------------|
+| [Architecture Deep Dive](wiki/Architecture-Deep-Dive.md) | Mathematical foundations: EMA smoothing, EAR blink formula, Z-depth pitch/yaw |
+| [Python Engine & Desktop](wiki/Python-Engine-&-Desktop.md) | pynput driver internals, PyQt5 transparent overlay, virtual keyboard hit-testing |
+| [Flutter Mobile Client](wiki/Flutter-Mobile-Client.md) | Kotlin platform channels, TrackerService lifecycle, AccessibilityService spoofing |
+| [Web Client & API](wiki/Web-Client-&-API.md) | Three.js particle physics, WebSocket streaming protocol, MediaPipe WASM |
+| [CI/CD Workflows](wiki/CI-CD-Workflows.md) | Pipeline architecture, runner configs, artifact outputs |
+| [Integrity Report](wiki/Integrity-Report.md) | Code audit — verifying docs match actual thresholds in source |
 
 ---
 
-## Roadmap
+## 🗺️ Roadmap
 
-- [ ] Voice commands integration
+- [ ] Voice commands integration (Whisper)
 - [ ] Multi-hand collaborative gestures
-- [ ] Custom gesture training (record your own)
+- [ ] Custom gesture training UI (record & save your own)
 - [ ] Accessibility mode for motor-impaired users
 - [ ] iOS Flutter client
-- [ ] Electron desktop app
+- [ ] Electron desktop app (cross-platform)
+
+---
+
+## 🤝 Contributing
+
+```bash
+# 1. Fork the repository
+# 2. Clone your fork
+git clone https://github.com/<your-username>/Spatial_tracer.git
+
+# 3. Create a feature branch
+git checkout -b feat/your-feature
+
+# 4. Make changes and commit
+git commit -m "feat: description of your change"
+
+# 5. Push and open a Pull Request
+git push origin feat/your-feature
+```
 
 ---
 
