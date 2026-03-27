@@ -26,61 +26,47 @@
 
 > *No simulations. No mockups. Real screenshots and recordings from physical devices running the Spatial_Tracer engine.*
 
-### 📸 Platform Screenshots
+### 📱 Mobile Client
 
 <div align="center">
 <table>
 <tr>
-<td align="center"><b>In-App Tutorial</b><br><img src="proofs/onboarding_screen.png" width="180"/></td>
-<td align="center"><b>Dashboard</b><br><img src="proofs/pointer_tutorial.png" width="180"/></td>
-<td align="center"><b>Web Client</b><br><img src="proofs/dashboard_standby.png" width="180"/></td>
+<td align="center"><b>App Front Page</b><br><br><img src="proofs/creator_profile.png" width="160"/></td>
+<td align="center"><b>In-App Tutorial</b><br><br><img src="proofs/onboarding_screen.png" width="160"/></td>
+<td align="center"><b>Dashboard</b><br><br><img src="proofs/pointer_tutorial.png" width="160"/></td>
+<td align="center"><b>My Profile</b><br><br><img src="proofs/sidebar_controls.png" width="160"/></td>
 </tr>
+</table>
+</div>
+
+### 🖥️ Desktop & Web
+
+<div align="center">
+<table>
 <tr>
-<td align="center"><b>My Profile</b><br><img src="proofs/sidebar_controls.png" width="180"/></td>
-<td align="center"><b>App Front Page</b><br><img src="proofs/creator_profile.png" width="180"/></td>
-<td align="center"><b>Desktop Overlay</b><br><img src="proofs/desktop_overlay.png" width="380"/></td>
+<td align="center" width="60%"><b>Desktop Overlay — Live Gesture Control</b><br><br><img src="proofs/desktop_overlay.png" width="100%"/></td>
+<td align="center" width="40%"><b>Web Client — 3D Particle Engine</b><br><br><img src="proofs/dashboard_standby.png" width="100%"/></td>
 </tr>
 </table>
 </div>
 
 ### 🎥 Video Demos *(click to play — silenced)*
 
-<div align="center">
-<table>
-<tr>
-<td align="center" width="50%">
-
 **👁️ Blink Detection — Desktop**
 
 https://github.com/RajTewari01/Spatial_tracer/raw/main/proofs/blink_scroll_control.mp4
-
-</td>
-<td align="center" width="50%">
 
 **🌐 Web 3D Simulation**
 
 https://github.com/RajTewari01/Spatial_tracer/raw/main/proofs/air_cursor_navigation.mp4
 
-</td>
-</tr>
-<tr>
-<td align="center" width="50%">
-
 **🖐️ Hand Gestures — Android**
 
 https://github.com/RajTewari01/Spatial_tracer/raw/main/proofs/full_system_walkthrough.mp4
 
-</td>
-<td align="center" width="50%">
-
 **😊 Blink & Scroll Control**
 
 https://github.com/RajTewari01/Spatial_tracer/raw/main/proofs/gesture_tracking_demo.mp4
-
-</td>
-</tr>
-</table>
-</div>
 
 ---
 
