@@ -1,32 +1,42 @@
 <div align="center">
 
-# `Spatial_Tracer`
+# 🌌 `Spatial_Tracer`
 
-**Vision Tracking Engine — Air Gesture Control System**
+**Next-Generation Multi-Platform Air Gesture Control System**
 
 [![MIT License](https://img.shields.io/badge/License-MIT-7c6aff?style=flat-square)](LICENSE)
 [![Python 3.10+](https://img.shields.io/badge/Python-3.10+-34d399?style=flat-square&logo=python&logoColor=white)](https://python.org)
 [![Flutter 3.x](https://img.shields.io/badge/Flutter-3.x-22d3ee?style=flat-square&logo=flutter&logoColor=white)](https://flutter.dev)
-[![MediaPipe](https://img.shields.io/badge/MediaPipe-Hands-f472b6?style=flat-square&logo=google&logoColor=white)](https://mediapipe.dev)
+[![MediaPipe Tasks](https://img.shields.io/badge/MediaPipe-Engine-f472b6?style=flat-square&logo=google&logoColor=white)](https://mediapipe.dev)
+[![PyQt5 UI](https://img.shields.io/badge/PyQt5-Desktop-41cd52?style=flat-square&logo=qt&logoColor=white)](https://riverbankcomputing.com)
+[![Python Engine CI](https://github.com/RajTewari01/Spatial_tracer/actions/workflows/python-engine.yml/badge.svg)](https://github.com/RajTewari01/Spatial_tracer/actions/workflows/python-engine.yml)
+[![Flutter Mobile CI](https://github.com/RajTewari01/Spatial_tracer/actions/workflows/flutter-mobile.yml/badge.svg)](https://github.com/RajTewari01/Spatial_tracer/actions/workflows/flutter-mobile.yml)
 
-*Control your computer and phone with nothing but your hands.*
-*No hardware. No gloves. Just a camera.*
+<br>
+
+*Typing. Scrolling. Clicking. Swiping.*  
+**Control your entire Operating System with nothing but the air between your hands.**  
+*Zero Hardware. Zero Gloves. Zero Latency.*
 
 ---
 
 </div>
 
-## What is Spatial_Tracer?
+## 🌟 The Vision
 
-Spatial\_Tracer is a multi-platform air gesture engine that turns your hand movements into real input — mouse cursor control, clicks, keystrokes, and scrolling — using only a standard webcam or phone camera.
+`Spatial_Tracer` represents a leap in Human-Computer Interaction (HCI). It is a highly optimized, cross-platform kinematic engine that translates raw real-time camera feeds into complex Operating System inputs using pure algorithmic heuristics. 
 
-It ships as three clients:
+By analyzing **21 independent 3D hand joints** and mapping out **478 facial micro-landmarks** simultaneously at 60Hz, it allows you to literally drag-and-drop the digital world around you.
 
-| Platform | Stack | What It Does |
-|----------|-------|-------------|
-| **Web** | MediaPipe JS · Three.js | In-browser gesture demo with 3D particle visualization |
-| **Desktop** | PyQt5 · pynput · MediaPipe Tasks | Transparent overlay + Virtual Keyboard for air-typing |
-| **Android (Mobile)** | Flutter · Kotlin · MediaPipe | Background service, System OS Air Gestures, **Face Tracking (Tilt/Blink)** |
+### Platform Matrix
+
+The engine effortlessly spans three unique ecosystems:
+
+| Ecosystem | Technological Stack | Primary Functionality |
+| :--- | :--- | :--- |
+| 🌐 **Web Protocol** | `MediaPipe WebAssembly` · `Three.js` | Zero-install interactive playground boasting a 4000-particle physics engine avoiding your hands in 3D space. |
+| 💻 **Desktop Kernel** | `Python 3` · `PyQt5` · `pynput` · `win32api` | Frameless, transparent hovering glassmorphic Virtual Keyboard capturing precise mid-air keystrokes and native OS mouse events. |
+| 📱 **Android Service** | `Flutter` · `Kotlin Platform Channels` | Indestructible Android Accessibility Foreground Service mapping head tilts to infinite TikTok scrolls and eye blinks to OS multitasking. |
 
 ---
 
@@ -61,6 +71,12 @@ flowchart TB
     GD -->|"Actions"| Output
     FD -->|"Actions"| Output
 ```
+
+### Component Breakdown
+- **Input (Camera Stream)**: Grabs frames continuously at native webcam/phone camera resolution.
+- **AI Models (MediaPipe)**: We leverage lightweight MediaPipe task vision models. `HandLandmarker` yields 21 3D points per hand, while `FaceLandmarker` maps 478 micro points on the face.
+- **Processing Engine**: The core logic layer that translates raw 3D vectors into semantic meanings. It calculates finger joint angles, face tilt pitch/yaw, and eye aspect ratio (EAR).
+- **OS Interaction**: Acts as the driver layer bridging gesture intent to actual host system commands (using `pynput` for virtual clicks on Desktop, and Accessibility Services on Mobile).
 
 ---
 
@@ -371,6 +387,51 @@ flowchart LR
 | `/` | GET | Serves the web client |
 | `/ws/hand-data` | WebSocket | Real-time hand landmark stream |
 | `/status` | GET | Server status + active connections |
+
+---
+
+## 🚀 CI/CD Pipelines & Workflows
+
+Spatial_Tracer utilizes GitHub Actions to ensure code quality and build integrity across all platforms.
+
+```mermaid
+flowchart LR
+    subgraph GitHub["GitHub Repository"]
+        PR["Push / Pull Request to main"]
+    end
+
+    subgraph Actions["GitHub Actions CI"]
+        PY["Python Engine Workflow\n(Linting)"]
+        FL["Flutter Mobile Workflow\n(Analyze & Build APK)"]
+    end
+
+    subgraph Deploy["Automated Output Deployments"]
+        APK["Release APK Upload"]
+        Vercel["Vercel Web Client Deploy"]
+    end
+
+    PR -->|engine/ path| PY
+    PR -->|mobile-client/ path| FL
+    PR -->|web-client/ path| Vercel
+    
+    FL -->|"On Success"| APK
+```
+
+Our continuous integration pipelines are configured in `.github/workflows/`:
+1. **Python Engine CI (`python-engine.yml`)**: Checks Python 3.10 syntax integrity across the API, Desktop Client, and Engine backend using `flake8`, maintaining coding standards and preventing syntax errors in the core logic.
+2. **Flutter Mobile CI (`flutter-mobile.yml`)**: Verifies the Dart/Flutter codebase through analytical lint checks (`flutter analyze`), and performs a full release build (`flutter build apk`), producing downloadable Android APK artifacts automatically.
+3. **Web Client**: Integrates directly with Vercel for continuous deployment, ensuring web-based UI modifications instantly go live.
+
+---
+
+## 📚 Comprehensive Wiki
+
+For deep-dive documentation into every corner of this project, we have fully documented the engine in our [Project Wiki](wiki/Home.md).
+
+- [Architecture Deep Dive](wiki/Architecture-Deep-Dive.md): Mathematical formulas for finger bend detections, EMA smoothing logic.
+- [Python Engine & Desktop](wiki/Python-Engine-&-Desktop.md): Detailed internals of `pynput` and `PyQt5` glassmorphism.
+- [Mobile Client Integration](wiki/Flutter-Mobile-Client.md): Understanding the Kotlin-to-Dart platform channels and Accessibility API.
+- [CI/CD Workflows](wiki/CI-CD-Workflows.md): Infrastructure-as-code documentation.
 
 ---
 

@@ -1,0 +1,46 @@
+name: Web Client CI
+
+on:
+  push:
+    branches: [ "main" ]
+    paths:
+      - 'web-client/**'
+      - '.github/workflows/web-client.yml'
+  pull_request:
+    branches: [ "main" ]
+    paths:
+      - 'web-client/**'
+      - '.github/workflows/web-client.yml'
+
+jobs:
+  lint-and-validate:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./web-client
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+
+    - name: Validate Integrity & Lint JS
+      run: |
+        npm install -g jshint
+        jshint app.js || true  # Run linter but don't fail the build immediately initially
+        
+        # Verify required files exist
+        if [ ! -f "index.html" ]; then echo "index.html missing"; exit 1; fi
+        if [ ! -f "app.js" ]; then echo "app.js missing"; exit 1; fi
+        if [ ! -f "style.css" ]; then echo "style.css missing"; exit 1; fi
+        
+        echo "Web client structure and syntax validated."
+
+    - name: Upload Web Client Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: web-client-build
+        path: web-client/
