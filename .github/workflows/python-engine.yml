@@ -81,17 +81,18 @@ jobs:
         python main.py --help
 
     - name: Verify config files
+      shell: python
       run: |
-        python -c "
         from pathlib import Path
+        import json
         model = Path('config/hand_landmarker.task')
         mapping = Path('config/mapping.json')
         assert model.exists(), 'hand_landmarker.task missing!'
         assert model.stat().st_size > 1_000_000, 'Model file too small - likely corrupted'
         assert mapping.exists(), 'mapping.json missing!'
-        import json
         data = json.loads(mapping.read_text())
         assert 'keys' in data, 'mapping.json missing keys array'
-        assert len(data['keys']) >= 60, f'Expected 60+ keys, got {len(data[\"keys\"])}'
-        print(f'[OK] Config OK - model: {model.stat().st_size:,} bytes, keyboard: {len(data[\"keys\"])} keys')
-        "
+        key_count = len(data['keys'])
+        model_size = model.stat().st_size
+        assert key_count >= 60, f'Expected 60+ keys, got {key_count}'
+        print(f'[OK] Config OK - model: {model_size:,} bytes, keyboard: {key_count} keys')
