@@ -22,7 +22,51 @@
 
 </div>
 
+## 🎬 Live Proof — See It In Action
+
+> *No simulations. No mockups. These are real, unedited screen recordings from a physical Android device running the Spatial_Tracer engine.*
+
+<div align="center">
+<table>
+<tr>
+<td align="center" width="50%">
+
+**🖐️ Gesture Tracking Demo**
+
+<video src="proofs/gesture_tracking_demo.mp4" muted autoplay loop playsinline width="300"></video>
+
+</td>
+<td align="center" width="50%">
+
+**🧭 Air Cursor Navigation**
+
+<video src="proofs/air_cursor_navigation.mp4" muted autoplay loop playsinline width="300"></video>
+
+</td>
+</tr>
+<tr>
+<td align="center" width="50%">
+
+**📱 Full System Walkthrough**
+
+<video src="proofs/full_system_walkthrough.mp4" muted autoplay loop playsinline width="300"></video>
+
+</td>
+<td align="center" width="50%">
+
+**👁️ Blink & Scroll Control**
+
+<video src="proofs/blink_scroll_control.mp4" muted autoplay loop playsinline width="300"></video>
+
+</td>
+</tr>
+</table>
+</div>
+
+---
+
 ## 🌟 The Vision
+
 
 `Spatial_Tracer` represents a leap in Human-Computer Interaction (HCI). It is a highly optimized, cross-platform kinematic engine that translates raw real-time camera feeds into complex Operating System inputs using pure algorithmic heuristics. 
 
