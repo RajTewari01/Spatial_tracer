@@ -24,14 +24,33 @@
 
 ## 🎬 Live Proof — See It In Action
 
-> *No simulations. No mockups. These are real, unedited screen recordings from a physical Android device running the Spatial_Tracer engine.*
+> *No simulations. No mockups. Real screenshots and recordings from physical devices running the Spatial_Tracer engine.*
+
+### 📸 Platform Screenshots
+
+<div align="center">
+<table>
+<tr>
+<td align="center"><b>Onboarding</b><br><img src="proofs/onboarding_screen.png" width="180"/></td>
+<td align="center"><b>Gesture Tutorial</b><br><img src="proofs/pointer_tutorial.png" width="180"/></td>
+<td align="center"><b>Dashboard</b><br><img src="proofs/dashboard_standby.png" width="180"/></td>
+</tr>
+<tr>
+<td align="center"><b>Sidebar Controls</b><br><img src="proofs/sidebar_controls.png" width="180"/></td>
+<td align="center"><b>Creator Profile</b><br><img src="proofs/creator_profile.png" width="180"/></td>
+<td align="center"><b>Desktop Overlay</b><br><img src="proofs/desktop_overlay.png" width="380"/></td>
+</tr>
+</table>
+</div>
+
+### 🎥 Video Demos (Silent)
 
 <div align="center">
 <table>
 <tr>
 <td align="center" width="50%">
 
-**🖐️ Gesture Tracking Demo**
+**🖐️ Gesture Tracking**
 
 <video src="proofs/gesture_tracking_demo.mp4" muted autoplay loop playsinline width="300"></video>
 
