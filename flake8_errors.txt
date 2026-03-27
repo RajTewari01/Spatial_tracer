@@ -1,0 +1,948 @@
+.\vision_tracker\Lib\site-packages\PIL\EpsImagePlugin.py:76:5: F824 `global gs_binary` is unused: name is never assigned in scope
+    global gs_binary
+    ^
+.\vision_tracker\Lib\site-packages\PyQt5\uic\port_v2\as_string.py:27:24: F821 undefined name 'basestring'
+    if isinstance(obj, basestring):
+                       ^
+.\vision_tracker\Lib\site-packages\PyQt5\uic\widget-plugins\qaxcontainer.py:25:14: F821 undefined name 'MODULE'
+pluginType = MODULE
+             ^
+.\vision_tracker\Lib\site-packages\PyQt5\uic\widget-plugins\qscintilla.py:25:14: F821 undefined name 'MODULE'
+pluginType = MODULE
+             ^
+.\vision_tracker\Lib\site-packages\PyQt5\uic\widget-plugins\qtcharts.py:25:14: F821 undefined name 'MODULE'
+pluginType = MODULE
+             ^
+.\vision_tracker\Lib\site-packages\PyQt5\uic\widget-plugins\qtprintsupport.py:25:14: F821 undefined name 'MODULE'
+pluginType = MODULE
+             ^
+.\vision_tracker\Lib\site-packages\PyQt5\uic\widget-plugins\qtquickwidgets.py:25:14: F821 undefined name 'MODULE'
+pluginType = MODULE
+             ^
+.\vision_tracker\Lib\site-packages\PyQt5\uic\widget-plugins\qtwebenginewidgets.py:25:14: F821 undefined name 'MODULE'
+pluginType = MODULE
+             ^
+.\vision_tracker\Lib\site-packages\PyQt5\uic\widget-plugins\qtwebkit.py:43:14: F821 undefined name 'MODULE'
+pluginType = MODULE
+             ^
+.\vision_tracker\Lib\site-packages\cffi\verifier.py:25:30: F821 undefined name 'unicode'
+            if isinstance(s, unicode):
+                             ^
+.\vision_tracker\Lib\site-packages\cv2\config-3.py:2:5: F821 undefined name 'LOADER_DIR'
+    LOADER_DIR
+    ^
+.\vision_tracker\Lib\site-packages\cv2\config-3.py:3:5: F821 undefined name 'PYTHON_EXTENSIONS_PATHS'
+] + PYTHON_EXTENSIONS_PATHS
+    ^
+.\vision_tracker\Lib\site-packages\cv2\config-3.py:15:4: F821 undefined name 'sys'
+if sys.platform.startswith("linux") and ci_and_not_headless:
+   ^
+.\vision_tracker\Lib\site-packages\cv2\config-3.py:16:5: F821 undefined name 'os'
+    os.environ["QT_QPA_PLATFORM_PLUGIN_PATH"] = os.path.join(
+    ^
+.\vision_tracker\Lib\site-packages\cv2\config-3.py:16:49: F821 undefined name 'os'
+    os.environ["QT_QPA_PLATFORM_PLUGIN_PATH"] = os.path.join(
+                                                ^
+.\vision_tracker\Lib\site-packages\cv2\config-3.py:17:9: F821 undefined name 'os'
+        os.path.dirname(os.path.abspath(__file__)), "qt", "plugins"
+        ^
+.\vision_tracker\Lib\site-packages\cv2\config-3.py:17:25: F821 undefined name 'os'
+        os.path.dirname(os.path.abspath(__file__)), "qt", "plugins"
+                        ^
+.\vision_tracker\Lib\site-packages\cv2\config-3.py:21:4: F821 undefined name 'sys'
+if sys.platform.startswith("linux") and ci_and_not_headless:
+   ^
+.\vision_tracker\Lib\site-packages\cv2\config-3.py:22:5: F821 undefined name 'os'
+    os.environ["QT_QPA_FONTDIR"] = os.path.join(
+    ^
+.\vision_tracker\Lib\site-packages\cv2\config-3.py:22:36: F821 undefined name 'os'
+    os.environ["QT_QPA_FONTDIR"] = os.path.join(
+                                   ^
+.\vision_tracker\Lib\site-packages\cv2\config-3.py:23:9: F821 undefined name 'os'
+        os.path.dirname(os.path.abspath(__file__)), "qt", "fonts"
+        ^
+.\vision_tracker\Lib\site-packages\cv2\config-3.py:23:25: F821 undefined name 'os'
+        os.path.dirname(os.path.abspath(__file__)), "qt", "fonts"
+                        ^
+.\vision_tracker\Lib\site-packages\cv2\config.py:4:31: F821 undefined name 'LOADER_DIR'
+    os.path.join(os.path.join(LOADER_DIR, '../../'), 'x64/vc17/bin')
+                              ^
+.\vision_tracker\Lib\site-packages\cv2\config.py:5:5: F821 undefined name 'BINARIES_PATHS'
+] + BINARIES_PATHS
+    ^
+.\vision_tracker\Lib\site-packages\flatbuffers\compat.py:40:19: F821 undefined name 'unicode'
+  string_types = (unicode,)
+                  ^
+.\vision_tracker\Lib\site-packages\flatbuffers\compat.py:45:16: F821 undefined name 'xrange'
+  range_func = xrange
+               ^
+.\vision_tracker\Lib\site-packages\flatbuffers\compat.py:47:23: F821 undefined name 'buffer'
+    memoryview_type = buffer
+                      ^
+.\vision_tracker\Lib\site-packages\fontTools\misc\configTools.py:162:27: F821 undefined name 'Iterator'
+    def __iter__(self) -> Iterator[str]:
+                          ^
+.\vision_tracker\Lib\site-packages\fontTools\pens\pointInsidePen.py:179:37: F821 undefined name 'ZERO_MINUS_EPSILON'
+            t for t in solutions if ZERO_MINUS_EPSILON <= t <= ONE_PLUS_EPSILON
+                                    ^
+.\vision_tracker\Lib\site-packages\fontTools\pens\pointInsidePen.py:179:64: F821 undefined name 'ONE_PLUS_EPSILON'
+            t for t in solutions if ZERO_MINUS_EPSILON <= t <= ONE_PLUS_EPSILON
+                                                               ^
+.\vision_tracker\Lib\site-packages\fontTools\tfmLib.py:212:45: F821 undefined name 'ne'
+            raise TFMException(f"There are {ne} extensible recipes!")
+                                            ^
+.\vision_tracker\Lib\site-packages\fontTools\ttLib\tables\otTables.py:994:25: F821 undefined name 'RangeRecord'
+                    r = RangeRecord()
+                        ^
+.\vision_tracker\Lib\site-packages\fontTools\ttLib\tables\otTables.py:1330:15: F821 undefined name 'Sequence'
+        seq = Sequence()
+              ^
+.\vision_tracker\Lib\site-packages\fontTools\ttLib\tables\otTables.py:1407:27: F821 undefined name 'ClassRangeRecord'
+                    rec = ClassRangeRecord()
+                          ^
+.\vision_tracker\Lib\site-packages\fontTools\ttLib\tables\otTables.py:1472:20: F821 undefined name 'AlternateSet'
+            alts = AlternateSet()
+                   ^
+.\vision_tracker\Lib\site-packages\fontTools\ttLib\tables\otTables.py:1569:28: F821 undefined name 'Ligature'
+                ligature = Ligature()
+                           ^
+.\vision_tracker\Lib\site-packages\fontTools\ttLib\tables\otTables.py:1586:22: F821 undefined name 'LigatureSet'
+            ligSet = LigatureSet()
+                     ^
+.\vision_tracker\Lib\site-packages\fontTools\ttLib\tables\otTables.py:1622:19: F821 undefined name 'Ligature'
+            lig = Ligature()
+                  ^
+.\vision_tracker\Lib\site-packages\fontTools\ttLib\tables\otTables.py:1855:22: F821 undefined name 'ClipRecord'
+            record = ClipRecord()
+                     ^
+.\vision_tracker\Lib\site-packages\fontTools\ttLib\tables\otTables.py:2630:16: F821 undefined name 'ContextSubst'
+            5: ContextSubst,
+               ^
+.\vision_tracker\Lib\site-packages\fontTools\ttLib\tables\otTables.py:2631:16: F821 undefined name 'ChainContextSubst'
+            6: ChainContextSubst,
+               ^
+.\vision_tracker\Lib\site-packages\fontTools\ttLib\tables\otTables.py:2632:16: F821 undefined name 'ExtensionSubst'
+            7: ExtensionSubst,
+               ^
+.\vision_tracker\Lib\site-packages\fontTools\ttLib\tables\otTables.py:2633:16: F821 undefined name 'ReverseChainSingleSubst'
+            8: ReverseChainSingleSubst,
+               ^
+.\vision_tracker\Lib\site-packages\fontTools\ttLib\tables\otTables.py:2636:16: F821 undefined name 'SinglePos'
+            1: SinglePos,
+               ^
+.\vision_tracker\Lib\site-packages\fontTools\ttLib\tables\otTables.py:2637:16: F821 undefined name 'PairPos'
+            2: PairPos,
+               ^
+.\vision_tracker\Lib\site-packages\fontTools\ttLib\tables\otTables.py:2638:16: F821 undefined name 'CursivePos'
+            3: CursivePos,
+               ^
+.\vision_tracker\Lib\site-packages\fontTools\ttLib\tables\otTables.py:2639:16: F821 undefined name 'MarkBasePos'
+            4: MarkBasePos,
+               ^
+.\vision_tracker\Lib\site-packages\fontTools\ttLib\tables\otTables.py:2640:16: F821 undefined name 'MarkLigPos'
+            5: MarkLigPos,
+               ^
+.\vision_tracker\Lib\site-packages\fontTools\ttLib\tables\otTables.py:2641:16: F821 undefined name 'MarkMarkPos'
+            6: MarkMarkPos,
+               ^
+.\vision_tracker\Lib\site-packages\fontTools\ttLib\tables\otTables.py:2642:16: F821 undefined name 'ContextPos'
+            7: ContextPos,
+               ^
+.\vision_tracker\Lib\site-packages\fontTools\ttLib\tables\otTables.py:2643:16: F821 undefined name 'ChainContextPos'
+            8: ChainContextPos,
+               ^
+.\vision_tracker\Lib\site-packages\fontTools\ttLib\tables\otTables.py:2644:16: F821 undefined name 'ExtensionPos'
+            9: ExtensionPos,
+               ^
+.\vision_tracker\Lib\site-packages\fontTools\ttLib\tables\otTables.py:2647:16: F821 undefined name 'NoncontextualMorph'
+            4: NoncontextualMorph,
+               ^
+.\vision_tracker\Lib\site-packages\fontTools\ttLib\tables\otTables.py:2650:16: F821 undefined name 'RearrangementMorph'
+            0: RearrangementMorph,
+               ^
+.\vision_tracker\Lib\site-packages\fontTools\ttLib\tables\otTables.py:2651:16: F821 undefined name 'ContextualMorph'
+            1: ContextualMorph,
+               ^
+.\vision_tracker\Lib\site-packages\fontTools\ttLib\tables\otTables.py:2652:16: F821 undefined name 'LigatureMorph'
+            2: LigatureMorph,
+               ^
+.\vision_tracker\Lib\site-packages\fontTools\ttLib\tables\otTables.py:2654:16: F821 undefined name 'NoncontextualMorph'
+            4: NoncontextualMorph,
+               ^
+.\vision_tracker\Lib\site-packages\fontTools\ttLib\tables\otTables.py:2655:16: F821 undefined name 'InsertionMorph'
+            5: InsertionMorph,
+               ^
+.\vision_tracker\Lib\site-packages\fontTools\varLib\hvar.py:59:61: F821 undefined name 'axisTags'
+    getAdvanceMetrics = partial(_get_advance_metrics, font, axisTags, VVAR_FIELDS)
+                                                            ^
+.\vision_tracker\Lib\site-packages\matplotlib\_mathtext.py:1607:9: F824 `nonlocal off_h` is unused: name is never assigned in scope
+        nonlocal cur_v, cur_h, off_h, off_v
+        ^
+.\vision_tracker\Lib\site-packages\matplotlib\_mathtext.py:1607:9: F824 `nonlocal off_v` is unused: name is never assigned in scope
+        nonlocal cur_v, cur_h, off_h, off_v
+        ^
+.\vision_tracker\Lib\site-packages\matplotlib\_mathtext.py:1670:9: F824 `nonlocal off_h` is unused: name is never assigned in scope
+        nonlocal cur_v, cur_h, off_h, off_v
+        ^
+.\vision_tracker\Lib\site-packages\matplotlib\_mathtext.py:1670:9: F824 `nonlocal off_v` is unused: name is never assigned in scope
+        nonlocal cur_v, cur_h, off_h, off_v
+        ^
+.\vision_tracker\Lib\site-packages\mediapipe\tasks\python\audio\__init__.py:20:19: F821 undefined name 'audio_classifier'
+AudioClassifier = audio_classifier.AudioClassifier
+                  ^
+.\vision_tracker\Lib\site-packages\mediapipe\tasks\python\audio\__init__.py:21:26: F821 undefined name 'audio_classifier'
+AudioClassifierOptions = audio_classifier.AudioClassifierOptions
+                         ^
+.\vision_tracker\Lib\site-packages\mediapipe\tasks\python\audio\__init__.py:22:25: F821 undefined name 'audio_classifier'
+AudioClassifierResult = audio_classifier.AudioClassifierResult
+                        ^
+.\vision_tracker\Lib\site-packages\mediapipe\tasks\python\audio\__init__.py:23:15: F821 undefined name 'core'
+RunningMode = core.audio_task_running_mode.AudioTaskRunningMode
+              ^
+.\vision_tracker\Lib\site-packages\mediapipe\tasks\python\audio\__init__.py:26:5: F821 undefined name 'audio_classifier'
+del audio_classifier
+    ^
+.\vision_tracker\Lib\site-packages\mediapipe\tasks\python\audio\__init__.py:27:5: F821 undefined name 'core'
+del core
+    ^
+.\vision_tracker\Lib\site-packages\mediapipe\tasks\python\components\containers\__init__.py:27:19: F821 undefined name 'audio_data'
+AudioDataFormat = audio_data.AudioDataFormat
+                  ^
+.\vision_tracker\Lib\site-packages\mediapipe\tasks\python\components\containers\__init__.py:28:13: F821 undefined name 'audio_data'
+AudioData = audio_data.AudioData
+            ^
+.\vision_tracker\Lib\site-packages\mediapipe\tasks\python\components\containers\__init__.py:29:15: F821 undefined name 'bounding_box'
+BoundingBox = bounding_box.BoundingBox
+              ^
+.\vision_tracker\Lib\site-packages\mediapipe\tasks\python\components\containers\__init__.py:30:12: F821 undefined name 'category'
+Category = category.Category
+           ^
+.\vision_tracker\Lib\site-packages\mediapipe\tasks\python\components\containers\__init__.py:31:19: F821 undefined name 'classification_result'
+Classifications = classification_result.Classifications
+                  ^
+.\vision_tracker\Lib\site-packages\mediapipe\tasks\python\components\containers\__init__.py:32:24: F821 undefined name 'classification_result'
+ClassificationResult = classification_result.ClassificationResult
+                       ^
+.\vision_tracker\Lib\site-packages\mediapipe\tasks\python\components\containers\__init__.py:33:13: F821 undefined name 'detections'
+Detection = detections.Detection
+            ^
+.\vision_tracker\Lib\site-packages\mediapipe\tasks\python\components\containers\__init__.py:34:19: F821 undefined name 'detections'
+DetectionResult = detections.DetectionResult
+                  ^
+.\vision_tracker\Lib\site-packages\mediapipe\tasks\python\components\containers\__init__.py:35:13: F821 undefined name 'embedding_result'
+Embedding = embedding_result.Embedding
+            ^
+.\vision_tracker\Lib\site-packages\mediapipe\tasks\python\components\containers\__init__.py:36:19: F821 undefined name 'embedding_result'
+EmbeddingResult = embedding_result.EmbeddingResult
+                  ^
+.\vision_tracker\Lib\site-packages\mediapipe\tasks\python\components\containers\__init__.py:37:12: F821 undefined name 'landmark'
+Landmark = landmark.Landmark
+           ^
+.\vision_tracker\Lib\site-packages\mediapipe\tasks\python\components\containers\__init__.py:38:22: F821 undefined name 'landmark'
+NormalizedLandmark = landmark.NormalizedLandmark
+                     ^
+.\vision_tracker\Lib\site-packages\mediapipe\tasks\python\components\containers\__init__.py:39:28: F821 undefined name 'landmark_detection_result'
+LandmarksDetectionResult = landmark_detection_result.LandmarksDetectionResult
+                           ^
+.\vision_tracker\Lib\site-packages\mediapipe\tasks\python\components\containers\__init__.py:40:8: F821 undefined name 'rect'
+Rect = rect.Rect
+       ^
+.\vision_tracker\Lib\site-packages\mediapipe\tasks\python\components\containers\__init__.py:41:18: F821 undefined name 'rect'
+NormalizedRect = rect.NormalizedRect
+                 ^
+.\vision_tracker\Lib\site-packages\mediapipe\tasks\python\components\containers\__init__.py:44:5: F821 undefined name 'audio_data'
+del audio_data
+    ^
+.\vision_tracker\Lib\site-packages\mediapipe\tasks\python\components\containers\__init__.py:45:5: F821 undefined name 'bounding_box'
+del bounding_box
+    ^
+.\vision_tracker\Lib\site-packages\mediapipe\tasks\python\components\containers\__init__.py:46:5: F821 undefined name 'category'
+del category
+    ^
+.\vision_tracker\Lib\site-packages\mediapipe\tasks\python\components\containers\__init__.py:47:5: F821 undefined name 'classification_result'
+del classification_result
+    ^
+.\vision_tracker\Lib\site-packages\mediapipe\tasks\python\components\containers\__init__.py:48:5: F821 undefined name 'detections'
+del detections
+    ^
+.\vision_tracker\Lib\site-packages\mediapipe\tasks\python\components\containers\__init__.py:49:5: F821 undefined name 'embedding_result'
+del embedding_result
+    ^
+.\vision_tracker\Lib\site-packages\mediapipe\tasks\python\components\containers\__init__.py:50:5: F821 undefined name 'landmark'
+del landmark
+    ^
+.\vision_tracker\Lib\site-packages\mediapipe\tasks\python\components\containers\__init__.py:51:5: F821 undefined name 'landmark_detection_result'
+del landmark_detection_result
+    ^
+.\vision_tracker\Lib\site-packages\mediapipe\tasks\python\components\containers\__init__.py:52:5: F821 undefined name 'rect'
+del rect
+    ^
+.\vision_tracker\Lib\site-packages\mediapipe\tasks\python\components\processors\__init__.py:19:21: F821 undefined name 'classifier_options'
+ClassifierOptions = classifier_options.ClassifierOptions
+                    ^
+.\vision_tracker\Lib\site-packages\mediapipe\tasks\python\components\processors\__init__.py:22:5: F821 undefined name 'classifier_options'
+del classifier_options
+    ^
+.\vision_tracker\Lib\site-packages\mediapipe\tasks\python\genai\bundler\__init__.py:19:16: F821 undefined name 'llm_bundler'
+BundleConfig = llm_bundler.BundleConfig
+               ^
+.\vision_tracker\Lib\site-packages\mediapipe\tasks\python\genai\bundler\__init__.py:20:17: F821 undefined name 'llm_bundler'
+create_bundle = llm_bundler.create_bundle
+                ^
+.\vision_tracker\Lib\site-packages\mediapipe\tasks\python\genai\bundler\__init__.py:23:5: F821 undefined name 'llm_bundler'
+del llm_bundler
+    ^
+.\vision_tracker\Lib\site-packages\mediapipe\tasks\python\genai\converter\__init__.py:19:20: F821 undefined name 'llm_converter'
+ConversionConfig = llm_converter.ConversionConfig
+                   ^
+.\vision_tracker\Lib\site-packages\mediapipe\tasks\python\genai\converter\__init__.py:20:22: F821 undefined name 'llm_converter'
+convert_checkpoint = llm_converter.convert_checkpoint
+                     ^
+.\vision_tracker\Lib\site-packages\mediapipe\tasks\python\genai\converter\__init__.py:24:5: F821 undefined name 'llm_converter'
+del llm_converter
+    ^
+.\vision_tracker\Lib\site-packages\mediapipe\tasks\python\genai\converter\llm_converter_test.py:32:24: F821 undefined name 'googletest'
+class LlmConverterTest(googletest.TestCase, parameterized.TestCase):
+                       ^
+.\vision_tracker\Lib\site-packages\mediapipe\tasks\python\genai\converter\llm_converter_test.py:264:3: F821 undefined name 'googletest'
+  googletest.main()
+  ^
+.\vision_tracker\Lib\site-packages\mediapipe\tasks\python\test\text\text_embedder_test.py:113:22: E999 SyntaxError: invalid character '∂' (U+2202)
+          0.9624276,∂ç
+                     ^
+.\vision_tracker\Lib\site-packages\mediapipe\tasks\python\test\vision\face_detector_test.py:478:7: F824 `nonlocal callback_event` is unused: name is never assigned in scope
+      nonlocal callback_event, callback_exception, observed_timestamp_ms
+      ^
+.\vision_tracker\Lib\site-packages\mediapipe\tasks\python\test\vision\face_landmarker_test.py:521:7: F824 `nonlocal callback_event` is unused: name is never assigned in scope
+      nonlocal callback_event, callback_exception, observed_timestamp_ms
+      ^
+.\vision_tracker\Lib\site-packages\mediapipe\tasks\python\test\vision\image_segmenter_test.py:435:7: F824 `nonlocal observed_timestamp_ms` is unused: name is never assigned in scope
+      nonlocal callback_exception, observed_timestamp_ms
+      ^
+.\vision_tracker\Lib\site-packages\mediapipe\tasks\python\test\vision\image_segmenter_test.py:487:7: F824 `nonlocal observed_timestamp_ms` is unused: name is never assigned in scope
+      nonlocal callback_exception, observed_timestamp_ms
+      ^
+.\vision_tracker\Lib\site-packages\mediapipe\tasks\python\test\vision\pose_landmarker_test.py:492:7: F824 `nonlocal observed_timestamp_ms` is unused: name is never assigned in scope
+      nonlocal callback_exception, observed_timestamp_ms
+      ^
+.\vision_tracker\Lib\site-packages\mediapipe\tasks\python\text\__init__.py:21:20: F821 undefined name 'language_detector'
+LanguageDetector = language_detector.LanguageDetector
+                   ^
+.\vision_tracker\Lib\site-packages\mediapipe\tasks\python\text\__init__.py:22:27: F821 undefined name 'language_detector'
+LanguageDetectorOptions = language_detector.LanguageDetectorOptions
+                          ^
+.\vision_tracker\Lib\site-packages\mediapipe\tasks\python\text\__init__.py:23:26: F821 undefined name 'language_detector'
+LanguageDetectorResult = language_detector.LanguageDetectorResult
+                         ^
+.\vision_tracker\Lib\site-packages\mediapipe\tasks\python\text\__init__.py:24:18: F821 undefined name 'text_classifier'
+TextClassifier = text_classifier.TextClassifier
+                 ^
+.\vision_tracker\Lib\site-packages\mediapipe\tasks\python\text\__init__.py:25:25: F821 undefined name 'text_classifier'
+TextClassifierOptions = text_classifier.TextClassifierOptions
+                        ^
+.\vision_tracker\Lib\site-packages\mediapipe\tasks\python\text\__init__.py:26:24: F821 undefined name 'text_classifier'
+TextClassifierResult = text_classifier.TextClassifierResult
+                       ^
+.\vision_tracker\Lib\site-packages\mediapipe\tasks\python\text\__init__.py:27:16: F821 undefined name 'text_embedder'
+TextEmbedder = text_embedder.TextEmbedder
+               ^
+.\vision_tracker\Lib\site-packages\mediapipe\tasks\python\text\__init__.py:28:23: F821 undefined name 'text_embedder'
+TextEmbedderOptions = text_embedder.TextEmbedderOptions
+                      ^
+.\vision_tracker\Lib\site-packages\mediapipe\tasks\python\text\__init__.py:29:22: F821 undefined name 'text_embedder'
+TextEmbedderResult = text_embedder.TextEmbedderResult
+                     ^
+.\vision_tracker\Lib\site-packages\mediapipe\tasks\python\text\__init__.py:33:5: F821 undefined name 'language_detector'
+del language_detector
+    ^
+.\vision_tracker\Lib\site-packages\mediapipe\tasks\python\text\__init__.py:34:5: F821 undefined name 'text_classifier'
+del text_classifier
+    ^
+.\vision_tracker\Lib\site-packages\mediapipe\tasks\python\text\__init__.py:35:5: F821 undefined name 'text_embedder'
+del text_embedder
+    ^
+.\vision_tracker\Lib\site-packages\mediapipe\tasks\python\vision\__init__.py:31:18: F821 undefined name 'drawing_styles'
+drawing_styles = drawing_styles
+                 ^
+.\vision_tracker\Lib\site-packages\mediapipe\tasks\python\vision\__init__.py:32:17: F821 undefined name 'drawing_utils'
+drawing_utils = drawing_utils
+                ^
+.\vision_tracker\Lib\site-packages\mediapipe\tasks\python\vision\__init__.py:33:16: F821 undefined name 'face_detector'
+FaceDetector = face_detector.FaceDetector
+               ^
+.\vision_tracker\Lib\site-packages\mediapipe\tasks\python\vision\__init__.py:34:23: F821 undefined name 'face_detector'
+FaceDetectorOptions = face_detector.FaceDetectorOptions
+                      ^
+.\vision_tracker\Lib\site-packages\mediapipe\tasks\python\vision\__init__.py:35:22: F821 undefined name 'face_detector'
+FaceDetectorResult = face_detector.FaceDetectorResult
+                     ^
+.\vision_tracker\Lib\site-packages\mediapipe\tasks\python\vision\__init__.py:36:18: F821 undefined name 'face_landmarker'
+FaceLandmarker = face_landmarker.FaceLandmarker
+                 ^
+.\vision_tracker\Lib\site-packages\mediapipe\tasks\python\vision\__init__.py:37:25: F821 undefined name 'face_landmarker'
+FaceLandmarkerOptions = face_landmarker.FaceLandmarkerOptions
+                        ^
+.\vision_tracker\Lib\site-packages\mediapipe\tasks\python\vision\__init__.py:38:24: F821 undefined name 'face_landmarker'
+FaceLandmarkerResult = face_landmarker.FaceLandmarkerResult
+                       ^
+.\vision_tracker\Lib\site-packages\mediapipe\tasks\python\vision\__init__.py:39:28: F821 undefined name 'face_landmarker'
+FaceLandmarksConnections = face_landmarker.FaceLandmarksConnections
+                           ^
+.\vision_tracker\Lib\site-packages\mediapipe\tasks\python\vision\__init__.py:40:21: F821 undefined name 'gesture_recognizer'
+GestureRecognizer = gesture_recognizer.GestureRecognizer
+                    ^
+.\vision_tracker\Lib\site-packages\mediapipe\tasks\python\vision\__init__.py:41:28: F821 undefined name 'gesture_recognizer'
+GestureRecognizerOptions = gesture_recognizer.GestureRecognizerOptions
+                           ^
+.\vision_tracker\Lib\site-packages\mediapipe\tasks\python\vision\__init__.py:42:27: F821 undefined name 'gesture_recognizer'
+GestureRecognizerResult = gesture_recognizer.GestureRecognizerResult
+                          ^
+.\vision_tracker\Lib\site-packages\mediapipe\tasks\python\vision\__init__.py:43:18: F821 undefined name 'hand_landmarker'
+HandLandmarker = hand_landmarker.HandLandmarker
+                 ^
+.\vision_tracker\Lib\site-packages\mediapipe\tasks\python\vision\__init__.py:44:25: F821 undefined name 'hand_landmarker'
+HandLandmarkerOptions = hand_landmarker.HandLandmarkerOptions
+                        ^
+.\vision_tracker\Lib\site-packages\mediapipe\tasks\python\vision\__init__.py:45:24: F821 undefined name 'hand_landmarker'
+HandLandmarkerResult = hand_landmarker.HandLandmarkerResult
+                       ^
+.\vision_tracker\Lib\site-packages\mediapipe\tasks\python\vision\__init__.py:46:28: F821 undefined name 'hand_landmarker'
+HandLandmarksConnections = hand_landmarker.HandLandmarksConnections
+                           ^
+.\vision_tracker\Lib\site-packages\mediapipe\tasks\python\vision\__init__.py:47:19: F821 undefined name 'image_classifier'
+ImageClassifier = image_classifier.ImageClassifier
+                  ^
+.\vision_tracker\Lib\site-packages\mediapipe\tasks\python\vision\__init__.py:48:26: F821 undefined name 'image_classifier'
+ImageClassifierOptions = image_classifier.ImageClassifierOptions
+                         ^
+.\vision_tracker\Lib\site-packages\mediapipe\tasks\python\vision\__init__.py:49:25: F821 undefined name 'image_classifier'
+ImageClassifierResult = image_classifier.ImageClassifierResult
+                        ^
+.\vision_tracker\Lib\site-packages\mediapipe\tasks\python\vision\__init__.py:50:17: F821 undefined name 'image_embedder'
+ImageEmbedder = image_embedder.ImageEmbedder
+                ^
+.\vision_tracker\Lib\site-packages\mediapipe\tasks\python\vision\__init__.py:51:24: F821 undefined name 'image_embedder'
+ImageEmbedderOptions = image_embedder.ImageEmbedderOptions
+                       ^
+.\vision_tracker\Lib\site-packages\mediapipe\tasks\python\vision\__init__.py:52:23: F821 undefined name 'image_embedder'
+ImageEmbedderResult = image_embedder.ImageEmbedderResult
+                      ^
+.\vision_tracker\Lib\site-packages\mediapipe\tasks\python\vision\__init__.py:53:18: F821 undefined name 'image_segmenter'
+ImageSegmenter = image_segmenter.ImageSegmenter
+                 ^
+.\vision_tracker\Lib\site-packages\mediapipe\tasks\python\vision\__init__.py:54:25: F821 undefined name 'image_segmenter'
+ImageSegmenterOptions = image_segmenter.ImageSegmenterOptions
+                        ^
+.\vision_tracker\Lib\site-packages\mediapipe\tasks\python\vision\__init__.py:55:26: F821 undefined name 'core'
+ImageProcessingOptions = core.image_processing_options.ImageProcessingOptions
+                         ^
+.\vision_tracker\Lib\site-packages\mediapipe\tasks\python\vision\__init__.py:56:24: F821 undefined name 'interactive_segmenter'
+InteractiveSegmenter = interactive_segmenter.InteractiveSegmenter
+                       ^
+.\vision_tracker\Lib\site-packages\mediapipe\tasks\python\vision\__init__.py:57:31: F821 undefined name 'interactive_segmenter'
+InteractiveSegmenterOptions = interactive_segmenter.InteractiveSegmenterOptions
+                              ^
+.\vision_tracker\Lib\site-packages\mediapipe\tasks\python\vision\__init__.py:58:40: F821 undefined name 'interactive_segmenter'
+InteractiveSegmenterRegionOfInterest = interactive_segmenter.RegionOfInterest
+                                       ^
+.\vision_tracker\Lib\site-packages\mediapipe\tasks\python\vision\__init__.py:59:18: F821 undefined name 'object_detector'
+ObjectDetector = object_detector.ObjectDetector
+                 ^
+.\vision_tracker\Lib\site-packages\mediapipe\tasks\python\vision\__init__.py:60:25: F821 undefined name 'object_detector'
+ObjectDetectorOptions = object_detector.ObjectDetectorOptions
+                        ^
+.\vision_tracker\Lib\site-packages\mediapipe\tasks\python\vision\__init__.py:61:24: F821 undefined name 'object_detector'
+ObjectDetectorResult = object_detector.ObjectDetectorResult
+                       ^
+.\vision_tracker\Lib\site-packages\mediapipe\tasks\python\vision\__init__.py:62:16: F821 undefined name 'pose_landmarker'
+PoseLandmark = pose_landmarker.PoseLandmark
+               ^
+.\vision_tracker\Lib\site-packages\mediapipe\tasks\python\vision\__init__.py:63:18: F821 undefined name 'pose_landmarker'
+PoseLandmarker = pose_landmarker.PoseLandmarker
+                 ^
+.\vision_tracker\Lib\site-packages\mediapipe\tasks\python\vision\__init__.py:64:25: F821 undefined name 'pose_landmarker'
+PoseLandmarkerOptions = pose_landmarker.PoseLandmarkerOptions
+                        ^
+.\vision_tracker\Lib\site-packages\mediapipe\tasks\python\vision\__init__.py:65:24: F821 undefined name 'pose_landmarker'
+PoseLandmarkerResult = pose_landmarker.PoseLandmarkerResult
+                       ^
+.\vision_tracker\Lib\site-packages\mediapipe\tasks\python\vision\__init__.py:66:28: F821 undefined name 'pose_landmarker'
+PoseLandmarksConnections = pose_landmarker.PoseLandmarksConnections
+                           ^
+.\vision_tracker\Lib\site-packages\mediapipe\tasks\python\vision\__init__.py:68:15: F821 undefined name 'core'
+RunningMode = core.vision_task_running_mode.VisionTaskRunningMode
+              ^
+.\vision_tracker\Lib\site-packages\mediapipe\tasks\python\vision\__init__.py:71:5: F821 undefined name 'core'
+del core
+    ^
+.\vision_tracker\Lib\site-packages\mediapipe\tasks\python\vision\__init__.py:72:5: F821 undefined name 'face_detector'
+del face_detector
+    ^
+.\vision_tracker\Lib\site-packages\mediapipe\tasks\python\vision\__init__.py:73:5: F821 undefined name 'face_landmarker'
+del face_landmarker
+    ^
+.\vision_tracker\Lib\site-packages\mediapipe\tasks\python\vision\__init__.py:74:5: F821 undefined name 'gesture_recognizer'
+del gesture_recognizer
+    ^
+.\vision_tracker\Lib\site-packages\mediapipe\tasks\python\vision\__init__.py:75:5: F821 undefined name 'hand_landmarker'
+del hand_landmarker
+    ^
+.\vision_tracker\Lib\site-packages\mediapipe\tasks\python\vision\__init__.py:76:5: F821 undefined name 'image_classifier'
+del image_classifier
+    ^
+.\vision_tracker\Lib\site-packages\mediapipe\tasks\python\vision\__init__.py:77:5: F821 undefined name 'image_embedder'
+del image_embedder
+    ^
+.\vision_tracker\Lib\site-packages\mediapipe\tasks\python\vision\__init__.py:78:5: F821 undefined name 'image_segmenter'
+del image_segmenter
+    ^
+.\vision_tracker\Lib\site-packages\mediapipe\tasks\python\vision\__init__.py:79:5: F821 undefined name 'interactive_segmenter'
+del interactive_segmenter
+    ^
+.\vision_tracker\Lib\site-packages\mediapipe\tasks\python\vision\__init__.py:80:5: F821 undefined name 'object_detector'
+del object_detector
+    ^
+.\vision_tracker\Lib\site-packages\mediapipe\tasks\python\vision\__init__.py:81:5: F821 undefined name 'pose_landmarker'
+del pose_landmarker
+    ^
+.\vision_tracker\Lib\site-packages\numpy\__init__.py:515:24: F821 undefined name 'os'
+        use_hugepage = os.environ.get("NUMPY_MADVISE_HUGEPAGE", None)
+                       ^
+.\vision_tracker\Lib\site-packages\numpy\__init__.py:516:12: F821 undefined name 'sys'
+        if sys.platform == "linux" and use_hugepage is None:
+           ^
+.\vision_tracker\Lib\site-packages\numpy\__init__.py:524:34: F821 undefined name 'os'
+                kernel_version = os.uname().release.split(".")[:2]
+                                 ^
+.\vision_tracker\Lib\site-packages\numpy\_core\numerictypes.py:226:27: F821 undefined name 'object_'
+        if res and res != object_:
+                          ^
+.\vision_tracker\Lib\site-packages\numpy\_core\numerictypes.py:623:31: F821 undefined name 'integer'
+    numbers.Integral.register(integer)
+                              ^
+.\vision_tracker\Lib\site-packages\numpy\_core\numerictypes.py:624:30: F821 undefined name 'inexact'
+    numbers.Complex.register(inexact)
+                             ^
+.\vision_tracker\Lib\site-packages\numpy\_core\numerictypes.py:625:27: F821 undefined name 'floating'
+    numbers.Real.register(floating)
+                          ^
+.\vision_tracker\Lib\site-packages\numpy\_core\numerictypes.py:626:29: F821 undefined name 'number'
+    numbers.Number.register(number)
+                            ^
+.\vision_tracker\Lib\site-packages\numpy\_core\tests\_natype.py:78:26: F821 undefined name 'is_32bit'
+        exponent = 31 if is_32bit else 61
+                         ^
+.\vision_tracker\Lib\site-packages\numpy\_core\tests\_natype.py:128:14: F821 undefined name 'util'
+        elif util.is_array(other):
+             ^
+.\vision_tracker\Lib\site-packages\numpy\_core\tests\_natype.py:141:14: F821 undefined name 'util'
+        elif util.is_array(other):
+             ^
+.\vision_tracker\Lib\site-packages\numpy\_core\tests\_natype.py:183:18: F821 undefined name 'maybe_dispatch_ufunc_to_dunder_op'
+        result = maybe_dispatch_ufunc_to_dunder_op(
+                 ^
+.\vision_tracker\Lib\site-packages\numpy\distutils\command\__init__.py:8:9: F821 undefined name 'np'
+    a = np.NA(2)
+        ^
+.\vision_tracker\Lib\site-packages\numpy\distutils\command\__init__.py:11:9: F821 undefined name 'assert_raises'
+        assert_raises(AttributeError, delattr, a, s)
+        ^
+.\vision_tracker\Lib\site-packages\numpy\distutils\command\build_clib.py:350:27: F821 undefined name 'cxx_compiler'
+                ccompiler=cxx_compiler
+                          ^
+.\vision_tracker\Lib\site-packages\numpy\distutils\fcompiler\__init__.py:883:5: F824 `global failed_fcompilers` is unused: name is never assigned in scope
+    global failed_fcompilers
+    ^
+.\vision_tracker\Lib\site-packages\numpy\distutils\npy_pkg_config.py:244:12: F821 undefined name 'meta_d'
+    return meta_d, r
+           ^
+.\vision_tracker\Lib\site-packages\numpy\distutils\npy_pkg_config.py:244:20: F821 undefined name 'r'
+    return meta_d, r
+                   ^
+.\vision_tracker\Lib\site-packages\numpy\distutils\system_info.py:294:9: F824 `global default_lib_dirs` is unused: name is never assigned in scope
+        global default_lib_dirs
+        ^
+.\vision_tracker\Lib\site-packages\numpy\distutils\system_info.py:295:9: F824 `global default_include_dirs` is unused: name is never assigned in scope
+        global default_include_dirs
+        ^
+.\vision_tracker\Lib\site-packages\numpy\distutils\tests\test_system_info.py:154:9: F824 `global simple_site` is unused: name is never assigned in scope
+        global simple_site, site_cfg
+        ^
+.\vision_tracker\Lib\site-packages\numpy\f2py\capi_maps.py:343:5: F824 `global lcb_map` is unused: name is never assigned in scope
+    global lcb_map
+    ^
+.\vision_tracker\Lib\site-packages\numpy\f2py\crackfortran.py:236:5: F824 `global filepositiontext` is unused: name is never assigned in scope
+    global filepositiontext
+    ^
+.\vision_tracker\Lib\site-packages\numpy\f2py\crackfortran.py:365:5: F824 `global include_paths` is unused: name is never assigned in scope
+    global beginpattern, quiet, verbose, dolowercase, include_paths
+    ^
+.\vision_tracker\Lib\site-packages\numpy\f2py\crackfortran.py:704:5: F824 `global beginpattern` is unused: name is never assigned in scope
+    global beginpattern, groupcounter, groupname, groupcache, grouplist
+    ^
+.\vision_tracker\Lib\site-packages\numpy\f2py\crackfortran.py:705:5: F824 `global filepositiontext` is unused: name is never assigned in scope
+    global filepositiontext, currentfilename, neededmodule, expectbegin
+    ^
+.\vision_tracker\Lib\site-packages\numpy\f2py\crackfortran.py:705:5: F824 `global currentfilename` is unused: name is never assigned in scope
+    global filepositiontext, currentfilename, neededmodule, expectbegin
+    ^
+.\vision_tracker\Lib\site-packages\numpy\f2py\crackfortran.py:706:5: F824 `global skipemptyends` is unused: name is never assigned in scope
+    global skipblocksuntil, skipemptyends, previous_context, gotnextfile
+    ^
+.\vision_tracker\Lib\site-packages\numpy\f2py\crackfortran.py:1002:5: F824 `global groupname` is unused: name is never assigned in scope
+    global groupcounter, groupname, groupcache, grouplist, filepositiontext
+    ^
+.\vision_tracker\Lib\site-packages\numpy\f2py\crackfortran.py:1002:5: F824 `global groupcache` is unused: name is never assigned in scope
+    global groupcounter, groupname, groupcache, grouplist, filepositiontext
+    ^
+.\vision_tracker\Lib\site-packages\numpy\f2py\crackfortran.py:1002:5: F824 `global grouplist` is unused: name is never assigned in scope
+    global groupcounter, groupname, groupcache, grouplist, filepositiontext
+    ^
+.\vision_tracker\Lib\site-packages\numpy\f2py\crackfortran.py:1002:5: F824 `global filepositiontext` is unused: name is never assigned in scope
+    global groupcounter, groupname, groupcache, grouplist, filepositiontext
+    ^
+.\vision_tracker\Lib\site-packages\numpy\f2py\crackfortran.py:1003:5: F824 `global currentfilename` is unused: name is never assigned in scope
+    global currentfilename, f77modulename, neededinterface, neededmodule
+    ^
+.\vision_tracker\Lib\site-packages\numpy\f2py\crackfortran.py:1003:5: F824 `global f77modulename` is unused: name is never assigned in scope
+    global currentfilename, f77modulename, neededinterface, neededmodule
+    ^
+.\vision_tracker\Lib\site-packages\numpy\f2py\crackfortran.py:1003:5: F824 `global neededinterface` is unused: name is never assigned in scope
+    global currentfilename, f77modulename, neededinterface, neededmodule
+    ^
+.\vision_tracker\Lib\site-packages\numpy\f2py\crackfortran.py:1678:5: F824 `global groupcache` is unused: name is never assigned in scope
+    global groupcache, groupcounter
+    ^
+.\vision_tracker\Lib\site-packages\numpy\f2py\crackfortran.py:1678:5: F824 `global groupcounter` is unused: name is never assigned in scope
+    global groupcache, groupcounter
+    ^
+.\vision_tracker\Lib\site-packages\numpy\f2py\crackfortran.py:1982:5: F824 `global f90modulevars` is unused: name is never assigned in scope
+    global f90modulevars
+    ^
+.\vision_tracker\Lib\site-packages\numpy\f2py\crackfortran.py:2012:5: F824 `global f90modulevars` is unused: name is never assigned in scope
+    global f90modulevars
+    ^
+.\vision_tracker\Lib\site-packages\numpy\f2py\crackfortran.py:2049:5: F824 `global usermodules` is unused: name is never assigned in scope
+    global usermodules, onlyfunctions
+    ^
+.\vision_tracker\Lib\site-packages\numpy\f2py\crackfortran.py:2049:5: F824 `global onlyfunctions` is unused: name is never assigned in scope
+    global usermodules, onlyfunctions
+    ^
+.\vision_tracker\Lib\site-packages\numpy\f2py\crackfortran.py:2217:5: F824 `global usermodules` is unused: name is never assigned in scope
+    global usermodules, skipfuncs, onlyfuncs, f90modulevars
+    ^
+.\vision_tracker\Lib\site-packages\numpy\f2py\crackfortran.py:2217:5: F824 `global skipfuncs` is unused: name is never assigned in scope
+    global usermodules, skipfuncs, onlyfuncs, f90modulevars
+    ^
+.\vision_tracker\Lib\site-packages\numpy\f2py\crackfortran.py:2217:5: F824 `global onlyfuncs` is unused: name is never assigned in scope
+    global usermodules, skipfuncs, onlyfuncs, f90modulevars
+    ^
+.\vision_tracker\Lib\site-packages\numpy\f2py\crackfortran.py:2217:5: F824 `global f90modulevars` is unused: name is never assigned in scope
+    global usermodules, skipfuncs, onlyfuncs, f90modulevars
+    ^
+.\vision_tracker\Lib\site-packages\numpy\f2py\crackfortran.py:2590:5: F824 `global f90modulevars` is unused: name is never assigned in scope
+    global f90modulevars
+    ^
+.\vision_tracker\Lib\site-packages\numpy\f2py\crackfortran.py:3250:5: F824 `global skipfuncs` is unused: name is never assigned in scope
+    global skipfuncs, onlyfuncs
+    ^
+.\vision_tracker\Lib\site-packages\numpy\f2py\crackfortran.py:3250:5: F824 `global onlyfuncs` is unused: name is never assigned in scope
+    global skipfuncs, onlyfuncs
+    ^
+.\vision_tracker\Lib\site-packages\numpy\f2py\crackfortran.py:3507:5: F824 `global post_processing_hooks` is unused: name is never assigned in scope
+    global usermodules, post_processing_hooks
+    ^
+.\vision_tracker\Lib\site-packages\numpy\f2py\crackfortran.py:3524:5: F824 `global f2py_version` is unused: name is never assigned in scope
+    global f2py_version
+    ^
+.\vision_tracker\Lib\site-packages\pip\_vendor\distlib\compat.py:20:20: F821 undefined name 'basestring'
+    string_types = basestring,
+                   ^
+.\vision_tracker\Lib\site-packages\pip\_vendor\distlib\compat.py:21:17: F821 undefined name 'unicode'
+    text_type = unicode
+                ^
+.\vision_tracker\Lib\site-packages\pip\_vendor\distlib\compat.py:30:26: F821 undefined name 'unicode'
+        if isinstance(s, unicode):
+                         ^
+.\vision_tracker\Lib\site-packages\pip\_vendor\distlib\compat.py:46:17: F821 undefined name 'raw_input'
+    raw_input = raw_input
+                ^
+.\vision_tracker\Lib\site-packages\pip\_vendor\distlib\compat.py:498:37: F821 undefined name 'get_ident'
+                    key = id(self), get_ident()
+                                    ^
+.\vision_tracker\Lib\site-packages\pip\_vendor\msgpack\ext.py:11:23: F821 undefined name 'long'
+    int_types = (int, long)
+                      ^
+.\vision_tracker\Lib\site-packages\pip\_vendor\msgpack\fallback.py:9:23: F821 undefined name 'long'
+    int_types = (int, long)
+                      ^
+.\vision_tracker\Lib\site-packages\pip\_vendor\rich\console.py:523:15: F821 undefined name 'get_ipython'
+    ipython = get_ipython()  # type: ignore[name-defined]
+              ^
+.\vision_tracker\Lib\site-packages\pip\_vendor\rich\pretty.py:251:14: F821 undefined name 'get_ipython'
+        ip = get_ipython()  # type: ignore[name-defined]
+             ^
+.\vision_tracker\Lib\site-packages\pip\_vendor\rich\traceback.py:134:14: F821 undefined name 'get_ipython'
+        ip = get_ipython()  # type: ignore[name-defined]
+             ^
+.\vision_tracker\Lib\site-packages\pip\_vendor\rich\traceback.py:673:17: F821 undefined name 'slfkjsldkfj'
+                slfkjsldkfj  # type: ignore[name-defined]
+                ^
+.\vision_tracker\Lib\site-packages\pip\_vendor\six.py:49:20: F821 undefined name 'basestring'
+    string_types = basestring,
+                   ^
+.\vision_tracker\Lib\site-packages\pip\_vendor\six.py:50:27: F821 undefined name 'long'
+    integer_types = (int, long)
+                          ^
+.\vision_tracker\Lib\site-packages\pip\_vendor\six.py:52:17: F821 undefined name 'unicode'
+    text_type = unicode
+                ^
+.\vision_tracker\Lib\site-packages\pip\_vendor\six.py:674:16: F821 undefined name 'unicode'
+        return unicode(s.replace(r'\\', r'\\\\'), "unicode_escape")
+               ^
+.\vision_tracker\Lib\site-packages\pip\_vendor\six.py:766:37: F821 undefined name 'basestring'
+            if not isinstance(data, basestring):
+                                    ^
+.\vision_tracker\Lib\site-packages\pip\_vendor\six.py:769:32: F821 undefined name 'file'
+            if (isinstance(fp, file) and
+                               ^
+.\vision_tracker\Lib\site-packages\pip\_vendor\six.py:770:38: F821 undefined name 'unicode'
+                    isinstance(data, unicode) and
+                                     ^
+.\vision_tracker\Lib\site-packages\pip\_vendor\six.py:780:32: F821 undefined name 'unicode'
+            if isinstance(sep, unicode):
+                               ^
+.\vision_tracker\Lib\site-packages\pip\_vendor\six.py:786:32: F821 undefined name 'unicode'
+            if isinstance(end, unicode):
+                               ^
+.\vision_tracker\Lib\site-packages\pip\_vendor\six.py:794:36: F821 undefined name 'unicode'
+                if isinstance(arg, unicode):
+                                   ^
+.\vision_tracker\Lib\site-packages\pip\_vendor\six.py:798:23: F821 undefined name 'unicode'
+            newline = unicode("\n")
+                      ^
+.\vision_tracker\Lib\site-packages\pip\_vendor\six.py:799:21: F821 undefined name 'unicode'
+            space = unicode(" ")
+                    ^
+.\vision_tracker\Lib\site-packages\pip\_vendor\urllib3\packages\six.py:49:21: F821 undefined name 'basestring'
+    string_types = (basestring,)
+                    ^
+.\vision_tracker\Lib\site-packages\pip\_vendor\urllib3\packages\six.py:50:27: F821 undefined name 'long'
+    integer_types = (int, long)
+                          ^
+.\vision_tracker\Lib\site-packages\pip\_vendor\urllib3\packages\six.py:52:17: F821 undefined name 'unicode'
+    text_type = unicode
+                ^
+.\vision_tracker\Lib\site-packages\pip\_vendor\urllib3\packages\six.py:722:16: F821 undefined name 'unicode'
+        return unicode(s.replace(r"\\", r"\\\\"), "unicode_escape")
+               ^
+.\vision_tracker\Lib\site-packages\pip\_vendor\urllib3\packages\six.py:824:37: F821 undefined name 'basestring'
+            if not isinstance(data, basestring):
+                                    ^
+.\vision_tracker\Lib\site-packages\pip\_vendor\urllib3\packages\six.py:828:32: F821 undefined name 'file'
+                isinstance(fp, file)
+                               ^
+.\vision_tracker\Lib\site-packages\pip\_vendor\urllib3\packages\six.py:829:38: F821 undefined name 'unicode'
+                and isinstance(data, unicode)
+                                     ^
+.\vision_tracker\Lib\site-packages\pip\_vendor\urllib3\packages\six.py:841:32: F821 undefined name 'unicode'
+            if isinstance(sep, unicode):
+                               ^
+.\vision_tracker\Lib\site-packages\pip\_vendor\urllib3\packages\six.py:847:32: F821 undefined name 'unicode'
+            if isinstance(end, unicode):
+                               ^
+.\vision_tracker\Lib\site-packages\pip\_vendor\urllib3\packages\six.py:855:36: F821 undefined name 'unicode'
+                if isinstance(arg, unicode):
+                                   ^
+.\vision_tracker\Lib\site-packages\pip\_vendor\urllib3\packages\six.py:859:23: F821 undefined name 'unicode'
+            newline = unicode("\n")
+                      ^
+.\vision_tracker\Lib\site-packages\pip\_vendor\urllib3\packages\six.py:860:21: F821 undefined name 'unicode'
+            space = unicode(" ")
+                    ^
+.\vision_tracker\Lib\site-packages\pkg_resources\_vendor\jaraco\functools.py:388:29: F821 undefined name 'more_itertools'
+    print_results = compose(more_itertools.consume, print_all, func)
+                            ^
+.\vision_tracker\Lib\site-packages\pydantic\fields.py:1798:9: F824 `nonlocal return_type` is unused: name is never assigned in scope
+        nonlocal description, deprecated, return_type, alias_priority
+        ^
+.\vision_tracker\Lib\site-packages\setuptools\_distutils\core.py:129:5: F824 `global _setup_stop_after` is unused: name is never assigned in scope
+    global _setup_stop_after, _setup_distribution
+    ^
+.\vision_tracker\Lib\site-packages\setuptools\_distutils\core.py:254:5: F824 `global _setup_distribution` is unused: name is never assigned in scope
+    global _setup_stop_after, _setup_distribution
+    ^
+.\vision_tracker\Lib\site-packages\setuptools\_distutils\dir_util.py:32:5: F824 `global _path_created` is unused: name is never assigned in scope
+    global _path_created
+    ^
+.\vision_tracker\Lib\site-packages\setuptools\_distutils\dir_util.py:216:5: F824 `global _path_created` is unused: name is never assigned in scope
+    global _path_created
+    ^
+.\vision_tracker\Lib\site-packages\setuptools\_distutils\sysconfig.py:278:13: F824 `global _config_vars` is unused: name is never assigned in scope
+            global _config_vars
+            ^
+.\vision_tracker\Lib\site-packages\setuptools\_vendor\jaraco\functools.py:388:29: F821 undefined name 'more_itertools'
+    print_results = compose(more_itertools.consume, print_all, func)
+                            ^
+.\vision_tracker\Lib\site-packages\six.py:49:20: F821 undefined name 'basestring'
+    string_types = basestring,
+                   ^
+.\vision_tracker\Lib\site-packages\six.py:50:27: F821 undefined name 'long'
+    integer_types = (int, long)
+                          ^
+.\vision_tracker\Lib\site-packages\six.py:52:17: F821 undefined name 'unicode'
+    text_type = unicode
+                ^
+.\vision_tracker\Lib\site-packages\six.py:679:16: F821 undefined name 'unicode'
+        return unicode(s.replace(r'\\', r'\\\\'), "unicode_escape")
+               ^
+.\vision_tracker\Lib\site-packages\six.py:771:37: F821 undefined name 'basestring'
+            if not isinstance(data, basestring):
+                                    ^
+.\vision_tracker\Lib\site-packages\six.py:774:32: F821 undefined name 'file'
+            if (isinstance(fp, file) and
+                               ^
+.\vision_tracker\Lib\site-packages\six.py:775:38: F821 undefined name 'unicode'
+                    isinstance(data, unicode) and
+                                     ^
+.\vision_tracker\Lib\site-packages\six.py:785:32: F821 undefined name 'unicode'
+            if isinstance(sep, unicode):
+                               ^
+.\vision_tracker\Lib\site-packages\six.py:791:32: F821 undefined name 'unicode'
+            if isinstance(end, unicode):
+                               ^
+.\vision_tracker\Lib\site-packages\six.py:799:36: F821 undefined name 'unicode'
+                if isinstance(arg, unicode):
+                                   ^
+.\vision_tracker\Lib\site-packages\six.py:803:23: F821 undefined name 'unicode'
+            newline = unicode("\n")
+                      ^
+.\vision_tracker\Lib\site-packages\six.py:804:21: F821 undefined name 'unicode'
+            space = unicode(" ")
+                    ^
+.\vision_tracker\Lib\site-packages\starlette\middleware\errors.py:157:13: F824 `nonlocal send` is unused: name is never assigned in scope
+            nonlocal response_started, send
+            ^
+.\vision_tracker\Lib\site-packages\starlette\testclient.py:321:13: F824 `nonlocal raw_kwargs` is unused: name is never assigned in scope
+            nonlocal raw_kwargs, response_started, template, context
+            ^
+.\vision_tracker\Lib\site-packages\typing_extensions.py:21:1: F822 undefined name 'AbstractSet' in __all__
+__all__ = [
+^
+.\vision_tracker\Lib\site-packages\typing_extensions.py:21:1: F822 undefined name 'AnyStr' in __all__
+__all__ = [
+^
+.\vision_tracker\Lib\site-packages\typing_extensions.py:21:1: F822 undefined name 'BinaryIO' in __all__
+__all__ = [
+^
+.\vision_tracker\Lib\site-packages\typing_extensions.py:21:1: F822 undefined name 'Callable' in __all__
+__all__ = [
+^
+.\vision_tracker\Lib\site-packages\typing_extensions.py:21:1: F822 undefined name 'Collection' in __all__
+__all__ = [
+^
+.\vision_tracker\Lib\site-packages\typing_extensions.py:21:1: F822 undefined name 'Container' in __all__
+__all__ = [
+^
+.\vision_tracker\Lib\site-packages\typing_extensions.py:21:1: F822 undefined name 'Dict' in __all__
+__all__ = [
+^
+.\vision_tracker\Lib\site-packages\typing_extensions.py:21:1: F822 undefined name 'FrozenSet' in __all__
+__all__ = [
+^
+.\vision_tracker\Lib\site-packages\typing_extensions.py:21:1: F822 undefined name 'Hashable' in __all__
+__all__ = [
+^
+.\vision_tracker\Lib\site-packages\typing_extensions.py:21:1: F822 undefined name 'IO' in __all__
+__all__ = [
+^
+.\vision_tracker\Lib\site-packages\typing_extensions.py:21:1: F822 undefined name 'ItemsView' in __all__
+__all__ = [
+^
+.\vision_tracker\Lib\site-packages\typing_extensions.py:21:1: F822 undefined name 'Iterable' in __all__
+__all__ = [
+^
+.\vision_tracker\Lib\site-packages\typing_extensions.py:21:1: F822 undefined name 'Iterator' in __all__
+__all__ = [
+^
+.\vision_tracker\Lib\site-packages\typing_extensions.py:21:1: F822 undefined name 'KeysView' in __all__
+__all__ = [
+^
+.\vision_tracker\Lib\site-packages\typing_extensions.py:21:1: F822 undefined name 'List' in __all__
+__all__ = [
+^
+.\vision_tracker\Lib\site-packages\typing_extensions.py:21:1: F822 undefined name 'Mapping' in __all__
+__all__ = [
+^
+.\vision_tracker\Lib\site-packages\typing_extensions.py:21:1: F822 undefined name 'MappingView' in __all__
+__all__ = [
+^
+.\vision_tracker\Lib\site-packages\typing_extensions.py:21:1: F822 undefined name 'Match' in __all__
+__all__ = [
+^
+.\vision_tracker\Lib\site-packages\typing_extensions.py:21:1: F822 undefined name 'MutableMapping' in __all__
+__all__ = [
+^
+.\vision_tracker\Lib\site-packages\typing_extensions.py:21:1: F822 undefined name 'MutableSequence' in __all__
+__all__ = [
+^
+.\vision_tracker\Lib\site-packages\typing_extensions.py:21:1: F822 undefined name 'MutableSet' in __all__
+__all__ = [
+^
+.\vision_tracker\Lib\site-packages\typing_extensions.py:21:1: F822 undefined name 'Optional' in __all__
+__all__ = [
+^
+.\vision_tracker\Lib\site-packages\typing_extensions.py:21:1: F822 undefined name 'Pattern' in __all__
+__all__ = [
+^
+.\vision_tracker\Lib\site-packages\typing_extensions.py:21:1: F822 undefined name 'Reversible' in __all__
+__all__ = [
+^
+.\vision_tracker\Lib\site-packages\typing_extensions.py:21:1: F822 undefined name 'Sequence' in __all__
+__all__ = [
+^
+.\vision_tracker\Lib\site-packages\typing_extensions.py:21:1: F822 undefined name 'Set' in __all__
+__all__ = [
+^
+.\vision_tracker\Lib\site-packages\typing_extensions.py:21:1: F822 undefined name 'Sized' in __all__
+__all__ = [
+^
+.\vision_tracker\Lib\site-packages\typing_extensions.py:21:1: F822 undefined name 'TextIO' in __all__
+__all__ = [
+^
+.\vision_tracker\Lib\site-packages\typing_extensions.py:21:1: F822 undefined name 'Tuple' in __all__
+__all__ = [
+^
+.\vision_tracker\Lib\site-packages\typing_extensions.py:21:1: F822 undefined name 'Union' in __all__
+__all__ = [
+^
+.\vision_tracker\Lib\site-packages\typing_extensions.py:21:1: F822 undefined name 'ValuesView' in __all__
+__all__ = [
+^
+.\vision_tracker\Lib\site-packages\typing_extensions.py:21:1: F822 undefined name 'cast' in __all__
+__all__ = [
+^
+.\vision_tracker\Lib\site-packages\typing_extensions.py:21:1: F822 undefined name 'no_type_check' in __all__
+__all__ = [
+^
+.\vision_tracker\Lib\site-packages\typing_extensions.py:21:1: F822 undefined name 'no_type_check_decorator' in __all__
+__all__ = [
+^
+.\vision_tracker\Lib\site-packages\websockets\asyncio\connection.py:1243:15: F821 undefined name 'ExceptionGroup'
+        raise ExceptionGroup("skipped broadcast", exceptions)
+              ^
+.\vision_tracker\Lib\site-packages\websockets\legacy\protocol.py:1038:21: F824 `nonlocal fragments` is unused: name is never assigned in scope
+                    nonlocal fragments
+                    ^
+.\vision_tracker\Lib\site-packages\websockets\legacy\protocol.py:1044:21: F824 `nonlocal fragments` is unused: name is never assigned in scope
+                    nonlocal fragments, max_size
+                    ^
+.\vision_tracker\Lib\site-packages\websockets\legacy\protocol.py:1053:21: F824 `nonlocal fragments` is unused: name is never assigned in scope
+                    nonlocal fragments
+                    ^
+.\vision_tracker\Lib\site-packages\websockets\legacy\protocol.py:1059:21: F824 `nonlocal fragments` is unused: name is never assigned in scope
+                    nonlocal fragments, max_size
+                    ^
+.\vision_tracker\Lib\site-packages\websockets\legacy\protocol.py:1631:15: F821 undefined name 'ExceptionGroup'
+        raise ExceptionGroup("skipped broadcast", exceptions)
+              ^
