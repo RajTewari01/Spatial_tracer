@@ -1,53 +1,107 @@
 # Python Engine & Desktop Application
 
-The `engine/` and `desktop-client/` directories encapsulate the entire logic required to transform spatial parameters into low-level Windows, macOS, or Linux HID interfaces.
+The `engine/`, `api/`, and `desktop-client/` directories contain the full logic for transforming spatial hand coordinates into real OS-level mouse/keyboard inputs on Windows.
 
 ## 1. The Headless Inference Engine (`engine/`)
 
-The Python engine is engineered to run perpetually in the background with near-zero UI overhead, maximizing CPU scheduling for inference.
+The Python engine runs in the background with zero GUI overhead, maximizing CPU scheduling for inference.
 
 ### Core Modules
-*   **`headless_hand_tracer.py`**: The main execution loop. It binds to `cv2.VideoCapture(0)` to read raw bytes. Unlike naive implementations, it runs MediaPipe in `Tasks` mode which uses an internal multithreaded executor to decouple camera I/O lag from AI inference bottlenecks.
-*   **`gesture_detector.py`**: An atomic pure-Python class that takes in NumPy arrays and spits out `Enum` gesture states. It houses the 2-frame stability buffer and the dictionary that maps finger bitmasks to Gestures.
-*   **`air_input_driver.py`**: The bridge between Python logic and the OS kernel. This module depends strictly on the `pynput` library.
 
-### OS Interfacing (`pynput`)
-The driver does not directly inject mouse/keyboard events. Instead, it maintains a singleton Controller instances for both peripherals:
+| File | Lines | Purpose |
+|:-----|:------|:--------|
+| `headless_hand_tracer.py` | 241 | Main camera loop. Binds `cv2.VideoCapture(0)`, runs MediaPipe `HandLandmarker` in `VIDEO` mode using the local TFLite model at `config/hand_landmarker.task` (7.8 MB). Default resolution: 1280×720, desktop override: 640×480. Yields per-frame data as a Python generator. |
+| `gesture_detector.py` | 366 | Stateless per-call gesture classifier with internal frame history buffer. Detects `tap`, `pinch`, `swipe`, `open_palm` using velocity analysis (`deque(maxlen=10)`) and distance thresholds. Pinch threshold: `0.05`, tap Y-threshold: `0.03`. |
+| `air_input_driver.py` | 358 | OS bridge via `pynput`. Maintains singleton `MouseController` + `KbdController`. Implements EMA smoothing, margin clamping, cooldown timers, and the full 13-gesture→action mapping. |
+| `simple_hand_tracer.py` | ~170 | Debug-only: Opens an OpenCV window showing the raw camera feed with hand skeleton drawn. Press `q` to quit. |
+| `__init__.py` | 8 | Package exports: `HeadlessHandTracker`, `GestureDetector` |
 
-```python
-from pynput.mouse import Controller as MouseController
-from pynput.keyboard import Controller as KbdController, Key
+### Cursor Mapping Pipeline
 
-mouse = MouseController()
-keyboard = KbdController()
-
-def execute_click():
-    mouse.press(Button.left)
-    mouse.release(Button.left)
+```
+Index Fingertip (0.0—1.0) → Margin Clamp (8% dead zone) → Screen Mapping (× resolution) → EMA Smoothing (α=0.6) → pynput mouse.position
 ```
 
-**Cursor Mapping Constraints:**
-A camera captures a 4:3 or 16:9 frame, but a user's monitor might be ultrawide or dual-screen. The engine normalizes the camera inputs `[X, Y]` and dynamically multiplies them against `win32api` screen dimension resolutions, accounting for a customizable 10% "deadband" edge to ensure the cursor can easily hit the corner of a screen without over-stretching the arm.
+**Smoothing parameters** (defaults in `air_input_driver.py`, overridden in `desktop-client/app.py`):
 
-## 2. PyQt5 Desktop Overlay (`desktop-client/`)
+| Parameter | Driver Default | Desktop Override | Formula |
+|:----------|:--------------|:-----------------|:--------|
+| `smoothing` | `0.35` | `0.4` | `α = 1.0 - smoothing` → 0.65 / 0.6 |
+| `margin` | `0.08` (8%) | `0.1` (10%) | Dead zone at screen edges |
+| `screen_w × screen_h` | `1920 × 1080` | Auto-detected via `ctypes.windll.user32.GetSystemMetrics` | — |
 
-Spatial_Tracer isn't just invisible; it requires feedback. The `desktop-client` provides a revolutionary glassmorphic heads-up display.
+### Gesture→Action Mapping (Desktop)
 
-### The Frameless Transparent Window
-We use `PyQt5` configured with ultra-specific Windows API flags to render a fully transparent canvas overlaid directly over the operating system, allowing clicks to pass through except when hovering over widgets.
+| Gesture | pynput Action | Cooldown |
+|:--------|:-------------|:---------|
+| POINTING | `mouse.position = (sx, sy)` | Per-frame |
+| PEACE | `mouse.press(Button.left)` / double-click | 400ms |
+| FIST | `mouse.press(Button.right)` | 400ms |
+| PINCH | Left click / drag start | 400ms |
+| THUMBS_UP | `mouse.scroll(0, 3)` + `Key.enter` | 150ms scroll, 500ms key |
+| THUMBS_DOWN | `mouse.scroll(0, -3)` + `Key.backspace` | 150ms scroll, 500ms key |
+| THREE | `Key.tab` | 500ms |
+| ROCK | `Key.esc` | 500ms |
+| OPEN_PALM | Release / idle | — |
+
+## 2. FastAPI Server (`api/`)
+
+| File | Lines | Purpose |
+|:-----|:------|:--------|
+| `fastapi_main.py` | 234 | ASGI server via Uvicorn. Serves `web-client/` as static files at `/`. WebSocket at `/ws/hand-data` streams JSON frames at ~30 FPS. REST endpoints: `/start`, `/stop`, `/status`, `/press-key`. Auto-starts tracker on first WebSocket connection. |
+| `input_controller.py` | 136 | Remote keystroke injection. Maps virtual keyboard labels to `pynput.Key` constants. Supports modifier stacking (Shift+Ctrl+key) with one-shot auto-reset. |
+
+### WebSocket Frame Format
+
+```json
+{
+  "timestamp": 1711574400.123,
+  "fps": 28.5,
+  "frame_index": 1204,
+  "hands": [
+    {
+      "handedness": "Right",
+      "landmarks": [{"id": 0, "x": 0.52, "y": 0.71, "z": -0.02}, ...],
+      "fingertips": [{"id": 8, "x": 0.55, "y": 0.35, "px_x": 352, "px_y": 168}, ...]
+    }
+  ],
+  "gestures": [{"gesture": "peace", "confidence": 0.92, "position": {"x": 0.55, "y": 0.35}}]
+}
+```
+
+## 3. PyQt5 Desktop Overlay (`desktop-client/`)
+
+The desktop client is an 814-line PyQt5 application providing a frameless, transparent, always-on-top HUD.
+
+| File | Lines | Purpose |
+|:-----|:------|:--------|
+| `app.py` | 814 | Main overlay window. Contains `TrackingThread` (QThread running HeadlessHandTracker + GestureDetector + AirInputDriver in-process), `CameraPanel` (280×180 preview with skeleton drawing), and `OverlayWindow` (300×280 draggable panel with Start/Stop, gesture badge, keyboard toggle, camera minimize). |
+| `virtual_keyboard.py` | 317 | Full QWERTY keyboard widget (69 keys across 5 rows). Glassmorphic dark theme with hover highlights, active modifier states, and green flash feedback on tap. Finger cursor overlay via custom `paintEvent`. |
+| `camera_widget.py` | 272 | Alternative WebSocket-based camera widget (connects to FastAPI server instead of running tracker in-process). Used when running in server mode. |
+
+### Window Flags (Transparent Overlay)
 
 ```python
-# PyQt5 Window Initialization
 self.setWindowFlags(
-    Qt.FramelessWindowHint | 
-    Qt.WindowStaysOnTopHint | 
-    Qt.Tool
+    Qt.FramelessWindowHint |   # No title bar or borders
+    Qt.WindowStaysOnTopHint |  # Always visible over all apps
+    Qt.Tool                    # Hidden from taskbar
 )
-self.setAttribute(Qt.WA_TranslucentBackground)
+self.setAttribute(Qt.WA_TranslucentBackground)  # Transparent background
 ```
 
-### The Virtual Keyboard
-The hallmark feature is the floating air keyboard. 
-1.  **Ray-casting simulation**: Since real mouse APIs exist, the Python script mathematically checks if the user's "Air Cursor" bounding box intersects with the `QButton` geometries of the virtual keys.
-2.  **Hover State**: If intersected, the `QButton` receives a custom stylesheet injection transforming it into a glowing hue.
-3.  **Key Event**: Upon a `PINCH` gesture, the engine reads the active QButton's label, translates it via `pynput.keyboard`, and initiates a local vibration or visual pop effect.
+### Virtual Keyboard Interaction
+
+The keyboard uses a two-hand gesture system:
+1. **POINTING/PEACE** → Index finger highlights keys as cursor moves over them
+2. **PINCH** → Activates the key at the midpoint between thumb and index tips
+3. **Modifiers** (SHIFT, CTRL, ALT, WIN) → Highlighted when hovered, held across the next keypress
+4. **Long-press** → Holding PINCH on DEL/BACK for 4 seconds triggers Ctrl+A → Delete (select-all + clear)
+
+Screen resolution is auto-detected via Windows API:
+```python
+import ctypes
+user32 = ctypes.windll.user32
+SCREEN_W = user32.GetSystemMetrics(0)
+SCREEN_H = user32.GetSystemMetrics(1)
+```
