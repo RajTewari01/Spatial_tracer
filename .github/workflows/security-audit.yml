@@ -1,0 +1,92 @@
+name: Security & Dependency Audit
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  schedule:
+    - cron: '0 6 * * 1'  # Weekly on Monday at 6 AM UTC
+
+jobs:
+  python-security:
+    name: Python Dependency Audit
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python 3.10
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.10"
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install safety pip-audit
+        pip install -r requirements.txt
+
+    - name: Audit with pip-audit
+      run: pip-audit --strict --desc || true
+
+    - name: Check with safety
+      run: safety check --full-report || true
+
+    - name: Check for known vulnerable packages
+      run: |
+        echo "## Python Dependency Report" >> $GITHUB_STEP_SUMMARY
+        echo '```' >> $GITHUB_STEP_SUMMARY
+        pip list --format=columns >> $GITHUB_STEP_SUMMARY
+        echo '```' >> $GITHUB_STEP_SUMMARY
+
+  flutter-security:
+    name: Flutter Dependency Audit
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./mobile-client
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version: '3.x'
+        channel: 'stable'
+
+    - name: Audit Flutter deps
+      run: |
+        flutter pub get
+        flutter pub outdated
+        echo "## Flutter Dependency Report" >> $GITHUB_STEP_SUMMARY
+        echo '```' >> $GITHUB_STEP_SUMMARY
+        flutter pub outdated >> $GITHUB_STEP_SUMMARY || true
+        echo '```' >> $GITHUB_STEP_SUMMARY
+
+  repo-secrets-scan:
+    name: Secrets & Credentials Scan
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Scan for hardcoded secrets
+      run: |
+        echo "Scanning for potential secrets..."
+        # Check for common secret patterns
+        FOUND=0
+        for pattern in "PRIVATE_KEY" "api_key" "secret_key" "password=" "token=" "-----BEGIN" "sk-" "AIza"; do
+          MATCHES=$(grep -rnI --include="*.py" --include="*.kt" --include="*.dart" --include="*.js" --include="*.json" "$pattern" . --exclude-dir=.git --exclude-dir=node_modules --exclude-dir=build || true)
+          if [ -n "$MATCHES" ]; then
+            echo "⚠️ Potential secret pattern '$pattern' found:"
+            echo "$MATCHES"
+            FOUND=1
+          fi
+        done
+        if [ "$FOUND" -eq 0 ]; then
+          echo "✅ No hardcoded secrets detected."
+        fi

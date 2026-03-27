@@ -1,0 +1,129 @@
+name: Release Pipeline
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  build-desktop:
+    name: Desktop Engine Package
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python 3.10
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.10"
+        cache: 'pip'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Validate engine imports
+      run: |
+        python -c "from engine import HeadlessHandTracker, GestureDetector; print('Engine imports OK')"
+        python -c "from api.fastapi_main import app; print('API imports OK')"
+
+    - name: Package desktop release
+      run: |
+        Compress-Archive -Path engine, api, desktop-client, config, main.py, requirements.txt, LICENSE -DestinationPath spatial-tracer-desktop.zip
+
+    - name: Upload Desktop Package
+      uses: actions/upload-artifact@v4
+      with:
+        name: desktop-package
+        path: spatial-tracer-desktop.zip
+
+  build-mobile:
+    name: Android APK Release
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./mobile-client
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup Java
+      uses: actions/setup-java@v3
+      with:
+        distribution: 'zulu'
+        java-version: '17'
+
+    - name: Setup Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version: '3.x'
+        channel: 'stable'
+        cache: true
+
+    - name: Install dependencies
+      run: flutter pub get
+
+    - name: Run tests
+      run: flutter test || true
+
+    - name: Build Release APK
+      run: flutter build apk --release
+
+    - name: Upload APK
+      uses: actions/upload-artifact@v4
+      with:
+        name: release-apk
+        path: mobile-client/build/app/outputs/flutter-apk/app-release.apk
+
+  build-web:
+    name: Web Client Bundle
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Validate web client
+      run: |
+        test -f web-client/index.html
+        test -f web-client/app.js
+        test -f web-client/style.css
+
+    - name: Package web client
+      run: |
+        cd web-client
+        zip -r ../spatial-tracer-web.zip index.html app.js style.css
+
+    - name: Upload Web Package
+      uses: actions/upload-artifact@v4
+      with:
+        name: web-client-bundle
+        path: spatial-tracer-web.zip
+
+  create-release:
+    name: Create GitHub Release
+    needs: [build-desktop, build-mobile, build-web]
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Download all artifacts
+      uses: actions/download-artifact@v4
+      with:
+        path: release-assets
+
+    - name: Create Release
+      uses: softprops/action-gh-release@v2
+      with:
+        generate_release_notes: true
+        files: |
+          release-assets/desktop-package/spatial-tracer-desktop.zip
+          release-assets/release-apk/app-release.apk
+          release-assets/web-client-bundle/spatial-tracer-web.zip
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

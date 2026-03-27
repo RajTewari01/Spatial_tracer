@@ -1,0 +1,93 @@
+name: Documentation Integrity
+
+on:
+  push:
+    branches: [ "main" ]
+    paths:
+      - 'README.md'
+      - 'wiki/**'
+      - '**.md'
+      - '.github/workflows/docs-integrity.yml'
+  pull_request:
+    branches: [ "main" ]
+    paths:
+      - 'README.md'
+      - 'wiki/**'
+      - '**.md'
+
+jobs:
+  validate-docs:
+    name: Validate Documentation
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Check markdown syntax
+      uses: DavidAnson/markdownlint-cli2-action@v19
+      with:
+        globs: |
+          README.md
+          wiki/*.md
+        config: |
+          {
+            "default": true,
+            "MD013": false,
+            "MD033": false,
+            "MD041": false,
+            "MD024": false,
+            "MD036": false
+          }
+      continue-on-error: true
+
+    - name: Verify internal links
+      run: |
+        echo "## Documentation Link Check" >> $GITHUB_STEP_SUMMARY
+        BROKEN=0
+
+        # Check that all wiki files referenced in README exist
+        for link in $(grep -oP '\(wiki/[^)]+\)' README.md | tr -d '()'); do
+          if [ ! -f "$link" ]; then
+            echo "❌ Broken link in README.md: $link" >> $GITHUB_STEP_SUMMARY
+            BROKEN=1
+          else
+            echo "✅ $link" >> $GITHUB_STEP_SUMMARY
+          fi
+        done
+
+        # Check that all proof images/videos referenced exist
+        for link in $(grep -oP 'proofs/[^"]+' README.md); do
+          if [ ! -f "$link" ]; then
+            echo "❌ Missing proof file: $link" >> $GITHUB_STEP_SUMMARY
+            BROKEN=1
+          else
+            echo "✅ $link" >> $GITHUB_STEP_SUMMARY
+          fi
+        done
+
+        if [ "$BROKEN" -eq 1 ]; then
+          echo "::warning::Some documentation links are broken. Check the summary."
+        else
+          echo "All documentation links verified ✅"
+        fi
+
+    - name: Verify proof media exists
+      run: |
+        echo "## Proof Media Inventory" >> $GITHUB_STEP_SUMMARY
+        echo "| File | Type | Size |" >> $GITHUB_STEP_SUMMARY
+        echo "|:-----|:-----|:-----|" >> $GITHUB_STEP_SUMMARY
+        for f in proofs/*; do
+          if [ -f "$f" ]; then
+            SIZE=$(du -h "$f" | cut -f1)
+            EXT="${f##*.}"
+            echo "| \`$f\` | $EXT | $SIZE |" >> $GITHUB_STEP_SUMMARY
+          fi
+        done
+
+    - name: Count documentation coverage
+      run: |
+        echo "## Documentation Stats" >> $GITHUB_STEP_SUMMARY
+        README_LINES=$(wc -l < README.md)
+        WIKI_LINES=$(cat wiki/*.md 2>/dev/null | wc -l || echo 0)
+        echo "- **README.md**: $README_LINES lines" >> $GITHUB_STEP_SUMMARY
+        echo "- **Wiki pages**: $(ls wiki/*.md 2>/dev/null | wc -l) files, $WIKI_LINES total lines" >> $GITHUB_STEP_SUMMARY

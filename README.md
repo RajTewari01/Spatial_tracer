@@ -11,6 +11,9 @@
 [![PyQt5 UI](https://img.shields.io/badge/PyQt5-Desktop-41cd52?style=flat-square&logo=qt&logoColor=white)](https://riverbankcomputing.com)
 [![Python Engine CI](https://github.com/RajTewari01/Spatial_tracer/actions/workflows/python-engine.yml/badge.svg)](https://github.com/RajTewari01/Spatial_tracer/actions/workflows/python-engine.yml)
 [![Flutter Mobile CI](https://github.com/RajTewari01/Spatial_tracer/actions/workflows/flutter-mobile.yml/badge.svg)](https://github.com/RajTewari01/Spatial_tracer/actions/workflows/flutter-mobile.yml)
+[![Web Client CI](https://github.com/RajTewari01/Spatial_tracer/actions/workflows/web-client.yml/badge.svg)](https://github.com/RajTewari01/Spatial_tracer/actions/workflows/web-client.yml)
+[![Security Audit](https://github.com/RajTewari01/Spatial_tracer/actions/workflows/security-audit.yml/badge.svg)](https://github.com/RajTewari01/Spatial_tracer/actions/workflows/security-audit.yml)
+[![Docs Integrity](https://github.com/RajTewari01/Spatial_tracer/actions/workflows/docs-integrity.yml/badge.svg)](https://github.com/RajTewari01/Spatial_tracer/actions/workflows/docs-integrity.yml)
 
 <br>
 
@@ -486,32 +489,42 @@ flowchart LR
         P["engine/ api/ desktop-client/"] --> PY
         M["mobile-client/"] --> FL
         W["web-client/"] --> WC
+        ALL["All files"] --> SEC
+        D["*.md files"] --> DOC
     end
 
-    subgraph CI["GitHub Actions"]
-        PY["Python Engine CI\nWindows runner\nflake8 E9,F63,F7,F82"]
-        FL["Flutter Mobile CI\nUbuntu runner\nflutter analyze\nflutter build apk"]
-        WC["Web Client CI\nUbuntu runner\njshint + file checks"]
+    subgraph CI["GitHub Actions — 6 Workflows"]
+        PY["Python Engine CI\nLint → Import Validation\n→ Config Integrity"]
+        FL["Flutter Mobile CI\nAnalyze → Test\n→ Build APK"]
+        WC["Web Client CI\nLint → HTML Validation\n→ CDN Check → Bundle Report"]
+        SEC["Security Audit\npip-audit → safety\n→ Secrets Scan"]
+        DOC["Docs Integrity\nMarkdown Lint\n→ Link Validation"]
     end
 
-    subgraph Output["Artifacts"]
-        APK["📦 Release APK\nactions/upload-artifact"]
-        VERCEL["🌐 Vercel Deploy\nAutomatic on push"]
-        WCA["📁 Web Client Bundle\nactions/upload-artifact"]
+    subgraph Output["Artifacts & Deploys"]
+        APK["📦 Release APK"]
+        VERCEL["🌐 Vercel Deploy"]
+        WCA["📁 Web Client Bundle"]
+        REL["🏷️ GitHub Release\nDesktop + APK + Web"]
     end
 
-    PY -.->|"Lint pass"| PY
+    PY -.->|"Validate"| PY
     FL -->|"On success"| APK
     WC --> WCA
     W -.->|"Webhook"| VERCEL
+    SEC -.->|"Weekly + PR"| SEC
+    DOC -.->|"Link check"| DOC
 ```
 
 | Workflow | Runner | Triggers On | What It Does |
 |:---------|:-------|:------------|:-------------|
-| `python-engine.yml` | `windows-latest` | `engine/` `api/` `desktop-client/` `main.py` | flake8 syntax check (excludes venv, mobile, web) |
-| `flutter-mobile.yml` | `ubuntu-latest` | `mobile-client/` | `flutter analyze --no-fatal-infos --no-fatal-warnings` → `flutter build apk --release` → upload APK artifact |
-| `web-client.yml` | `ubuntu-latest` | `web-client/` | jshint linting + file integrity check (index.html, app.js, style.css exist) |
-| **Vercel** | Managed | `web-client/` | Auto-deploy via GitHub integration — routes defined in `vercel.json` |
+| `python-engine.yml` | `windows-latest` | `engine/` `api/` `desktop-client/` `main.py` | flake8 lint → import validation (engine, api) → config file integrity (model size, keyboard keys) |
+| `flutter-mobile.yml` | `ubuntu-latest` | `mobile-client/` | Dart analysis → unit tests → release APK build → APK size report → upload artifact |
+| `web-client.yml` | `ubuntu-latest` | `web-client/` | jshint → HTML structure validation → CDN availability check → bundle size report → upload artifact |
+| `security-audit.yml` | `ubuntu-latest` | All pushes/PRs + weekly | pip-audit + safety (Python deps) → flutter pub outdated → hardcoded secrets scan |
+| `docs-integrity.yml` | `ubuntu-latest` | `*.md` files | Markdown lint → internal link validation → proof media inventory → docs coverage stats |
+| `release.yml` | Multi-platform | `v*` tags | Parallel build (desktop zip + APK + web zip) → GitHub Release with all artifacts |
+| **Vercel** | Managed | `web-client/` | Auto-deploy via GitHub webhook — routes defined in `vercel.json` |
 
 ---
 

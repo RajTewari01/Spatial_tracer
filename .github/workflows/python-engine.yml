@@ -21,7 +21,8 @@ on:
       - '.github/workflows/python-engine.yml'
 
 jobs:
-  build:
+  lint:
+    name: Syntax & Style Lint
     runs-on: windows-latest
 
     steps:
@@ -38,9 +39,59 @@ jobs:
         pip install flake8
         if (Test-Path requirements.txt) { pip install -r requirements.txt }
 
-    - name: Lint with flake8
+    - name: Lint — fatal errors
       run: |
-        # stop the build if there are Python syntax errors or undefined names
         flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics --exclude=mobile-client,web-client,wiki,vision_tracker,venv,.venv,env,Lib,Scripts
-        # exit-zero treats all errors as warnings.
+
+    - name: Lint — style warnings
+      run: |
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics --exclude=mobile-client,web-client,wiki,vision_tracker,venv,.venv,env,Lib,Scripts
+
+  validate:
+    name: Import & Structure Validation
+    runs-on: windows-latest
+    needs: lint
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python 3.10
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.10"
+        cache: 'pip'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        if (Test-Path requirements.txt) { pip install -r requirements.txt }
+
+    - name: Validate engine package imports
+      run: |
+        python -c "from engine import HeadlessHandTracker, GestureDetector; print('✅ engine/ imports OK')"
+        python -c "from engine.air_input_driver import AirInputDriver; print('✅ AirInputDriver import OK')"
+        python -c "from engine.simple_hand_tracer import InitializeCamera; print('✅ simple_hand_tracer import OK')"
+
+    - name: Validate API imports
+      run: |
+        python -c "from api.fastapi_main import app; print('✅ FastAPI app import OK')"
+        python -c "from api.input_controller import InputController; print('✅ InputController import OK')"
+
+    - name: Validate CLI entry point
+      run: |
+        python main.py --help
+
+    - name: Verify config files
+      run: |
+        python -c "
+        from pathlib import Path
+        model = Path('config/hand_landmarker.task')
+        mapping = Path('config/mapping.json')
+        assert model.exists(), 'hand_landmarker.task missing!'
+        assert model.stat().st_size > 1_000_000, 'Model file too small — likely corrupted'
+        assert mapping.exists(), 'mapping.json missing!'
+        import json
+        data = json.loads(mapping.read_text())
+        assert 'keys' in data, 'mapping.json missing keys array'
+        assert len(data['keys']) >= 60, f'Expected 60+ keys, got {len(data[\"keys\"])}'
+        print(f'✅ Config OK — model: {model.stat().st_size:,} bytes, keyboard: {len(data[\"keys\"])} keys')
+        "

@@ -14,6 +14,7 @@ on:
 
 jobs:
   lint-and-validate:
+    name: Lint & File Integrity
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -27,17 +28,65 @@ jobs:
       with:
         node-version: '20'
 
-    - name: Validate Integrity & Lint JS
+    - name: Lint JavaScript
       run: |
         npm install -g jshint
-        jshint app.js || true  # Run linter but don't fail the build immediately initially
-        
-        # Verify required files exist
-        if [ ! -f "index.html" ]; then echo "index.html missing"; exit 1; fi
-        if [ ! -f "app.js" ]; then echo "app.js missing"; exit 1; fi
-        if [ ! -f "style.css" ]; then echo "style.css missing"; exit 1; fi
-        
-        echo "Web client structure and syntax validated."
+        jshint app.js --extract=auto || true
+
+    - name: Verify required files exist
+      run: |
+        MISSING=0
+        for file in index.html app.js style.css; do
+          if [ ! -f "$file" ]; then
+            echo "❌ MISSING: $file"
+            MISSING=1
+          else
+            SIZE=$(du -h "$file" | cut -f1)
+            echo "✅ $file ($SIZE)"
+          fi
+        done
+        if [ "$MISSING" -eq 1 ]; then
+          echo "::error::Critical web client files are missing!"
+          exit 1
+        fi
+
+    - name: Validate HTML structure
+      run: |
+        # Check for required HTML elements
+        grep -q '<script src="./app.js">' index.html || echo "::warning::app.js script tag not found"
+        grep -q '<link rel="stylesheet" href="./style.css">' index.html || echo "::warning::style.css link not found"
+        grep -q 'mediapipe' index.html || echo "::warning::MediaPipe CDN not found in index.html"
+        grep -q 'three' index.html || echo "::warning::Three.js CDN not found in index.html"
+        echo "HTML structure validated."
+
+    - name: Check CDN availability
+      run: |
+        echo "## CDN Dependency Check" >> $GITHUB_STEP_SUMMARY
+        CDNS=(
+          "https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"
+          "https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4.1675469240/hands.min.js"
+          "https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils@0.3.1675466862/camera_utils.min.js"
+        )
+        for url in "${CDNS[@]}"; do
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$url" --max-time 10)
+          if [ "$STATUS" = "200" ]; then
+            echo "✅ \`$url\` — HTTP $STATUS" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "⚠️ \`$url\` — HTTP $STATUS" >> $GITHUB_STEP_SUMMARY
+          fi
+        done
+
+    - name: Report bundle size
+      run: |
+        echo "## Web Client Bundle Sizes" >> $GITHUB_STEP_SUMMARY
+        echo "| File | Size |" >> $GITHUB_STEP_SUMMARY
+        echo "|:-----|:-----|" >> $GITHUB_STEP_SUMMARY
+        for f in index.html app.js style.css; do
+          SIZE=$(du -h "$f" | cut -f1)
+          echo "| \`$f\` | $SIZE |" >> $GITHUB_STEP_SUMMARY
+        done
+        TOTAL=$(du -sh . | cut -f1)
+        echo "| **Total** | **$TOTAL** |" >> $GITHUB_STEP_SUMMARY
 
     - name: Upload Web Client Artifact
       uses: actions/upload-artifact@v4
