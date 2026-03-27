@@ -43,39 +43,39 @@
 </table>
 </div>
 
-### 🎥 Video Demos (Silent)
+### 🎥 Video Demos *(click to play — silenced)*
 
 <div align="center">
 <table>
 <tr>
 <td align="center" width="50%">
 
-**🖐️ Gesture Tracking**
+**👁️ Blink Detection — Desktop**
 
-<video src="proofs/gesture_tracking_demo.mp4" muted autoplay loop playsinline width="300"></video>
+https://github.com/RajTewari01/Spatial_tracer/raw/main/proofs/blink_scroll_control.mp4
 
 </td>
 <td align="center" width="50%">
 
-**🧭 Air Cursor Navigation**
+**🌐 Web 3D Simulation**
 
-<video src="proofs/air_cursor_navigation.mp4" muted autoplay loop playsinline width="300"></video>
+https://github.com/RajTewari01/Spatial_tracer/raw/main/proofs/air_cursor_navigation.mp4
 
 </td>
 </tr>
 <tr>
 <td align="center" width="50%">
 
-**📱 Full System Walkthrough**
+**🖐️ Hand Gestures — Android**
 
-<video src="proofs/full_system_walkthrough.mp4" muted autoplay loop playsinline width="300"></video>
+https://github.com/RajTewari01/Spatial_tracer/raw/main/proofs/full_system_walkthrough.mp4
 
 </td>
 <td align="center" width="50%">
 
-**👁️ Blink & Scroll Control**
+**😊 Blink & Scroll Control**
 
-<video src="proofs/blink_scroll_control.mp4" muted autoplay loop playsinline width="300"></video>
+https://github.com/RajTewari01/Spatial_tracer/raw/main/proofs/gesture_tracking_demo.mp4
 
 </td>
 </tr>
