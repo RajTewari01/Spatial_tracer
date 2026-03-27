@@ -217,7 +217,7 @@ spatial_tracer/
 │   └── mapping.json                 # Key mapping config
 │
 ├── main.py                          # CLI entry point
-├── requirement.txt                  # Python dependencies
+├── requirements.txt                 # Python dependencies
 └── LICENSE                          # MIT
 ```
 
@@ -272,7 +272,7 @@ Webcam / Camera
 ```bash
 git clone https://github.com/RajTewari01/Spatial_tracer.git
 cd Spatial_tracer
-pip install -r requirement.txt
+pip install -r requirements.txt
 ```
 
 ### Run
