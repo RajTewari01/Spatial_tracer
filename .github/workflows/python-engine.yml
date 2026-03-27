@@ -67,14 +67,14 @@ jobs:
 
     - name: Validate engine package imports
       run: |
-        python -c "from engine import HeadlessHandTracker, GestureDetector; print('✅ engine/ imports OK')"
-        python -c "from engine.air_input_driver import AirInputDriver; print('✅ AirInputDriver import OK')"
-        python -c "from engine.simple_hand_tracer import InitializeCamera; print('✅ simple_hand_tracer import OK')"
+        python -c "from engine import HeadlessHandTracker, GestureDetector; print('[OK] engine/ imports OK')"
+        python -c "from engine.air_input_driver import AirInputDriver; print('[OK] AirInputDriver import OK')"
+        python -c "from engine.simple_hand_tracer import InitializeCamera; print('[OK] simple_hand_tracer import OK')"
 
     - name: Validate API imports
       run: |
-        python -c "from api.fastapi_main import app; print('✅ FastAPI app import OK')"
-        python -c "from api.input_controller import InputController; print('✅ InputController import OK')"
+        python -c "from api.fastapi_main import app; print('[OK] FastAPI app import OK')"
+        python -c "from api.input_controller import InputController; print('[OK] InputController import OK')"
 
     - name: Validate CLI entry point
       run: |
@@ -87,11 +87,11 @@ jobs:
         model = Path('config/hand_landmarker.task')
         mapping = Path('config/mapping.json')
         assert model.exists(), 'hand_landmarker.task missing!'
-        assert model.stat().st_size > 1_000_000, 'Model file too small — likely corrupted'
+        assert model.stat().st_size > 1_000_000, 'Model file too small - likely corrupted'
         assert mapping.exists(), 'mapping.json missing!'
         import json
         data = json.loads(mapping.read_text())
         assert 'keys' in data, 'mapping.json missing keys array'
         assert len(data['keys']) >= 60, f'Expected 60+ keys, got {len(data[\"keys\"])}'
-        print(f'✅ Config OK — model: {model.stat().st_size:,} bytes, keyboard: {len(data[\"keys\"])} keys')
+        print(f'[OK] Config OK - model: {model.stat().st_size:,} bytes, keyboard: {len(data[\"keys\"])} keys')
         "
