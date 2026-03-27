@@ -133,7 +133,7 @@ flowchart TD
 │  HEAD TILT DOWN  │  Scroll Down       │  Z-Depth Pitch │
 │  HEAD TILT LEFT  │  Swipe Left        │  Z-Depth Yaw   │
 │  HEAD TILT RIGHT │  Swipe Right       │  Z-Depth Yaw   │
-│  FIRM BLINK      │  Recent Apps/Close │  EAR < 0.24    │
+│  FIRM BLINK      │  Recent Apps/Close │  EAR < 0.22    │
 └──────────────────┴────────────────────┴────────────────┘
 ```
 
@@ -354,14 +354,14 @@ A **2-frame stability buffer** prevents single-frame noise from triggering false
 
 ```mermaid
 flowchart LR
-    A["Index Fingertip normalized 0-1"] --> B["Margin Mapping 0.1 dead zone"]
+    A["Index Fingertip normalized 0-1"] --> B["Margin Mapping 0.08 dead zone"]
     B --> C["Screen Mapping 1920x1080"]
-    C --> D["EMA Smoothing alpha 0.6"]
+    C --> D["EMA Smoothing alpha 0.22"]
     D --> E["pynput mouse position"]
 ```
 
 - **Smoothing**: Exponential Moving Average prevents cursor jitter
-- **Margin**: 10% dead zone at screen edges for comfortable use
+- **Margin**: 8% dead zone at screen edges for comfortable use
 - **Cooldowns**: 400ms click, 150ms scroll, 500ms key — prevents accidental repeats
 
 ---

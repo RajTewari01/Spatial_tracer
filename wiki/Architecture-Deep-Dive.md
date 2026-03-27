@@ -33,7 +33,7 @@ Face processing calculates deeply granular movements:
 1.  **Head Tilt (Pose Estimation):** We infer pitch and yaw by analyzing the relative `Z-depth` differentials between the `NOSE_TIP`, `LEFT_CHEEK`, and `RIGHT_CHEEK`.
     *   *Pitch Math:* `pitch = (nose.z - (left_cheek.z + right_cheek.z)/2) * scalar`
 2.  **Eye Aspect Ratio (EAR):** To invoke non-vocal, non-manual commands (like minimizing apps), we analyze the EAR.
-    *   *EAR Formula:* The Euclidean distance between vertical eye landmarks divided by the horizontal eye landmarks. An EAR `< 0.24` registered across 3 consecutive frames acts as a secure "Blink Trigger".
+    *   *EAR Formula:* The Euclidean distance between vertical eye landmarks divided by the horizontal eye landmarks. An EAR `< 0.22` registered across 3 consecutive frames acts as a secure "Blink Trigger".
 
 ### Phase 2: Heuristics, Smoothing, and Command Dispatch
 
@@ -44,7 +44,7 @@ Vision AI naturally jitters by 1-3 pixels per frame even when hands are perfectl
 
 ```javascript
 // EMA Smoothing Algorithm
-const ALPHA = 0.6; // High alpha = faster response, low alpha = smoother movement
+const ALPHA = 0.65; // High alpha = faster response, low alpha = smoother movement
 let smoothedX = (rawX * ALPHA) + (previousX * (1 - ALPHA));
 let smoothedY = (rawY * ALPHA) + (previousY * (1 - ALPHA));
 ```
