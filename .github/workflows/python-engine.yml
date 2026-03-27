@@ -85,14 +85,26 @@ jobs:
       run: |
         from pathlib import Path
         import json
-        model = Path('config/hand_landmarker.task')
-        mapping = Path('config/mapping.json')
-        assert model.exists(), 'hand_landmarker.task missing!'
-        assert model.stat().st_size > 1_000_000, 'Model file too small - likely corrupted'
-        assert mapping.exists(), 'mapping.json missing!'
-        data = json.loads(mapping.read_text())
+        import urllib.request
+
+        # mapping.json is tracked in git
+        mapping = Path('config/hand_landmarker.task')
+        mapping_json = Path('config/mapping.json')
+
+        # Model is gitignored (7.8MB) - download from Google CDN to validate
+        if not mapping.exists():
+            print('[INFO] hand_landmarker.task not in repo (gitignored) - downloading from Google CDN...')
+            url = 'https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/latest/hand_landmarker.task'
+            urllib.request.urlretrieve(url, str(mapping))
+            print(f'[OK] Downloaded: {mapping.stat().st_size:,} bytes')
+
+        assert mapping.exists(), 'hand_landmarker.task missing after download!'
+        assert mapping.stat().st_size > 1_000_000, 'Model file too small - likely corrupted'
+
+        assert mapping_json.exists(), 'mapping.json missing!'
+        data = json.loads(mapping_json.read_text())
         assert 'keys' in data, 'mapping.json missing keys array'
         key_count = len(data['keys'])
-        model_size = model.stat().st_size
+        model_size = mapping.stat().st_size
         assert key_count >= 60, f'Expected 60+ keys, got {key_count}'
         print(f'[OK] Config OK - model: {model_size:,} bytes, keyboard: {key_count} keys')
