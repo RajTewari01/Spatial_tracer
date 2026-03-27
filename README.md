@@ -580,7 +580,7 @@ git push origin feat/your-feature
 *Full-Stack & AI/ML Engineer · Python · Dart · Kotlin · JS*
 *MAKAUT University, West Bengal*
 
-`build > ship > learn > repeat`
+`build it before they taught it`
 
 ---
 
