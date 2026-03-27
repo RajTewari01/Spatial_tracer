@@ -31,13 +31,13 @@
 <div align="center">
 <table>
 <tr>
-<td align="center"><b>Onboarding</b><br><img src="proofs/onboarding_screen.png" width="180"/></td>
-<td align="center"><b>Gesture Tutorial</b><br><img src="proofs/pointer_tutorial.png" width="180"/></td>
-<td align="center"><b>Dashboard</b><br><img src="proofs/dashboard_standby.png" width="180"/></td>
+<td align="center"><b>In-App Tutorial</b><br><img src="proofs/onboarding_screen.png" width="180"/></td>
+<td align="center"><b>Dashboard</b><br><img src="proofs/pointer_tutorial.png" width="180"/></td>
+<td align="center"><b>Web Client</b><br><img src="proofs/dashboard_standby.png" width="180"/></td>
 </tr>
 <tr>
-<td align="center"><b>Sidebar Controls</b><br><img src="proofs/sidebar_controls.png" width="180"/></td>
-<td align="center"><b>Creator Profile</b><br><img src="proofs/creator_profile.png" width="180"/></td>
+<td align="center"><b>My Profile</b><br><img src="proofs/sidebar_controls.png" width="180"/></td>
+<td align="center"><b>App Front Page</b><br><img src="proofs/creator_profile.png" width="180"/></td>
 <td align="center"><b>Desktop Overlay</b><br><img src="proofs/desktop_overlay.png" width="380"/></td>
 </tr>
 </table>
