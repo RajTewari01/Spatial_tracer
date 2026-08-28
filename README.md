@@ -559,7 +559,7 @@ For comprehensive internals documentation, see the [Project Wiki](wiki/Home.md):
 ```bash
 # 1. Fork the repository
 # 2. Clone your fork
-git clone https://github.com/<your-username>/Spatial_tracer.git
+git clone https://github.com/RajTewari01/Spatial_tracer.git
 
 # 3. Create a feature branch
 git checkout -b feat/your-feature
