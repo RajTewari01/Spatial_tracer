@@ -747,23 +747,25 @@ document.addEventListener('DOMContentLoaded', () => {
     initThreeJS();
     animate(0);
 
-    // Typewriter Header Title — ONLY Product / MotionW Branding (NO by Biswadeep Tewari)
-    const logoTW = new Typewriter(document.getElementById('typewriter-text'), { speed: 70 });
-    logoTW
-        .type('Air Gesture Engine')
-        .wait(3000)
-        .clear()
-        .type('Spatial Vision 3D')
-        .wait(2500)
-        .clear()
-        .type('Real-Time MediaPipe')
-        .wait(2500)
-        .clear()
-        .type('Zero-Latency Tracking')
-        .wait(2500)
-        .clear()
-        .loop()
-        .start();
+    const twEl = document.getElementById('typewriter-text');
+    if (twEl) {
+        const logoTW = new Typewriter(twEl, { speed: 70 });
+        logoTW
+            .type('Air Gesture Engine')
+            .wait(3000)
+            .clear()
+            .type('Spatial Vision 3D')
+            .wait(2500)
+            .clear()
+            .type('Real-Time MediaPipe')
+            .wait(2500)
+            .clear()
+            .type('Zero-Latency Tracking')
+            .wait(2500)
+            .clear()
+            .loop()
+            .start();
+    }
 
     addEventLog('MotionW initialized');
 

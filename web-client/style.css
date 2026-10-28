@@ -1,35 +1,30 @@
 /* ═══════════════════════════════════════════════════════════════
-   MotionW — Cupertino Minimalist Solid Theme (Apple Caliber)
+   MotionW — Native Mobile App Cupertino Theme
    ✦ Complete Black OLED Background (#000000)
-   ✦ Solid Cupertino Pills with Crisp Vector SVGs — Zero Glassmorphism
-   ✦ Zero Red: Titanium, Pure White, Champagne Gold, Cupertino Green
+   ✦ Clean Header: Left Cylindrical Pill + Right Settings ONLY
+   ✦ Zero Dividers, Zero Neon Anywhere (Matte Apple Dark Mode)
    ✦ Widescreen 16:9 PiP Camera Preview
-   ✦ Live Continuous FPS Motion Indicator
-   ✦ Creator Profile Modal: Biswadeep Tewari (from mobile_client_v2)
+   ✦ Developer Portfolio Modal for Biswadeep Tewari
    ═══════════════════════════════════════════════════════════════ */
 
 :root {
-    /* Pure Black & Solid Cupertino Dark Palette */
-    --void:           #000000;
     --bg-black:       #000000;
     --surface-1:      #121214;
     --surface-2:      #161618;
-    --surface-3:      #222225;
-    --surface-hover:  #2C2C30;
+    --surface-3:      #202023;
+    --surface-card:   #18181B;
 
     --border:         #242427;
     --border-light:   #343438;
-    --border-hairline:#1A1A1D;
+    --border-hairline:#1C1C1F;
 
     --text-primary:   #FFFFFF;
     --text-secondary: #8E8E93;
     --text-tertiary:  #636366;
 
-    /* Cupertino Monochrome & Accent Tokens — NO RED */
     --gold:           #D4AF37;
     --gold-light:     #E6C56E;
-    --gold-subtle:    #C5A059;
-    --gold-pill:      #242014;
+    --gold-pill:      #221D12;
     --green-live:     #30D158;
     --titanium:       #E5E5EA;
 
@@ -38,7 +33,6 @@
 
     --radius-pill:    9999px;
     --radius-card:    20px;
-    --radius-sm:      10px;
 }
 
 * {
@@ -72,7 +66,7 @@ html, body {
     background: var(--bg-black);
 }
 
-/* ── Top Bar (Apple-Grade Premium Vector Header) ─────────────── */
+/* ── Native App Floating Header (Only Two Floating Elements) ── */
 #top-bar {
     position: fixed;
     top: 0;
@@ -82,193 +76,111 @@ html, body {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0 28px;
-    height: 64px;
-    background: var(--bg-black);
-    border-bottom: 1px solid var(--border-hairline);
+    padding: 14px 18px;
+    background: transparent;
+    border: none;
+    pointer-events: none;
 }
 
-.logo {
+/* Left Cylindrical Pill */
+.header-left-pill {
+    pointer-events: auto;
     display: flex;
     align-items: center;
-    gap: 14px;
-}
-
-/* Apple-style Motion Glyph Wrap */
-.logo-icon-wrap {
-    width: 38px;
-    height: 38px;
-    border-radius: 12px;
+    gap: 10px;
+    height: 42px;
+    padding: 0 14px 0 8px;
+    border-radius: var(--radius-pill);
     background: var(--surface-1);
     border: 1px solid var(--border);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.7);
+    transition: transform 0.15s ease, background 0.15s ease;
+}
+
+.pill-m-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--surface-3);
+    border: 1px solid var(--border-light);
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6);
     flex-shrink: 0;
 }
 
-.apple-motion-svg {
-    display: block;
-}
-
-.brand-info {
+.pill-brand-text {
     display: flex;
     flex-direction: column;
     justify-content: center;
 }
 
-.brand-row {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.brand-title {
-    font-size: 16px;
-    font-weight: 800;
-    letter-spacing: -0.3px;
-    color: #FFFFFF;
-    font-family: var(--font);
-}
-
-.brand-divider {
-    font-size: 14px;
-    color: var(--border-light);
-    font-weight: 400;
-}
-
-.typewriter {
-    font-family: var(--mono);
+.pill-brand-name {
     font-size: 13px;
+    font-weight: 800;
+    color: var(--text-primary);
+    line-height: 1.1;
+    letter-spacing: -0.2px;
+}
+
+.pill-brand-sub {
+    font-size: 9px;
     font-weight: 500;
     color: var(--text-secondary);
     letter-spacing: 0.2px;
 }
 
-.cursor-blink {
-    font-family: var(--mono);
-    font-size: 13px;
-    font-weight: 300;
-    color: var(--gold);
-    animation: blink 1s step-end infinite;
-    margin-left: 2px;
-}
-
-@keyframes blink {
-    50% { opacity: 0; }
-}
-
-/* Status Telemetry Group */
-.status-group {
+.pill-fps-badge {
     display: flex;
     align-items: center;
-    gap: 10px;
-}
-
-/* Cupertino Solid Vector Pills */
-.cupertino-pill {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    height: 38px;
-    padding: 0 16px;
+    gap: 3px;
+    padding: 3px 8px;
     border-radius: var(--radius-pill);
-    background: var(--surface-2);
+    background: var(--surface-3);
+    border: 1px solid var(--border);
+    margin-left: 4px;
+}
+
+.fps-num {
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 800;
+    color: var(--gold);
+}
+
+.fps-unit {
+    font-family: var(--mono);
+    font-size: 8px;
+    font-weight: 700;
+    color: var(--text-secondary);
+    letter-spacing: 0.5px;
+}
+
+/* Right Settings Button Only */
+.header-settings-btn {
+    pointer-events: auto;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: var(--surface-1);
     border: 1px solid var(--border);
     color: var(--text-primary);
-    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.cupertino-pill:hover {
-    background: var(--surface-3);
-    border-color: var(--border-light);
-}
-
-.pill-svg {
-    width: 15px;
-    height: 15px;
-    flex-shrink: 0;
-    color: var(--text-secondary);
-    transition: color 0.2s;
-}
-
-.pill-value {
-    font-size: 13px;
-    font-weight: 700;
-    color: var(--text-primary);
-}
-
-.pill-value.font-mono {
-    font-family: var(--mono);
-    font-size: 13px;
-    font-weight: 700;
-    letter-spacing: 0.3px;
-}
-
-.pill-sub {
-    font-family: var(--mono);
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 1px;
-    color: var(--text-secondary);
-    margin-left: 1px;
-}
-
-/* Live Pulse Animation on FPS Pulse Icon */
-@keyframes live-pulse {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.55; transform: scale(0.92); }
-}
-
-.pulse-svg {
-    animation: live-pulse 1.8s ease-in-out infinite;
-}
-
-/* Connected Online Status */
-.cupertino-pill.connected {
-    border-color: rgba(48, 209, 88, 0.35);
-}
-
-.cupertino-pill.connected .pill-svg {
-    color: var(--green-live);
-}
-
-.cupertino-pill.connected .pill-value {
-    color: #FFFFFF;
-}
-
-/* Header Creator Profile Button (Cupertino Action Style) */
-.cupertino-btn-pill {
     display: flex;
     align-items: center;
-    gap: 8px;
-    height: 38px;
-    padding: 0 18px;
-    border-radius: var(--radius-pill);
-    background: #FFFFFF;
-    color: #000000;
-    font-family: var(--font);
-    font-size: 12px;
-    font-weight: 800;
-    letter-spacing: 0.5px;
-    border: none;
+    justify-content: center;
     cursor: pointer;
-    box-shadow: 0 4px 16px rgba(255, 255, 255, 0.12);
-    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.7);
+    transition: transform 0.15s ease, background 0.15s ease;
 }
 
-.cupertino-btn-pill .pill-svg {
-    color: #000000;
+.header-settings-btn:hover {
+    background: var(--surface-3);
+    border-color: var(--border-light);
+    color: var(--gold);
 }
 
-.cupertino-btn-pill:hover {
-    background: var(--titanium);
-    transform: scale(1.02);
-}
-
-.cupertino-btn-pill:active {
-    transform: scale(0.96);
+.header-settings-btn:active {
+    transform: scale(0.92);
 }
 
 /* ── Camera PiP Panel (Completely 16:9 Widescreen Rectangle) ── */
@@ -309,12 +221,6 @@ html, body {
     height: 6px;
     border-radius: 50%;
     background: var(--green-live);
-    animation: cam-pulse 2s ease-in-out infinite;
-}
-
-@keyframes cam-pulse {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.5; transform: scale(0.85); }
 }
 
 .btn-icon {
@@ -337,7 +243,6 @@ html, body {
     border-color: var(--border-light);
 }
 
-/* Completely 16:9 widescreen rectangle */
 .camera-body {
     position: relative;
     width: 100%;
@@ -362,7 +267,7 @@ html, body {
     pointer-events: none;
 }
 
-/* ── Desktop Right Panel (Solid Cupertino Cards) ────────────── */
+/* ── Desktop Right Panel (Hidden on Mobile) ─────────────────── */
 #info-panel {
     position: fixed;
     top: 76px;
@@ -395,17 +300,11 @@ html, body {
     margin-bottom: 12px;
 }
 
-/* Quick Creator Header in Sidebar */
 .creator-quick-card {
     display: flex;
     align-items: center;
     gap: 12px;
     cursor: pointer;
-    transition: transform 0.2s ease;
-}
-
-.creator-quick-card:hover {
-    opacity: 0.9;
 }
 
 .creator-quick-avatar {
@@ -444,7 +343,6 @@ html, body {
     color: var(--gold);
 }
 
-/* Gesture Tag Display */
 .gesture-display {
     min-height: 40px;
     display: flex;
@@ -470,15 +368,8 @@ html, body {
     font-size: 12px;
     font-weight: 800;
     letter-spacing: 1px;
-    animation: pop-in 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-@keyframes pop-in {
-    0% { transform: scale(0.92); opacity: 0; }
-    100% { transform: scale(1); opacity: 1; }
-}
-
-/* Finger Grid */
 .finger-grid {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
@@ -491,14 +382,13 @@ html, body {
     align-items: center;
     justify-content: center;
     padding: 8px 4px;
-    border-radius: var(--radius-sm);
+    border-radius: var(--radius-pill);
     background: var(--surface-2);
     border: 1px solid var(--border);
     font-family: var(--mono);
     font-size: 10px;
     font-weight: 600;
     color: var(--text-secondary);
-    transition: all 0.2s ease;
 }
 
 .finger.extended {
@@ -507,7 +397,6 @@ html, body {
     color: var(--gold);
 }
 
-/* Event Log */
 .event-log {
     max-height: 110px;
     overflow-y: auto;
@@ -531,7 +420,6 @@ html, body {
     color: var(--text-primary);
 }
 
-/* Buttons (Solid Cupertino Style) */
 .controls {
     display: flex;
     gap: 8px;
@@ -556,10 +444,6 @@ html, body {
     color: #000000;
 }
 
-.btn-primary:hover {
-    background: var(--titanium);
-}
-
 .btn-primary:active {
     transform: scale(0.98);
 }
@@ -570,16 +454,10 @@ html, body {
     border: 1px solid var(--border);
 }
 
-.btn-secondary:hover {
-    background: var(--surface-3);
-    border-color: var(--border-light);
-}
-
 .btn-secondary:active {
     transform: scale(0.98);
 }
 
-/* HUD Gesture Flash */
 .gesture-flash {
     position: fixed;
     top: 50%;
@@ -592,35 +470,34 @@ html, body {
     font-weight: 900;
     letter-spacing: 4px;
     color: var(--gold);
-    text-shadow: 0 0 20px rgba(212, 175, 55, 0.4);
     opacity: 0;
     transition: opacity 0.2s, transform 0.2s;
 }
 
 .gesture-flash.visible {
     opacity: 1;
-    transform: translate(-50%, -50%) scale(1.08);
+    transform: translate(-50%, -50%) scale(1.06);
 }
 
 .gesture-flash.hidden {
     opacity: 0;
 }
 
-/* ── Mobile Cupertino Bottom Dock ───────────────────────────── */
+/* ── Mobile Floating Bottom Dock (Zero Neon) ────────────────── */
 #mobile-dock {
     display: none;
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   CUPERTINO CREATOR PROFILE MODAL
-   (Directly inspired by mobile_client_v2/lib/screens/creator_profile.dart)
+   SETTINGS: BISWADEEP TEWARI DEVELOPER PORTFOLIO MODAL
+   (Matte Apple Dark Theme — ZERO NEON)
    ═══════════════════════════════════════════════════════════════ */
 
 .modal-backdrop {
     position: fixed;
     inset: 0;
     z-index: 300;
-    background: rgba(0, 0, 0, 0.85);
+    background: rgba(0, 0, 0, 0.88);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -636,9 +513,9 @@ html, body {
     pointer-events: none;
 }
 
-.cupertino-modal-card {
+.portfolio-modal {
     width: 100%;
-    max-width: 520px;
+    max-width: 560px;
     max-height: 88vh;
     background: var(--surface-1);
     border: 1px solid var(--border);
@@ -647,11 +524,11 @@ html, body {
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    animation: modal-enter 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    animation: modal-enter 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 @keyframes modal-enter {
-    0% { transform: scale(0.94) translateY(12px); opacity: 0; }
+    0% { transform: scale(0.96) translateY(8px); opacity: 0; }
     100% { transform: scale(1) translateY(0); opacity: 1; }
 }
 
@@ -714,153 +591,221 @@ html, body {
     overflow-y: auto;
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 20px;
 }
 
-/* Creator Hero Card */
-.creator-hero-card {
+/* Portfolio Hero Card */
+.portfolio-hero-card {
     display: flex;
-    align-items: center;
-    gap: 18px;
+    align-items: flex-start;
+    gap: 16px;
     padding: 20px;
     border-radius: 20px;
-    background: var(--surface-2);
+    background: var(--surface-card);
     border: 1px solid var(--border);
 }
 
-.avatar-ring {
-    width: 72px;
-    height: 72px;
+.portfolio-avatar {
+    width: 58px;
+    height: 58px;
     border-radius: 50%;
     background: #000000;
     border: 2px solid var(--gold);
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 0 24px rgba(212, 175, 55, 0.25);
+    font-family: var(--mono);
+    font-size: 20px;
+    font-weight: 900;
+    color: var(--gold);
     flex-shrink: 0;
 }
 
-.avatar-monogram {
-    font-family: var(--mono);
-    font-size: 24px;
-    font-weight: 900;
-    color: var(--gold);
-    letter-spacing: 1px;
-}
-
-.creator-identity {
+.portfolio-meta {
     display: flex;
     flex-direction: column;
     gap: 6px;
 }
 
-.creator-name {
-    font-size: 22px;
-    font-weight: 900;
+.portfolio-name {
+    font-size: 20px;
+    font-weight: 800;
     color: var(--text-primary);
-    letter-spacing: -0.5px;
     line-height: 1.1;
 }
 
-.creator-role-badge {
+.portfolio-role-badge {
     align-self: flex-start;
-    padding: 4px 10px;
+    padding: 3px 10px;
     border-radius: var(--radius-pill);
     background: var(--gold-pill);
-    border: 1px solid rgba(212, 175, 55, 0.35);
+    border: 1px solid rgba(212, 175, 55, 0.3);
     font-family: var(--mono);
     font-size: 9px;
     font-weight: 800;
-    letter-spacing: 1.8px;
+    letter-spacing: 1.5px;
     color: var(--gold-light);
 }
 
-.creator-handle {
-    font-family: var(--mono);
-    font-size: 11px;
+.portfolio-tagline {
+    font-size: 13px;
+    line-height: 1.5;
     color: var(--text-secondary);
+    margin-top: 2px;
 }
 
-/* Cupertino Card Content */
-.cupertino-card {
-    background: var(--surface-2);
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    padding: 20px;
+.portfolio-location {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    color: var(--text-tertiary);
+    margin-top: 2px;
+}
+
+/* Portfolio Sections */
+.portfolio-section {
     display: flex;
     flex-direction: column;
     gap: 12px;
 }
 
-/* Satori Zen Card */
-.satori-card {
-    align-items: center;
-    text-align: center;
-    padding: 18px 24px;
-    background: #000000;
-    border-color: var(--border);
-}
-
-.zen-kanji {
-    font-size: 44px;
-    font-weight: 800;
-    color: var(--gold);
-    line-height: 1;
-}
-
-.zen-quote {
-    font-style: italic;
-    font-size: 13px;
-    color: var(--text-secondary);
-    letter-spacing: 0.3px;
-}
-
-/* Section Header in Card */
-.card-section-title {
+.section-title {
     display: flex;
     align-items: center;
-    gap: 10px;
-    font-size: 14px;
+    gap: 8px;
+    font-size: 13px;
     font-weight: 700;
     color: var(--text-primary);
     letter-spacing: -0.2px;
 }
 
-.card-body-text {
-    font-size: 13px;
+/* Project Cards */
+.project-card {
+    background: var(--surface-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.project-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.project-name {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.project-tag {
+    font-family: var(--mono);
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    padding: 3px 8px;
+    border-radius: var(--radius-pill);
+    background: var(--surface-3);
+    border: 1px solid var(--border);
+    color: var(--gold);
+}
+
+.project-desc {
+    font-size: 12px;
+    line-height: 1.6;
+    color: var(--text-secondary);
+}
+
+.project-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 4px;
+}
+
+.mini-chip {
+    font-family: var(--mono);
+    font-size: 10px;
+    padding: 4px 10px;
+    border-radius: var(--radius-pill);
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    color: var(--titanium);
+}
+
+/* Philosophy Card */
+.philosophy-card {
+    background: var(--surface-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 14px 16px;
+}
+
+.philosophy-text {
+    font-size: 12px;
     line-height: 1.65;
     color: var(--text-secondary);
 }
 
-/* Tech Chips (Solid Pills) */
-.tech-chips-wrap {
+.philosophy-text strong {
+    color: var(--text-primary);
+}
+
+/* Zen Card */
+.zen-card {
+    background: #000000;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.zen-symbol {
+    font-size: 32px;
+    font-weight: 800;
+    color: var(--gold);
+    line-height: 1;
+}
+
+.zen-text {
+    font-style: italic;
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+
+/* Skills Grid */
+.skills-grid {
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
-    margin-top: 4px;
 }
 
-.solid-pill-chip {
-    padding: 6px 14px;
-    border-radius: var(--radius-pill);
-    background: var(--surface-3);
-    border: 1px solid var(--border-light);
+.skill-pill {
     font-family: var(--mono);
     font-size: 11px;
     font-weight: 600;
+    padding: 6px 14px;
+    border-radius: var(--radius-pill);
+    background: var(--surface-card);
+    border: 1px solid var(--border);
     color: var(--titanium);
-    letter-spacing: 0.3px;
 }
 
-/* Action Links (Solid Cupertino Buttons) */
-.modal-actions-row {
+/* Portfolio Action Buttons */
+.portfolio-actions {
     display: flex;
     gap: 10px;
     margin-top: 4px;
 }
 
-.cupertino-action-btn {
+.portfolio-btn {
     flex: 1;
     display: flex;
     align-items: center;
@@ -868,7 +813,7 @@ html, body {
     gap: 8px;
     padding: 12px 14px;
     border-radius: var(--radius-pill);
-    background: var(--surface-2);
+    background: var(--surface-card);
     border: 1px solid var(--border);
     color: var(--text-primary);
     text-decoration: none;
@@ -877,90 +822,37 @@ html, body {
     transition: all 0.2s ease;
 }
 
-.cupertino-action-btn:hover {
+.portfolio-btn:hover {
     background: var(--surface-3);
     border-color: var(--border-light);
     color: var(--gold);
 }
 
-.cupertino-action-btn:active {
+.portfolio-btn:active {
     transform: scale(0.97);
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   RESPONSIVE MOBILE STYLES (Cupertino Mobile Polish)
+   RESPONSIVE MOBILE STYLES (Clean App-Like Experience)
    ═══════════════════════════════════════════════════════════════ */
 
 @media (max-width: 768px) {
-    /* Hide desktop sidebar on mobile to keep screen clean */
     #info-panel {
         display: none !important;
     }
 
     #top-bar {
-        padding: 0 14px;
-        height: 56px;
-    }
-
-    .logo {
-        gap: 10px;
-    }
-
-    .logo-icon-wrap {
-        width: 32px;
-        height: 32px;
-        border-radius: 9px;
-    }
-
-    .brand-title {
-        font-size: 14px;
-    }
-
-    .brand-divider, .typewriter, .cursor-blink {
-        display: none;
-    }
-
-    .status-group {
-        gap: 6px;
-    }
-
-    .cupertino-pill {
-        height: 32px;
-        padding: 0 10px;
-        gap: 6px;
-    }
-
-    .pill-svg {
-        width: 13px;
-        height: 13px;
-    }
-
-    .pill-value {
-        font-size: 11px;
-    }
-
-    .pill-sub {
-        font-size: 9px;
-    }
-
-    .cupertino-btn-pill {
-        height: 32px;
-        padding: 0 12px;
-        font-size: 10px;
-    }
-
-    .cupertino-btn-pill .btn-text {
-        display: none;
+        padding: 12px 14px;
     }
 
     /* ── Mobile PiP Camera: Completely 16:9 Widescreen Rectangle ── */
     #camera-panel {
         position: fixed !important;
-        top: 64px !important;
+        top: 66px !important;
         right: 14px !important;
         left: auto !important;
         bottom: auto !important;
-        width: 140px !important;
+        width: 136px !important;
         border-radius: 14px !important;
         box-shadow: 0 12px 32px rgba(0, 0, 0, 0.9) !important;
         border: 1px solid var(--border) !important;
@@ -985,7 +877,7 @@ html, body {
         height: auto !important;
     }
 
-    /* ── Mobile Bottom Cupertino Dock (Solid Pills) ────────── */
+    /* ── Mobile Bottom Floating Dock ────────── */
     #mobile-dock {
         display: flex;
         position: fixed;
@@ -1004,17 +896,17 @@ html, body {
         align-items: center;
         justify-content: center;
         gap: 8px;
-        padding: 14px 20px;
+        padding: 13px 20px;
         border-radius: var(--radius-pill);
         background: #FFFFFF;
         color: #000000;
         font-family: var(--font);
-        font-size: 14px;
+        font-size: 13px;
         font-weight: 800;
         letter-spacing: 0.3px;
         border: none;
         cursor: pointer;
-        box-shadow: 0 8px 24px rgba(255, 255, 255, 0.15);
+        box-shadow: 0 8px 24px rgba(255, 255, 255, 0.12);
         transition: transform 0.15s, background 0.15s;
     }
 
@@ -1030,14 +922,14 @@ html, body {
     }
 
     .dock-pill {
-        flex: 1.2;
+        flex: 1.3;
         display: flex;
         align-items: center;
         justify-content: center;
         gap: 8px;
-        padding: 14px 16px;
+        padding: 13px 16px;
         border-radius: var(--radius-pill);
-        background: var(--surface-2);
+        background: var(--surface-1);
         border: 1px solid var(--border);
         color: var(--text-primary);
         font-family: var(--mono);
@@ -1057,38 +949,18 @@ html, body {
         flex-shrink: 0;
     }
 
-    .dock-btn-icon {
-        width: 48px;
-        height: 48px;
-        border-radius: 50%;
-        background: var(--surface-2);
-        border: 1px solid var(--border);
-        color: var(--text-primary);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        flex-shrink: 0;
-        transition: transform 0.15s, background 0.15s;
-    }
-
-    .dock-btn-icon:active {
-        transform: scale(0.92);
-        background: var(--surface-3);
-    }
-
-    /* ── Mobile Creator Modal: Bottom Sheet ─────────────────── */
+    /* ── Mobile Portfolio Sheet ─────────────────────────────── */
     .modal-backdrop {
         padding: 0;
         align-items: flex-end;
     }
 
-    .cupertino-modal-card {
+    .portfolio-modal {
         max-width: 100%;
         max-height: 85vh;
         border-radius: 28px 28px 0 0;
         border-bottom: none;
-        animation: modal-slide-up 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+        animation: modal-slide-up 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     @keyframes modal-slide-up {

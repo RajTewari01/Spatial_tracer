@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>MotionW — Air Gesture Engine</title>
-    <meta name="description" content="Real-time hand gesture tracking with MediaPipe and Three.js — by Biswadeep Tewari">
+    <meta name="description" content="MotionW real-time 3D air gesture tracking by alypion. Portfolio of Biswadeep Tewari.">
     <link rel="stylesheet" href="./style.css">
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -36,74 +36,37 @@
         </div>
     </div>
 
-    <!-- Cupertino Top Bar (Apple-Grade Premium Vector Header) -->
+    <!-- Native App Floating Header: Only Two Elements (Left Cylindrical Pill + Right Settings) -->
     <header id="top-bar">
-        <div class="logo">
-            <!-- Apple-style Spatial Motion Vector Glyph -->
-            <div class="logo-icon-wrap" aria-label="MotionW Logo">
-                <svg width="28" height="28" viewBox="0 0 32 32" fill="none" class="apple-motion-svg">
-                    <circle cx="16" cy="16" r="14.5" stroke="#FFFFFF" stroke-width="1.8" stroke-dasharray="72 20" stroke-linecap="round"/>
-                    <path d="M8 18L13 11L16 16L19 11L24 18" stroke="#D4AF37" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
-                    <circle cx="16" cy="6.5" r="1.6" fill="#FFFFFF"/>
+        <!-- Left: Cylindrical Pill with SVG M, Made by alypion, and Live FPS -->
+        <div class="header-left-pill">
+            <div class="pill-m-icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                    <path d="M4 19V5L12 13L20 5V19" stroke="#FFFFFF" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
             </div>
-            <div class="brand-info">
-                <div class="brand-row">
-                    <span class="brand-title">MotionW</span>
-                    <span class="brand-divider">/</span>
-                    <span id="typewriter-text" class="typewriter"></span>
-                    <span class="cursor-blink">|</span>
-                </div>
+            <div class="pill-brand-text">
+                <span class="pill-brand-name">MotionW</span>
+                <span class="pill-brand-sub">Made by alypion</span>
+            </div>
+            <div class="pill-fps-badge">
+                <span id="fps-value" class="fps-num">60</span>
+                <span class="fps-unit">FPS</span>
             </div>
         </div>
 
-        <div class="status-group">
-            <!-- Connection Status Pill -->
-            <div id="connection-indicator" class="cupertino-pill disconnected">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="pill-svg">
-                    <path d="M5 12.55a11 11 0 0 1 14.08 0"/>
-                    <path d="M1.42 9a16 16 0 0 1 21.16 0"/>
-                    <path d="M8.53 16.11a6 6 0 0 1 6.95 0"/>
-                    <circle cx="12" cy="20" r="1" fill="currentColor"/>
-                </svg>
-                <span id="connection-text" class="pill-value">Offline</span>
-            </div>
-
-            <!-- Live Motion FPS Pill -->
-            <div class="cupertino-pill fps-pill">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="pill-svg pulse-svg">
-                    <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
-                </svg>
-                <span id="fps-value" class="pill-value font-mono">60</span>
-                <span class="pill-sub">FPS</span>
-            </div>
-
-            <!-- Hands Tracking Pill -->
-            <div class="cupertino-pill hands-pill">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="pill-svg">
-                    <path d="M18 11V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v3"/>
-                    <path d="M14 10V4a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v6"/>
-                    <path d="M10 10.5V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v8"/>
-                    <path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.83L7 15"/>
-                </svg>
-                <span id="hands-value" class="pill-value font-mono">0</span>
-                <span class="pill-sub">HANDS</span>
-            </div>
-
-            <!-- Header Creator Profile Button -->
-            <button id="btn-owner-header" class="cupertino-btn-pill" onclick="openCreatorModal()" title="Creator Info" aria-label="Creator Profile">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="pill-svg">
-                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                    <circle cx="12" cy="7" r="4"></circle>
-                </svg>
-                <span class="btn-text">CREATOR</span>
-            </button>
-        </div>
+        <!-- Right: Settings Icon Only -->
+        <button id="btn-settings" class="header-settings-btn" onclick="openCreatorModal()" aria-label="Settings and Portfolio" title="Settings & Portfolio">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="3"></circle>
+                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+            </svg>
+        </button>
     </header>
 
-    <!-- Desktop Sidebar Panel (Solid Cupertino Style) -->
+    <!-- Desktop Sidebar Panel (Matte Solid Cupertino Style - Hidden on Mobile) -->
     <aside id="info-panel">
-        <!-- Creator Header Summary -->
+        <!-- Quick Portfolio Card -->
         <div class="panel-section creator-quick-section">
             <div class="creator-quick-card" onclick="openCreatorModal()">
                 <div class="creator-quick-avatar">BT</div>
@@ -152,7 +115,7 @@
         </div>
     </aside>
 
-    <!-- Mobile Cupertino Bottom Dock (Solid Pills) -->
+    <!-- Mobile Bottom Dock (Clean Floating Pills - Zero Neon) -->
     <div id="mobile-dock">
         <button id="mobile-btn-camera" class="dock-btn-primary" onclick="toggleCameraMobile()">
             <svg id="mobile-cam-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
@@ -164,27 +127,22 @@
             <span class="dock-dot"></span>
             <span id="mobile-gesture-label">No Hand</span>
         </div>
-        <button class="dock-btn-icon" onclick="openCreatorModal()" title="Creator Profile" aria-label="Creator Profile">
-            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                <circle cx="12" cy="7" r="4"></circle>
-            </svg>
-        </button>
     </div>
 
     <!-- Gesture Flash (HUD) -->
     <div id="gesture-flash" class="gesture-flash hidden"></div>
 
-    <!-- Cupertino Creator Profile Modal (Biswadeep Tewari - Inspired by mobile_client_v2) -->
+    <!-- Settings: Biswadeep Tewari Full Developer Portfolio Modal (Zero Neon) -->
     <div id="creator-modal" class="modal-backdrop hidden" onclick="handleModalBackdrop(event)">
-        <div class="cupertino-modal-card" onclick="event.stopPropagation()">
-            <!-- Mobile iOS drag bar -->
+        <div class="cupertino-modal-card portfolio-modal" onclick="event.stopPropagation()">
+            <!-- iOS Drag Handle -->
             <div class="modal-handle"></div>
 
+            <!-- Modal Header -->
             <div class="modal-header">
                 <div class="modal-title-group">
-                    <span class="modal-subtitle">AI ARCHITECT & ENGINEER</span>
-                    <h2 class="modal-title">Creator Profile</h2>
+                    <span class="modal-subtitle">DEVELOPER PORTFOLIO</span>
+                    <h2 class="modal-title">Biswadeep Tewari</h2>
                 </div>
                 <button class="modal-close-btn" onclick="closeCreatorModal()" aria-label="Close">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
@@ -195,83 +153,126 @@
             </div>
 
             <div class="modal-scroll-body">
-                <!-- Creator Hero Identity -->
-                <div class="creator-hero-card">
-                    <div class="avatar-ring">
-                        <div class="avatar-monogram">BT</div>
-                    </div>
-                    <div class="creator-identity">
-                        <h3 class="creator-name">Biswadeep Tewari</h3>
-                        <div class="creator-role-badge">AI ARCHITECT & ENGINEER</div>
-                        <div class="creator-handle">@RajTewari01</div>
-                    </div>
-                </div>
-
-                <!-- Satori Zen Card -->
-                <div class="cupertino-card satori-card">
-                    <div class="zen-kanji">悟</div>
-                    <p class="zen-quote">"Where the mind wanders, the engine follows."</p>
-                </div>
-
-                <!-- Section: A Dialogue with Machines -->
-                <div class="cupertino-card">
-                    <div class="card-section-title">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
-                        </svg>
-                        <span>A Dialogue with Machines</span>
-                    </div>
-                    <p class="card-body-text">
-                        I am an architect of unseen threads, weaving human intention into the cold, beautiful logic of machines. By stripping away traditional interfaces, I invite a pure dialogue—where a quiet gesture speaks directly to the ether. This is not just an engine; it is an intimate dance between thought and digital reality.
-                    </p>
-                    <div class="tech-chips-wrap">
-                        <span class="solid-pill-chip">Flutter</span>
-                        <span class="solid-pill-chip">Python / FastAPI</span>
-                        <span class="solid-pill-chip">LangChain</span>
-                        <span class="solid-pill-chip">MediaPipe</span>
-                        <span class="solid-pill-chip">Kotlin</span>
-                        <span class="solid-pill-chip">TensorFlow</span>
+                <!-- Portfolio Hero Card -->
+                <div class="portfolio-hero-card">
+                    <div class="portfolio-avatar">BT</div>
+                    <div class="portfolio-meta">
+                        <h3 class="portfolio-name">Biswadeep Tewari</h3>
+                        <div class="portfolio-role-badge">AI ARCHITECT & ENGINEER</div>
+                        <p class="portfolio-tagline">Architecting intelligent autonomous engines, real-time spatial computing pipelines, and zero-latency human-machine interfaces.</p>
+                        <div class="portfolio-location">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                            <span>MAKAUT University | Kolkata, West Bengal</span>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Section: Invisible Mathematics -->
-                <div class="cupertino-card">
-                    <div class="card-section-title">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                            <rect x="4" y="4" width="16" height="16" rx="2" ry="2"></rect>
-                            <rect x="9" y="9" width="6" height="6"></rect>
-                            <line x1="9" y1="1" x2="9" y2="4"></line>
-                            <line x1="15" y1="1" x2="15" y2="4"></line>
-                            <line x1="9" y1="20" x2="9" y2="23"></line>
-                            <line x1="15" y1="20" x2="15" y2="23"></line>
-                            <line x1="20" y1="9" x2="23" y2="9"></line>
-                            <line x1="20" y1="14" x2="23" y2="14"></line>
-                            <line x1="1" y1="9" x2="4" y2="9"></line>
-                            <line x1="1" y1="14" x2="4" y2="14"></line>
-                        </svg>
-                        <span>Invisible Mathematics</span>
+                <!-- Featured Systems Built -->
+                <div class="portfolio-section">
+                    <h4 class="section-title">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" stroke-width="2.2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                        <span>Featured Systems</span>
+                    </h4>
+                    
+                    <div class="project-card">
+                        <div class="project-header">
+                            <span class="project-name">MotionW (Spatial Tracer)</span>
+                            <span class="project-tag">Spatial Computing</span>
+                        </div>
+                        <p class="project-desc">In-browser real-time 3D air gesture tracking powered by MediaPipe and Three.js with zero server roundtrips, sub-15ms landmark pipeline, and 13 discrete air gestures.</p>
+                        <div class="project-chips">
+                            <span class="mini-chip">Three.js</span>
+                            <span class="mini-chip">MediaPipe</span>
+                            <span class="mini-chip">WebRTC</span>
+                            <span class="mini-chip">Vanilla JS</span>
+                        </div>
                     </div>
-                    <p class="card-body-text">
-                        Operating like a ghost within the system, this tracking heuristic requires no hardware, no gloves, and no tethers. It is simply mathematics in its most elegant, invisible form. Every movement is caught by pure geometric logic—a whisper of motion translated into instantaneous action.
-                    </p>
+
+                    <div class="project-card">
+                        <div class="project-header">
+                            <span class="project-name">Neural Citadel</span>
+                            <span class="project-tag">Agentic Core</span>
+                        </div>
+                        <p class="project-desc">Autonomous multi-agent orchestration infrastructure with self-correcting telemetry, asynchronous execution, and containerized runtime.</p>
+                        <div class="project-chips">
+                            <span class="mini-chip">Python</span>
+                            <span class="mini-chip">FastAPI</span>
+                            <span class="mini-chip">Docker</span>
+                            <span class="mini-chip">Agentic AI</span>
+                        </div>
+                    </div>
+
+                    <div class="project-card">
+                        <div class="project-header">
+                            <span class="project-name">Headless Vision Engine</span>
+                            <span class="project-tag">Computer Vision</span>
+                        </div>
+                        <p class="project-desc">High-performance OpenCV + MediaPipe heuristic streaming landmark data over WebSockets with virtual OS keystroke injection via pynput.</p>
+                        <div class="project-chips">
+                            <span class="mini-chip">Python</span>
+                            <span class="mini-chip">MediaPipe</span>
+                            <span class="mini-chip">pynput</span>
+                            <span class="mini-chip">WebSockets</span>
+                        </div>
+                    </div>
                 </div>
 
-                <!-- Connect / Links Row (Solid Cupertino Buttons) -->
-                <div class="modal-actions-row">
-                    <a href="https://github.com/RajTewari01" target="_blank" rel="noopener noreferrer" class="cupertino-action-btn">
+                <!-- Philosophy / Ethos -->
+                <div class="portfolio-section">
+                    <h4 class="section-title">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" stroke-width="2.2"><circle cx="12" cy="12" r="10"></circle><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                        <span>Philosophy & Architecture</span>
+                    </h4>
+                    <div class="philosophy-card">
+                        <p class="philosophy-text"><strong>A Dialogue with Machines:</strong> Weaving human intention into the cold, beautiful logic of machines. By stripping away traditional interfaces, I invite a pure dialogue—where a quiet gesture speaks directly to the ether. An intimate dance between thought and digital reality.</p>
+                    </div>
+                    <div class="philosophy-card">
+                        <p class="philosophy-text"><strong>Invisible Mathematics:</strong> Operating like a ghost within the system, this tracking heuristic requires no hardware, no gloves, and no tethers. Pure geometric logic translating whisper motions into action.</p>
+                    </div>
+                </div>
+
+                <!-- Satori Zen Quote -->
+                <div class="zen-card">
+                    <span class="zen-symbol">悟</span>
+                    <p class="zen-text">"Where the mind wanders, the engine follows."</p>
+                </div>
+
+                <!-- Technical Arsenal / Skills -->
+                <div class="portfolio-section">
+                    <h4 class="section-title">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" stroke-width="2.2"><rect x="4" y="4" width="16" height="16" rx="2" ry="2"></rect><rect x="9" y="9" width="6" height="6"></rect></svg>
+                        <span>Technical Arsenal</span>
+                    </h4>
+                    <div class="skills-grid">
+                        <span class="skill-pill">Python</span>
+                        <span class="skill-pill">FastAPI</span>
+                        <span class="skill-pill">Flutter / Dart</span>
+                        <span class="skill-pill">MediaPipe</span>
+                        <span class="skill-pill">Three.js</span>
+                        <span class="skill-pill">PyTorch</span>
+                        <span class="skill-pill">LangChain</span>
+                        <span class="skill-pill">Kotlin</span>
+                        <span class="skill-pill">Docker</span>
+                        <span class="skill-pill">WebSockets</span>
+                    </div>
+                </div>
+
+                <!-- Connect Links -->
+                <div class="portfolio-actions">
+                    <a href="https://github.com/RajTewari01" target="_blank" rel="noopener noreferrer" class="portfolio-btn">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
                             <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
                         </svg>
                         <span>GitHub</span>
                     </a>
-                    <a href="mailto:tewari765@gmail.com" class="cupertino-action-btn">
+                    <a href="mailto:tewari765@gmail.com" class="portfolio-btn">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
                             <polyline points="22,6 12,13 2,6"></polyline>
                         </svg>
                         <span>Email</span>
                     </a>
-                    <a href="https://biswadeep.pythonanywhere.com" target="_blank" rel="noopener noreferrer" class="cupertino-action-btn">
+                    <a href="https://biswadeep.pythonanywhere.com" target="_blank" rel="noopener noreferrer" class="portfolio-btn">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <circle cx="12" cy="12" r="10"></circle>
                             <line x1="2" y1="12" x2="22" y2="12"></line>
