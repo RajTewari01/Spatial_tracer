@@ -1,491 +1,1046 @@
 /* ═══════════════════════════════════════════════════════════════
-   MotionW — Luxury Velvet Obsidian Theme
-   Zero neon. Developer-grade elegance matching the Motion splash.
+   MotionW — Cupertino Minimalist Solid Theme
+   ✦ Complete Black OLED Background (#000000)
+   ✦ Solid Color Cupertino Pills — Zero Glassmorphism
+   ✦ Zero Red: Titanium, Pure White, Champagne Gold, Cupertino Green
+   ✦ Widescreen 16:9 PiP Camera Preview
+   ✦ Creator Profile Modal: Biswadeep Tewari (from mobile_client_v2)
    ═══════════════════════════════════════════════════════════════ */
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@300;400;500;600;700&display=swap');
-
 :root {
-    --void:       #070103;
-    --bg:         #0D0206;
-    --surface:    #14040A;
-    --elevated:   #1C060E;
-    --hover:      #2A0A16;
-    --subtle:     #3B0E1E;
+    /* Pure Black & Solid Cupertino Dark Palette */
+    --void:           #000000;
+    --bg-black:       #000000;
+    --surface-1:      #121214;
+    --surface-2:      #1C1C1E;
+    --surface-3:      #2C2C2E;
+    --surface-hover:  #3A3A3C;
 
-    --text:       #FFFFFF;
-    --text-2:     #C9B8BF;
-    --text-3:     #755561;
+    --border:         #2C2C2E;
+    --border-light:   #3A3A3C;
+    --border-hairline:#1F1F22;
 
-    --accent:     #781939;
-    --accent-2:   #A32850;
-    --gold:       #D4AF37;
-    --gold-light: #E6C56E;
-    --rose-soft:  #D47A95;
-    --platinum:   #E8E8EE;
+    --text-primary:   #FFFFFF;
+    --text-secondary: #8E8E93;
+    --text-tertiary:  #636366;
 
-    --glow:       rgba(120, 25, 57, 0.28);
-    --glow-gold:  rgba(212, 175, 55, 0.20);
+    /* Cupertino Monochrome & Accent Tokens — NO RED */
+    --gold:           #D4AF37;
+    --gold-light:     #E6C56E;
+    --gold-subtle:    #C5A059;
+    --gold-pill:      #242014;
+    --green-live:     #30D158;
+    --titanium:       #E5E5EA;
 
-    --border:     rgba(120, 25, 57, 0.22);
-    --border-2:   rgba(255, 255, 255, 0.08);
-    --glass:      rgba(13, 2, 6, 0.90);
+    --font:           -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Inter", system-ui, sans-serif;
+    --mono:           "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
 
-    --font:       'Inter', system-ui, -apple-system, sans-serif;
-    --mono:       'JetBrains Mono', monospace;
-    --r:          16px;
-    --r-sm:       10px;
+    --radius-pill:    9999px;
+    --radius-card:    20px;
+    --radius-sm:      10px;
 }
 
-* { margin: 0; padding: 0; box-sizing: border-box; }
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
 
 html, body {
-    width: 100%; height: 100%; overflow: hidden;
-    font-family: var(--font);
-    color: var(--text);
-    background: var(--void);
-    -webkit-font-smoothing: antialiased;
-}
-
-::selection { background: var(--accent); color: #fff; }
-::-webkit-scrollbar { width: 3px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--text-3); border-radius: 3px; }
-
-/* ── Canvas ─────────────────────────────────────────────────── */
-#canvas-container { position: fixed; inset: 0; z-index: 0; background: var(--void); }
-
-/* ── Camera Panel ───────────────────────────────────────────── */
-#camera-panel {
-    position: fixed; bottom: 24px; left: 24px;
-    z-index: 120; width: 300px;
-    border-radius: var(--r);
-    background: var(--glass);
-    backdrop-filter: blur(40px) saturate(180%);
-    -webkit-backdrop-filter: blur(40px) saturate(180%);
-    border: 1px solid var(--border);
+    width: 100%;
+    height: 100%;
     overflow: hidden;
-    box-shadow: 0 24px 80px rgba(0,0,0,0.85), 0 0 1px rgba(255,255,255,0.08);
-    transition: width 0.5s cubic-bezier(0.16,1,0.3,1);
-}
-#camera-panel.expanded { width: 520px; }
-
-.camera-header {
-    display: flex; align-items: center; gap: 8px;
-    padding: 10px 16px;
-    font-family: var(--mono); font-size: 10px; font-weight: 600;
-    letter-spacing: 2px; color: var(--text-2);
-    border-bottom: 1px solid var(--border);
-    background: rgba(120, 25, 57, 0.08);
+    font-family: var(--font);
+    color: var(--text-primary);
+    background: var(--bg-black);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
-.cam-dot {
-    width: 6px; height: 6px; border-radius: 50%;
-    background: var(--accent-2);
-    box-shadow: 0 0 6px var(--glow);
-    animation: cam-pulse 2s ease-in-out infinite;
+::selection {
+    background: var(--gold);
+    color: #000000;
 }
 
-.btn-icon {
-    margin-left: auto; background: transparent;
-    border: 1px solid var(--border-2); border-radius: 6px;
-    color: var(--text-2); padding: 4px 6px;
-    cursor: pointer; transition: all 0.2s; display: flex; align-items: center;
+/* ── 3D Canvas ──────────────────────────────────────────────── */
+#canvas-container {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    background: var(--bg-black);
 }
-.btn-icon:hover { color: var(--text); border-color: var(--accent); background: var(--hover); }
 
-.camera-body { position: relative; width: 100%; aspect-ratio: 16/9; background: #000; }
-#webcam { width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); }
-#hand-overlay { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
-
-/* ── Top Bar ────────────────────────────────────────────────── */
+/* ── Top Bar (Solid Cupertino Header) ────────────────────────── */
 #top-bar {
-    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 0 28px; height: 56px;
-    background: var(--glass);
-    backdrop-filter: blur(40px) saturate(180%);
-    -webkit-backdrop-filter: blur(40px) saturate(180%);
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 24px;
+    height: 56px;
+    background: var(--bg-black);
     border-bottom: 1px solid var(--border);
-    box-shadow: 0 4px 24px rgba(0,0,0,0.5);
 }
 
-.logo { display: flex; align-items: center; gap: 14px; }
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
 
 .logo-mark {
-    font-family: var(--mono); font-size: 12px; font-weight: 700;
-    color: #FFFFFF;
-    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 100%);
-    padding: 5px 9px; border-radius: 6px;
-    border: 1px solid rgba(255,255,255,0.15);
-    letter-spacing: 1.5px; line-height: 1;
-    box-shadow: 0 2px 10px var(--glow);
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 800;
+    color: #000000;
+    background: #FFFFFF;
+    padding: 4px 8px;
+    border-radius: 6px;
+    letter-spacing: 1.5px;
+    line-height: 1;
 }
 
-.logo-typewriter { display: flex; align-items: center; }
+.logo-typewriter {
+    display: flex;
+    align-items: center;
+}
 
 .typewriter {
-    font-family: var(--mono); font-size: 15px; font-weight: 600;
-    color: var(--text); letter-spacing: 0.5px;
+    font-family: var(--mono);
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary);
+    letter-spacing: 0.5px;
 }
 
 .cursor-blink {
-    font-family: var(--mono); font-size: 16px; font-weight: 300;
-    color: var(--gold); animation: blink 1s step-end infinite;
-    margin-left: 2px;
+    font-family: var(--mono);
+    font-size: 14px;
+    font-weight: 300;
+    color: var(--gold);
+    animation: blink 1s step-end infinite;
+    margin-left: 3px;
 }
 
-.status-group { display: flex; align-items: center; gap: 10px; }
+@keyframes blink {
+    50% { opacity: 0; }
+}
 
+.status-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Solid Cupertino Pills */
 .indicator {
-    display: flex; align-items: center; gap: 6px;
-    padding: 6px 14px; border-radius: 100px;
-    font-family: var(--mono); font-size: 10px; font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: var(--radius-pill);
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 600;
     letter-spacing: 0.5px;
-    background: var(--surface); border: 1px solid var(--border);
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+}
+
+.indicator.connected {
+    color: var(--text-primary);
+    border-color: var(--border-light);
+}
+
+.indicator.connected .dot {
+    background: var(--green-live);
+    box-shadow: 0 0 8px rgba(48, 209, 88, 0.4);
 }
 
 .indicator .dot {
-    width: 6px; height: 6px; border-radius: 50%;
-}
-.indicator.connected .dot {
-    background: var(--gold);
-    box-shadow: 0 0 8px var(--glow-gold);
-    animation: cam-pulse 2s ease-in-out infinite;
-}
-.indicator.disconnected .dot {
-    background: var(--text-3);
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--text-tertiary);
+    transition: background 0.3s;
 }
 
 .stat-pill {
-    display: flex; align-items: center; gap: 6px;
-    padding: 6px 12px; border-radius: 100px;
-    background: var(--surface); border: 1px solid var(--border);
-    font-family: var(--mono); font-size: 10px; font-weight: 600;
-}
-.stat-pill span:first-child { color: var(--gold-light); }
-.stat-label { color: var(--text-3); font-weight: 500; letter-spacing: 1px; }
-
-/* ── Info Panel ─────────────────────────────────────────────── */
-#info-panel {
-    position: fixed; top: 68px; right: 20px;
-    width: 280px; max-height: calc(100vh - 88px);
-    z-index: 100; display: flex; flex-direction: column;
-    background: var(--glass);
-    backdrop-filter: blur(40px) saturate(180%);
-    -webkit-backdrop-filter: blur(40px) saturate(180%);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 6px 12px;
+    border-radius: var(--radius-pill);
+    font-family: var(--mono);
+    font-size: 11px;
+    background: var(--surface-2);
     border: 1px solid var(--border);
-    border-radius: var(--r); overflow-y: auto;
-    box-shadow: 0 24px 80px rgba(0,0,0,0.85);
+    color: var(--text-primary);
+}
+
+.stat-label {
+    font-size: 9px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    letter-spacing: 1px;
+}
+
+/* Header Settings / Creator Button */
+.cupertino-btn-pill {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border-radius: var(--radius-pill);
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    color: var(--text-primary);
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.cupertino-btn-pill:hover {
+    background: var(--surface-3);
+    border-color: var(--border-light);
+    color: var(--gold);
+}
+
+.cupertino-btn-pill:active {
+    transform: scale(0.96);
+}
+
+/* ── Camera PiP Panel (Completely 16:9 Widescreen Rectangle) ── */
+#camera-panel {
+    position: fixed;
+    bottom: 24px;
+    left: 24px;
+    z-index: 120;
+    width: 280px;
+    border-radius: 16px;
+    background: var(--surface-1);
+    border: 1px solid var(--border);
+    overflow: hidden;
+    box-shadow: 0 16px 48px rgba(0,0,0,0.85);
+    transition: width 0.35s cubic-bezier(0.16, 1, 0.3, 1), transform 0.2s;
+}
+
+#camera-panel.expanded {
+    width: 440px;
+}
+
+.camera-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    color: var(--text-secondary);
+    background: var(--surface-2);
+    border-bottom: 1px solid var(--border);
+}
+
+.cam-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--green-live);
+    animation: cam-pulse 2s ease-in-out infinite;
+}
+
+@keyframes cam-pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.85); }
+}
+
+.btn-icon {
+    margin-left: auto;
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text-secondary);
+    padding: 3px 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.btn-icon:hover {
+    color: var(--text-primary);
+    background: var(--surface-3);
+    border-color: var(--border-light);
+}
+
+/* Completely 16:9 widescreen rectangle */
+.camera-body {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    background: #000000;
+    overflow: hidden;
+}
+
+#webcam {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transform: scaleX(-1);
+    display: block;
+}
+
+#hand-overlay {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+/* ── Desktop Right Panel (Solid Cupertino Cards) ────────────── */
+#info-panel {
+    position: fixed;
+    top: 68px;
+    right: 24px;
+    bottom: 24px;
+    width: 330px;
+    z-index: 90;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-right: 4px;
 }
 
 .panel-section {
-    padding: 14px 16px;
-    border-bottom: 1px solid var(--border);
+    background: var(--surface-1);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 16px;
 }
-.panel-section:last-child { border-bottom: none; }
 
 .panel-section h3 {
-    font-family: var(--mono); font-size: 9px; font-weight: 700;
-    text-transform: uppercase; letter-spacing: 2px;
-    color: var(--text-3); margin-bottom: 10px;
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    margin-bottom: 12px;
 }
 
-/* ── About Card ─────────────────────────────────────────────── */
-.about-card {
-    padding: 12px 14px;
-    background: var(--surface);
-    border-radius: var(--r-sm);
-    border: 1px solid var(--border);
+/* Quick Creator Header in Sidebar */
+.creator-quick-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    transition: transform 0.2s ease;
 }
-.about-name {
-    font-size: 14px; font-weight: 700; color: var(--text);
-    margin-bottom: 2px;
-}
-.about-handle {
-    font-family: var(--mono); font-size: 11px; font-weight: 600;
-    color: var(--gold); margin-bottom: 8px;
-}
-.about-bio {
-    font-size: 11px; line-height: 1.6; color: var(--text-2);
-    min-height: 32px;
-}
-.about-bio .bio-cursor {
-    display: inline-block; width: 1px; height: 12px;
-    background: var(--gold); animation: blink 0.8s step-end infinite;
-    vertical-align: middle; margin-left: 2px;
-}
-.about-links { margin-top: 10px; display: flex; gap: 8px; }
-.about-link {
-    font-family: var(--mono); font-size: 10px; font-weight: 600;
-    color: var(--text-2); text-decoration: none;
-    padding: 4px 10px; border-radius: 6px;
-    border: 1px solid var(--border);
-    background: rgba(120, 25, 57, 0.12);
-    transition: all 0.2s; letter-spacing: 0.5px;
-}
-.about-link:hover { color: #fff; border-color: var(--accent); background: var(--accent); }
 
-/* ── Gesture Display ────────────────────────────────────────── */
+.creator-quick-card:hover {
+    opacity: 0.9;
+}
+
+.creator-quick-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--surface-2);
+    border: 1.5px solid var(--gold);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 800;
+    color: var(--gold);
+}
+
+.creator-quick-meta {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.creator-quick-name {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.creator-quick-role {
+    font-family: var(--mono);
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    color: var(--gold);
+}
+
+/* Gesture Tag Display */
 .gesture-display {
-    min-height: 36px;
-    display: flex; flex-direction: column; gap: 6px;
+    min-height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
+
 .gesture-placeholder {
-    font-family: var(--mono); font-size: 11px; color: var(--text-3);
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-tertiary);
 }
 
 .gesture-tag {
-    display: inline-flex; align-items: center; gap: 8px;
-    padding: 6px 12px; border-radius: 6px;
-    font-family: var(--mono); font-size: 11px; font-weight: 700;
-    letter-spacing: 1px; text-transform: uppercase;
-    animation: tag-in 0.2s cubic-bezier(0.34,1.56,0.64,1);
-    background: rgba(120, 25, 57, 0.18);
-    border: 1px solid var(--border);
-    color: #FFFFFF;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 16px;
+    border-radius: var(--radius-pill);
+    background: #FFFFFF;
+    color: #000000;
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    animation: pop-in 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.gesture-tag .tag-dot {
-    width: 6px; height: 6px; border-radius: 50%;
-    background: var(--gold);
+@keyframes pop-in {
+    0% { transform: scale(0.92); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+/* Finger Grid */
+.finger-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 6px;
+}
+
+.finger {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 4px;
+    border-radius: var(--radius-sm);
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    transition: all 0.2s ease;
+}
+
+.finger.extended {
+    background: var(--surface-3);
+    border-color: var(--gold);
+    color: var(--gold);
+}
+
+/* Event Log */
+.event-log {
+    max-height: 110px;
+    overflow-y: auto;
+    font-family: var(--mono);
+    font-size: 10px;
+    line-height: 1.8;
+}
+
+.event-entry {
+    display: flex;
+    gap: 8px;
+    color: var(--text-secondary);
+}
+
+.event-entry .time {
+    color: var(--text-tertiary);
     flex-shrink: 0;
 }
 
-/* ── Finger Status ──────────────────────────────────────────── */
-.finger-grid {
-    display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px;
-}
-.finger {
-    font-family: var(--mono); font-size: 8px; font-weight: 600;
-    padding: 6px 2px; text-align: center; border-radius: 6px;
-    background: var(--surface); border: 1px solid var(--border);
-    color: var(--text-3); transition: all 0.2s;
-}
-.finger.active {
-    background: rgba(120, 25, 57, 0.35);
-    border-color: var(--accent);
-    color: #FFFFFF;
-    box-shadow: 0 0 10px var(--glow);
+.event-entry .ev {
+    color: var(--text-primary);
 }
 
-/* ── Event Log ──────────────────────────────────────────────── */
-.event-log {
-    max-height: 120px; overflow-y: auto;
-    font-family: var(--mono); font-size: 10px;
-    color: var(--text-2); line-height: 1.8;
+/* Buttons (Solid Cupertino Style) */
+.controls {
+    display: flex;
+    gap: 8px;
 }
-.event-entry {
-    padding: 2px 0; border-bottom: 1px solid rgba(255,255,255,0.03);
-    animation: slide-in 0.12s ease-out;
-}
-.event-entry .time { color: var(--text-3); font-size: 9px; }
-.event-entry .ev { color: var(--gold-light); font-weight: 500; }
-
-/* ── Buttons ────────────────────────────────────────────────── */
-.controls { display: flex; flex-direction: column; gap: 8px; }
 
 .btn {
-    width: 100%; padding: 11px 16px; border: none;
-    border-radius: var(--r-sm); font-family: var(--mono);
-    font-size: 11px; font-weight: 700; letter-spacing: 1.5px;
-    cursor: pointer; transition: all 0.25s cubic-bezier(0.16,1,0.3,1);
-    text-transform: uppercase;
+    flex: 1;
+    padding: 12px 16px;
+    border-radius: var(--radius-pill);
+    font-family: var(--font);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: center;
 }
+
 .btn-primary {
-    background: linear-gradient(135deg, var(--accent) 0%, #4F1025 100%);
-    color: #FFFFFF;
-    border: 1px solid rgba(255,255,255,0.18);
-    box-shadow: 0 4px 18px var(--glow), inset 0 1px 0 rgba(255,255,255,0.2);
+    background: #FFFFFF;
+    color: #000000;
 }
+
 .btn-primary:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 6px 24px var(--glow);
-    border-color: rgba(255,255,255,0.3);
+    background: var(--titanium);
 }
-.btn-primary:disabled { opacity: 0.35; cursor: default; transform: none; }
+
+.btn-primary:active {
+    transform: scale(0.98);
+}
 
 .btn-secondary {
-    background: var(--surface); color: var(--text-2);
+    background: var(--surface-2);
+    color: var(--text-primary);
     border: 1px solid var(--border);
 }
-.btn-secondary:hover { background: var(--hover); color: #fff; border-color: var(--border-2); }
 
-/* ── Gesture Flash ──────────────────────────────────────────── */
-.gesture-flash {
-    position: fixed; top: 50%; left: 50%;
-    transform: translate(-50%, -50%); z-index: 200;
-    font-family: var(--mono); font-size: 36px; font-weight: 800;
-    color: #FFFFFF; letter-spacing: 4px; text-transform: uppercase;
-    text-shadow: 0 4px 20px rgba(0,0,0,0.95), 0 0 30px var(--glow);
-    pointer-events: none; opacity: 0;
+.btn-secondary:hover {
+    background: var(--surface-3);
+    border-color: var(--border-light);
 }
-.gesture-flash.visible { opacity: 1; animation: flash-in 0.7s cubic-bezier(0.16,1,0.3,1); }
-.gesture-flash.hidden { opacity: 0; }
 
-/* ── Animations ─────────────────────────────────────────────── */
-@keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0; } }
-@keyframes cam-pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.35; } }
-@keyframes tag-in { 0% { transform: translateX(-6px); opacity: 0; } 100% { transform: translateX(0); opacity: 1; } }
-@keyframes slide-in { 0% { transform: translateX(-4px); opacity: 0; } 100% { transform: translateX(0); opacity: 1; } }
-@keyframes flash-in {
-    0%   { transform: translate(-50%,-50%) scale(0.7); opacity: 0; }
-    30%  { transform: translate(-50%,-50%) scale(1.05); opacity: 1; }
-    100% { transform: translate(-50%,-50%) scale(1); opacity: 0; }
+.btn-secondary:active {
+    transform: scale(0.98);
+}
+
+/* HUD Gesture Flash */
+.gesture-flash {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 150;
+    pointer-events: none;
+    font-family: var(--mono);
+    font-size: 32px;
+    font-weight: 900;
+    letter-spacing: 4px;
+    color: var(--gold);
+    text-shadow: 0 0 20px rgba(212, 175, 55, 0.4);
+    opacity: 0;
+    transition: opacity 0.2s, transform 0.2s;
+}
+
+.gesture-flash.visible {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.08);
+}
+
+.gesture-flash.hidden {
+    opacity: 0;
+}
+
+/* ── Mobile Cupertino Bottom Dock ───────────────────────────── */
+#mobile-dock {
+    display: none;
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   PREMIUM MOBILE UI (Matching Splash Screen)
-   Velvet Wine Glass Bottom Sheet · Obsidian PiP · No Neon
+   CUPERTINO CREATOR PROFILE MODAL
+   (Directly inspired by mobile_client_v2/lib/screens/creator_profile.dart)
    ═══════════════════════════════════════════════════════════════ */
-@media (max-width: 768px) {
-    html, body { overflow: hidden; height: 100%; }
 
-    /* ── Top bar: Luxury Slim Glass Bar ─────────────────────── */
-    #top-bar {
-        padding: 0 12px; height: 42px;
-        background: rgba(13, 2, 6, 0.88);
-        border-bottom: 1px solid var(--border);
-        box-shadow: 0 2px 16px rgba(0,0,0,0.6);
-    }
-    .logo { gap: 8px; }
-    .logo-mark {
-        font-size: 10px; padding: 3px 6px;
-        background: linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 100%);
-    }
-    .typewriter { font-size: 11px; }
-    .cursor-blink { font-size: 12px; }
-    .status-group { gap: 6px; }
-    .indicator { padding: 3px 8px; font-size: 8px; }
-    .stat-pill { padding: 3px 7px; font-size: 8px; }
-
-    /* ── Camera: Floating Draggable Luxury PiP ──────────────── */
-    #camera-panel {
-        position: fixed !important;
-        bottom: 52vh; right: 12px;
-        top: auto; left: auto;
-        width: 156px !important;
-        height: auto;
-        border-radius: 12px !important;
-        z-index: 130;
-        background: rgba(13, 2, 6, 0.90);
-        backdrop-filter: blur(35px) saturate(180%);
-        -webkit-backdrop-filter: blur(35px) saturate(180%);
-        border: 1px solid var(--border);
-        box-shadow: 0 8px 32px rgba(0,0,0,0.85);
-        touch-action: none;
-        cursor: grab;
-        transition: width 0.3s ease;
-        overflow: hidden;
-    }
-    #camera-panel.expanded {
-        width: 280px !important;
-    }
-    .camera-header {
-        padding: 4px 10px; font-size: 8px;
-        letter-spacing: 1.5px;
-    }
-    .cam-dot { width: 5px; height: 5px; }
-    .camera-body { aspect-ratio: 4/3; width: 100%; height: auto; }
-
-    /* ── Info panel: Velvet Obsidian Bottom Sheet ──────────── */
-    #info-panel {
-        position: fixed;
-        bottom: 0; left: 0; right: 0; top: auto;
-        width: 100%;
-        height: auto;
-        max-height: 88vh;
-        z-index: 60;
-        border-radius: 20px 20px 0 0;
-        background: rgba(13, 2, 6, 0.94);
-        backdrop-filter: blur(40px) saturate(180%);
-        -webkit-backdrop-filter: blur(40px) saturate(180%);
-        border: 1px solid var(--border);
-        border-bottom: none;
-        box-shadow: 0 -12px 48px rgba(0,0,0,0.85);
-        overflow-y: auto;
-        padding-bottom: env(safe-area-inset-bottom, 8px);
-        transition: height 0.35s cubic-bezier(0.16,1,0.3,1);
-    }
-    #info-panel.sheet-full {
-        height: 94vh;
-        border-radius: 0;
-    }
-    /* Luxury Glass Drag Handle */
-    #info-panel::before {
-        content: '';
-        display: block;
-        width: 40px; height: 4px;
-        background: rgba(255,255,255,0.22);
-        border-radius: 4px;
-        margin: 10px auto 6px;
-    }
-
-    /* ── Sections ───────────────────────────────────────────── */
-    .panel-section {
-        padding: 10px 16px;
-        border-bottom: 1px solid rgba(120, 25, 57, 0.15);
-        background: transparent;
-    }
-    .panel-section:last-child { border-bottom: none; }
-    .panel-section h3 { font-size: 8px; margin-bottom: 6px; letter-spacing: 2px; }
-
-    .gesture-display { min-height: 24px; }
-    .gesture-tag { font-size: 10px; padding: 5px 12px; }
-
-    .finger-grid { grid-template-columns: repeat(5, 1fr); gap: 4px; }
-    .finger { font-size: 8px; padding: 5px 2px; }
-
-    .event-log { max-height: 60px; font-size: 9px; line-height: 1.7; }
-
-    .controls { flex-direction: row; gap: 8px; padding: 10px 16px; }
-    .btn { padding: 9px 12px; font-size: 10px; flex: 1; }
-
-    .about-name { font-size: 13px; }
-    .about-handle { font-size: 10px; }
-    .about-bio { font-size: 10px; }
-    .about-link { font-size: 9px; padding: 4px 8px; }
-    .about-card { padding: 8px 12px; }
-
-    .gesture-flash { font-size: 20px; letter-spacing: 2px; }
-    #canvas-container { z-index: 0; }
+.modal-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 300;
+    background: rgba(0, 0, 0, 0.85);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 0.25s ease, visibility 0.25s ease;
 }
 
-/* ── Immersive Toggle Button (Luxury Glass Pill) ───────────── */
-.immersive-toggle { display: none; }
+.modal-backdrop.hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+.cupertino-modal-card {
+    width: 100%;
+    max-width: 520px;
+    max-height: 88vh;
+    background: var(--surface-1);
+    border: 1px solid var(--border);
+    border-radius: 28px;
+    box-shadow: 0 32px 80px rgba(0, 0, 0, 0.95);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    animation: modal-enter 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes modal-enter {
+    0% { transform: scale(0.94) translateY(12px); opacity: 0; }
+    100% { transform: scale(1) translateY(0); opacity: 1; }
+}
+
+.modal-handle {
+    display: none;
+}
+
+.modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 24px 16px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface-1);
+}
+
+.modal-title-group {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.modal-subtitle {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: var(--gold);
+}
+
+.modal-title {
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--text-primary);
+    letter-spacing: -0.5px;
+}
+
+.modal-close-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.modal-close-btn:hover {
+    background: var(--surface-3);
+    color: var(--text-primary);
+    border-color: var(--border-light);
+}
+
+.modal-scroll-body {
+    padding: 20px 24px 28px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+/* Creator Hero Card */
+.creator-hero-card {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    padding: 20px;
+    border-radius: 20px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+}
+
+.avatar-ring {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    background: #000000;
+    border: 2px solid var(--gold);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 24px rgba(212, 175, 55, 0.25);
+    flex-shrink: 0;
+}
+
+.avatar-monogram {
+    font-family: var(--mono);
+    font-size: 24px;
+    font-weight: 900;
+    color: var(--gold);
+    letter-spacing: 1px;
+}
+
+.creator-identity {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.creator-name {
+    font-size: 22px;
+    font-weight: 900;
+    color: var(--text-primary);
+    letter-spacing: -0.5px;
+    line-height: 1.1;
+}
+
+.creator-role-badge {
+    align-self: flex-start;
+    padding: 4px 10px;
+    border-radius: var(--radius-pill);
+    background: var(--gold-pill);
+    border: 1px solid rgba(212, 175, 55, 0.35);
+    font-family: var(--mono);
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 1.8px;
+    color: var(--gold-light);
+}
+
+.creator-handle {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-secondary);
+}
+
+/* Cupertino Card Content */
+.cupertino-card {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+/* Satori Zen Card */
+.satori-card {
+    align-items: center;
+    text-align: center;
+    padding: 18px 24px;
+    background: #000000;
+    border-color: var(--border);
+}
+
+.zen-kanji {
+    font-size: 44px;
+    font-weight: 800;
+    color: var(--gold);
+    line-height: 1;
+}
+
+.zen-quote {
+    font-style: italic;
+    font-size: 13px;
+    color: var(--text-secondary);
+    letter-spacing: 0.3px;
+}
+
+/* Section Header in Card */
+.card-section-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text-primary);
+    letter-spacing: -0.2px;
+}
+
+.card-body-text {
+    font-size: 13px;
+    line-height: 1.65;
+    color: var(--text-secondary);
+}
+
+/* Tech Chips (Solid Pills) */
+.tech-chips-wrap {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 4px;
+}
+
+.solid-pill-chip {
+    padding: 6px 14px;
+    border-radius: var(--radius-pill);
+    background: var(--surface-3);
+    border: 1px solid var(--border-light);
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--titanium);
+    letter-spacing: 0.3px;
+}
+
+/* Action Links (Solid Cupertino Buttons) */
+.modal-actions-row {
+    display: flex;
+    gap: 10px;
+    margin-top: 4px;
+}
+
+.cupertino-action-btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 14px;
+    border-radius: var(--radius-pill);
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    color: var(--text-primary);
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 700;
+    transition: all 0.2s ease;
+}
+
+.cupertino-action-btn:hover {
+    background: var(--surface-3);
+    border-color: var(--border-light);
+    color: var(--gold);
+}
+
+.cupertino-action-btn:active {
+    transform: scale(0.97);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   RESPONSIVE MOBILE STYLES (Cupertino Mobile Polish)
+   ═══════════════════════════════════════════════════════════════ */
 
 @media (max-width: 768px) {
-    .immersive-toggle {
-        display: flex; position: fixed;
-        z-index: 200; width: 34px; height: 34px;
-        align-items: center; justify-content: center;
-        background: rgba(13, 2, 6, 0.88);
-        backdrop-filter: blur(20px);
-        -webkit-backdrop-filter: blur(20px);
+    /* Hide desktop sidebar on mobile to keep screen clean */
+    #info-panel {
+        display: none !important;
+    }
+
+    #top-bar {
+        padding: 0 16px;
+        height: 50px;
+    }
+
+    .logo-mark {
+        font-size: 10px;
+        padding: 3px 6px;
+    }
+
+    .typewriter {
+        font-size: 12px;
+    }
+
+    .status-group {
+        gap: 6px;
+    }
+
+    .indicator {
+        padding: 4px 8px;
+        font-size: 9px;
+    }
+
+    .stat-pill {
+        padding: 4px 8px;
+        font-size: 9px;
+    }
+
+    .cupertino-btn-pill {
+        padding: 4px 10px;
+        font-size: 9px;
+    }
+
+    .cupertino-btn-pill .btn-text {
+        display: none;
+    }
+
+    /* ── Mobile PiP Camera: Completely 16:9 Widescreen Rectangle ── */
+    #camera-panel {
+        position: fixed !important;
+        top: 60px !important;
+        right: 14px !important;
+        left: auto !important;
+        bottom: auto !important;
+        width: 140px !important;
+        border-radius: 14px !important;
+        box-shadow: 0 12px 32px rgba(0, 0, 0, 0.9) !important;
+        border: 1px solid var(--border) !important;
+        z-index: 120 !important;
+        touch-action: none;
+        cursor: grab;
+    }
+
+    #camera-panel.expanded {
+        width: 240px !important;
+    }
+
+    .camera-header {
+        padding: 4px 10px;
+        font-size: 8px;
+        letter-spacing: 1px;
+    }
+
+    .camera-body {
+        aspect-ratio: 16 / 9 !important;
+        width: 100% !important;
+        height: auto !important;
+    }
+
+    /* ── Mobile Bottom Cupertino Dock (Solid Pills) ────────── */
+    #mobile-dock {
+        display: flex;
+        position: fixed;
+        bottom: 24px;
+        left: 16px;
+        right: 16px;
+        z-index: 140;
+        align-items: center;
+        gap: 8px;
+        padding-bottom: env(safe-area-inset-bottom, 0px);
+    }
+
+    .dock-btn-primary {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 14px 20px;
+        border-radius: var(--radius-pill);
+        background: #FFFFFF;
+        color: #000000;
+        font-family: var(--font);
+        font-size: 14px;
+        font-weight: 800;
+        letter-spacing: 0.3px;
+        border: none;
+        cursor: pointer;
+        box-shadow: 0 8px 24px rgba(255, 255, 255, 0.15);
+        transition: transform 0.15s, background 0.15s;
+    }
+
+    .dock-btn-primary.active {
+        background: var(--surface-3);
+        color: #FFFFFF;
+        border: 1px solid var(--border-light);
+        box-shadow: none;
+    }
+
+    .dock-btn-primary:active {
+        transform: scale(0.96);
+    }
+
+    .dock-pill {
+        flex: 1.2;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 14px 16px;
+        border-radius: var(--radius-pill);
+        background: var(--surface-2);
         border: 1px solid var(--border);
+        color: var(--text-primary);
+        font-family: var(--mono);
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .dock-dot {
+        width: 6px;
+        height: 6px;
         border-radius: 50%;
-        color: var(--text-2); cursor: pointer;
-        box-shadow: 0 4px 16px rgba(0,0,0,0.6);
-        transition: all 0.3s ease;
-        bottom: 14px; left: 14px; right: auto; top: auto;
+        background: var(--gold);
+        flex-shrink: 0;
     }
-    .immersive-toggle:active {
-        color: #fff; border-color: var(--accent);
+
+    .dock-btn-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        background: var(--surface-2);
+        border: 1px solid var(--border);
+        color: var(--text-primary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        flex-shrink: 0;
+        transition: transform 0.15s, background 0.15s;
+    }
+
+    .dock-btn-icon:active {
         transform: scale(0.92);
-        background: var(--accent);
+        background: var(--surface-3);
     }
-    .immersive-toggle svg { transition: transform 0.3s ease; }
-    .immersive-toggle.flipped svg { transform: rotate(180deg); }
 
-    body.immersive #top-bar {
-        transform: translateY(-100%); opacity: 0; pointer-events: none;
+    /* ── Mobile Creator Modal: Bottom Sheet ─────────────────── */
+    .modal-backdrop {
+        padding: 0;
+        align-items: flex-end;
     }
-    body.immersive #info-panel {
-        transform: translateY(100%); opacity: 0; pointer-events: none;
-    }
-    body.immersive .immersive-toggle { bottom: 16px; }
 
-    #top-bar, #info-panel, #camera-panel {
-        transition: all 0.4s cubic-bezier(0.16,1,0.3,1);
+    .cupertino-modal-card {
+        max-width: 100%;
+        max-height: 85vh;
+        border-radius: 28px 28px 0 0;
+        border-bottom: none;
+        animation: modal-slide-up 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes modal-slide-up {
+        0% { transform: translateY(100%); }
+        100% { transform: translateY(0); }
+    }
+
+    .modal-handle {
+        display: block;
+        width: 38px;
+        height: 5px;
+        border-radius: 3px;
+        background: var(--border-light);
+        margin: 10px auto 4px;
+        flex-shrink: 0;
+    }
+
+    .modal-header {
+        padding: 12px 20px 14px;
+    }
+
+    .modal-scroll-body {
+        padding: 16px 20px 32px;
+        padding-bottom: calc(32px + env(safe-area-inset-bottom, 0px));
     }
 }
