@@ -1,9 +1,10 @@
 /* ═══════════════════════════════════════════════════════════════
-   MotionW — Cupertino Minimalist Solid Theme
+   MotionW — Cupertino Minimalist Solid Theme (Apple Caliber)
    ✦ Complete Black OLED Background (#000000)
-   ✦ Solid Color Cupertino Pills — Zero Glassmorphism
+   ✦ Solid Cupertino Pills with Crisp Vector SVGs — Zero Glassmorphism
    ✦ Zero Red: Titanium, Pure White, Champagne Gold, Cupertino Green
    ✦ Widescreen 16:9 PiP Camera Preview
+   ✦ Live Continuous FPS Motion Indicator
    ✦ Creator Profile Modal: Biswadeep Tewari (from mobile_client_v2)
    ═══════════════════════════════════════════════════════════════ */
 
@@ -12,13 +13,13 @@
     --void:           #000000;
     --bg-black:       #000000;
     --surface-1:      #121214;
-    --surface-2:      #1C1C1E;
-    --surface-3:      #2C2C2E;
-    --surface-hover:  #3A3A3C;
+    --surface-2:      #161618;
+    --surface-3:      #222225;
+    --surface-hover:  #2C2C30;
 
-    --border:         #2C2C2E;
-    --border-light:   #3A3A3C;
-    --border-hairline:#1F1F22;
+    --border:         #242427;
+    --border-light:   #343438;
+    --border-hairline:#1A1A1D;
 
     --text-primary:   #FFFFFF;
     --text-secondary: #8E8E93;
@@ -32,7 +33,7 @@
     --green-live:     #30D158;
     --titanium:       #E5E5EA;
 
-    --font:           -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Inter", system-ui, sans-serif;
+    --font:           -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Inter", system-ui, sans-serif;
     --mono:           "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
 
     --radius-pill:    9999px;
@@ -71,7 +72,7 @@ html, body {
     background: var(--bg-black);
 }
 
-/* ── Top Bar (Solid Cupertino Header) ────────────────────────── */
+/* ── Top Bar (Apple-Grade Premium Vector Header) ─────────────── */
 #top-bar {
     position: fixed;
     top: 0;
@@ -81,138 +82,189 @@ html, body {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0 24px;
-    height: 56px;
+    padding: 0 28px;
+    height: 64px;
     background: var(--bg-black);
-    border-bottom: 1px solid var(--border);
+    border-bottom: 1px solid var(--border-hairline);
 }
 
 .logo {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 14px;
 }
 
-.logo-mark {
-    font-family: var(--mono);
-    font-size: 11px;
-    font-weight: 800;
-    color: #000000;
-    background: #FFFFFF;
-    padding: 4px 8px;
-    border-radius: 6px;
-    letter-spacing: 1.5px;
-    line-height: 1;
-}
-
-.logo-typewriter {
+/* Apple-style Motion Glyph Wrap */
+.logo-icon-wrap {
+    width: 38px;
+    height: 38px;
+    border-radius: 12px;
+    background: var(--surface-1);
+    border: 1px solid var(--border);
     display: flex;
     align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6);
+    flex-shrink: 0;
+}
+
+.apple-motion-svg {
+    display: block;
+}
+
+.brand-info {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.brand-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.brand-title {
+    font-size: 16px;
+    font-weight: 800;
+    letter-spacing: -0.3px;
+    color: #FFFFFF;
+    font-family: var(--font);
+}
+
+.brand-divider {
+    font-size: 14px;
+    color: var(--border-light);
+    font-weight: 400;
 }
 
 .typewriter {
     font-family: var(--mono);
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--text-primary);
-    letter-spacing: 0.5px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    letter-spacing: 0.2px;
 }
 
 .cursor-blink {
     font-family: var(--mono);
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 300;
     color: var(--gold);
     animation: blink 1s step-end infinite;
-    margin-left: 3px;
+    margin-left: 2px;
 }
 
 @keyframes blink {
     50% { opacity: 0; }
 }
 
+/* Status Telemetry Group */
 .status-group {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
 }
 
-/* Solid Cupertino Pills */
-.indicator {
+/* Cupertino Solid Vector Pills */
+.cupertino-pill {
     display: flex;
     align-items: center;
-    gap: 6px;
-    padding: 6px 12px;
+    gap: 8px;
+    height: 38px;
+    padding: 0 16px;
     border-radius: var(--radius-pill);
-    font-family: var(--mono);
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 0.5px;
     background: var(--surface-2);
     border: 1px solid var(--border);
-    color: var(--text-secondary);
+    color: var(--text-primary);
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.indicator.connected {
-    color: var(--text-primary);
+.cupertino-pill:hover {
+    background: var(--surface-3);
     border-color: var(--border-light);
 }
 
-.indicator.connected .dot {
-    background: var(--green-live);
-    box-shadow: 0 0 8px rgba(48, 209, 88, 0.4);
+.pill-svg {
+    width: 15px;
+    height: 15px;
+    flex-shrink: 0;
+    color: var(--text-secondary);
+    transition: color 0.2s;
 }
 
-.indicator .dot {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: var(--text-tertiary);
-    transition: background 0.3s;
-}
-
-.stat-pill {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    padding: 6px 12px;
-    border-radius: var(--radius-pill);
-    font-family: var(--mono);
-    font-size: 11px;
-    background: var(--surface-2);
-    border: 1px solid var(--border);
+.pill-value {
+    font-size: 13px;
+    font-weight: 700;
     color: var(--text-primary);
 }
 
-.stat-label {
-    font-size: 9px;
-    font-weight: 600;
-    color: var(--text-secondary);
-    letter-spacing: 1px;
+.pill-value.font-mono {
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
 }
 
-/* Header Settings / Creator Button */
+.pill-sub {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: var(--text-secondary);
+    margin-left: 1px;
+}
+
+/* Live Pulse Animation on FPS Pulse Icon */
+@keyframes live-pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.55; transform: scale(0.92); }
+}
+
+.pulse-svg {
+    animation: live-pulse 1.8s ease-in-out infinite;
+}
+
+/* Connected Online Status */
+.cupertino-pill.connected {
+    border-color: rgba(48, 209, 88, 0.35);
+}
+
+.cupertino-pill.connected .pill-svg {
+    color: var(--green-live);
+}
+
+.cupertino-pill.connected .pill-value {
+    color: #FFFFFF;
+}
+
+/* Header Creator Profile Button (Cupertino Action Style) */
 .cupertino-btn-pill {
     display: flex;
     align-items: center;
-    gap: 6px;
-    padding: 6px 14px;
+    gap: 8px;
+    height: 38px;
+    padding: 0 18px;
     border-radius: var(--radius-pill);
-    background: var(--surface-2);
-    border: 1px solid var(--border);
-    color: var(--text-primary);
-    font-family: var(--mono);
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 1px;
+    background: #FFFFFF;
+    color: #000000;
+    font-family: var(--font);
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    border: none;
     cursor: pointer;
-    transition: all 0.2s ease;
+    box-shadow: 0 4px 16px rgba(255, 255, 255, 0.12);
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.cupertino-btn-pill .pill-svg {
+    color: #000000;
 }
 
 .cupertino-btn-pill:hover {
-    background: var(--surface-3);
-    border-color: var(--border-light);
-    color: var(--gold);
+    background: var(--titanium);
+    transform: scale(1.02);
 }
 
 .cupertino-btn-pill:active {
@@ -313,8 +365,8 @@ html, body {
 /* ── Desktop Right Panel (Solid Cupertino Cards) ────────────── */
 #info-panel {
     position: fixed;
-    top: 68px;
-    right: 24px;
+    top: 76px;
+    right: 28px;
     bottom: 24px;
     width: 330px;
     z-index: 90;
@@ -846,36 +898,55 @@ html, body {
     }
 
     #top-bar {
-        padding: 0 16px;
-        height: 50px;
+        padding: 0 14px;
+        height: 56px;
     }
 
-    .logo-mark {
-        font-size: 10px;
-        padding: 3px 6px;
+    .logo {
+        gap: 10px;
     }
 
-    .typewriter {
-        font-size: 12px;
+    .logo-icon-wrap {
+        width: 32px;
+        height: 32px;
+        border-radius: 9px;
+    }
+
+    .brand-title {
+        font-size: 14px;
+    }
+
+    .brand-divider, .typewriter, .cursor-blink {
+        display: none;
     }
 
     .status-group {
         gap: 6px;
     }
 
-    .indicator {
-        padding: 4px 8px;
-        font-size: 9px;
+    .cupertino-pill {
+        height: 32px;
+        padding: 0 10px;
+        gap: 6px;
     }
 
-    .stat-pill {
-        padding: 4px 8px;
+    .pill-svg {
+        width: 13px;
+        height: 13px;
+    }
+
+    .pill-value {
+        font-size: 11px;
+    }
+
+    .pill-sub {
         font-size: 9px;
     }
 
     .cupertino-btn-pill {
-        padding: 4px 10px;
-        font-size: 9px;
+        height: 32px;
+        padding: 0 12px;
+        font-size: 10px;
     }
 
     .cupertino-btn-pill .btn-text {
@@ -885,7 +956,7 @@ html, body {
     /* ── Mobile PiP Camera: Completely 16:9 Widescreen Rectangle ── */
     #camera-panel {
         position: fixed !important;
-        top: 60px !important;
+        top: 64px !important;
         right: 14px !important;
         left: auto !important;
         bottom: auto !important;

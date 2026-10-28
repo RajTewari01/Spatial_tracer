@@ -5,6 +5,7 @@
    ✦ Zero Red: Pure White, Titanium, Champagne Gold, Green
    ✦ Small Floating Globe by default on mobile (zoomable via gesture)
    ✦ Widescreen 16:9 Rectangular PiP Camera
+   ✦ Live FPS Motion from 3D Render Loop
    ✦ Creator Profile Modal: Biswadeep Tewari (from mobile_client_v2)
    ═══════════════════════════════════════════════════════════════ */
 
@@ -16,7 +17,7 @@ let particleSphere = null;
 let trailParticles = [], ripples = [];
 let gestureFlashTimer = null;
 let eventLog = [];
-let frameCount = 0, lastFpsTime = performance.now(), currentFps = 0;
+let animFrames = 0, lastAnimTime = performance.now(), currentFps = 60;
 let trailFrameSkip = 0;
 
 const CONN = [
@@ -346,18 +347,10 @@ function onHandResults(results) {
     canvas.height = video.videoHeight || 360;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    frameCount++;
-    const now = performance.now();
-    if (now - lastFpsTime >= 1000) {
-        currentFps = Math.round((frameCount * 1000) / (now - lastFpsTime));
-        frameCount = 0;
-        lastFpsTime = now;
-        document.getElementById('fps-value').textContent = currentFps;
-    }
-
     handData = [];
     if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
-        document.getElementById('hands-value').textContent = results.multiHandLandmarks.length;
+        const handsEl = document.getElementById('hands-value');
+        if (handsEl) handsEl.textContent = results.multiHandLandmarks.length;
 
         for (let h = 0; h < results.multiHandLandmarks.length; h++) {
             const lm = results.multiHandLandmarks[h];
@@ -388,7 +381,8 @@ function onHandResults(results) {
             }
         }
     } else {
-        document.getElementById('hands-value').textContent = '0';
+        const handsEl = document.getElementById('hands-value');
+        if (handsEl) handsEl.textContent = '0';
         clearFingerStatus();
     }
 }
@@ -594,7 +588,8 @@ async function startCamera() {
             ind.classList.remove('disconnected');
             ind.classList.add('connected');
         }
-        document.getElementById('connection-text').textContent = 'Active';
+        const connText = document.getElementById('connection-text');
+        if (connText) connText.textContent = 'Active';
 
         const btnStart = document.getElementById('btn-start');
         if (btnStart) {
@@ -632,7 +627,8 @@ function stopCamera() {
         ind.classList.remove('connected');
         ind.classList.add('disconnected');
     }
-    document.getElementById('connection-text').textContent = 'Offline';
+    const connText = document.getElementById('connection-text');
+    if (connText) connText.textContent = 'Offline';
 
     const btnStart = document.getElementById('btn-start');
     if (btnStart) {
@@ -722,10 +718,22 @@ document.addEventListener('keydown', (e) => {
 });
 
 
-// ── Render Loop ────────────────────────────────────────────────
+// ── Render Loop — Live Continuous 60/120 FPS Motion ───────────
 
 function animate(time) {
     requestAnimationFrame(animate);
+
+    // Live continuous FPS calculation driven by actual 3D render loop
+    animFrames++;
+    const now = performance.now();
+    if (now - lastAnimTime >= 500) {
+        currentFps = Math.round((animFrames * 1000) / (now - lastAnimTime));
+        animFrames = 0;
+        lastAnimTime = now;
+        const fpsEl = document.getElementById('fps-value');
+        if (fpsEl) fpsEl.textContent = currentFps;
+    }
+
     updateSphere(time * 0.001);
     updateEffects();
     if (controls) controls.update();
@@ -739,16 +747,19 @@ document.addEventListener('DOMContentLoaded', () => {
     initThreeJS();
     animate(0);
 
-    // Typewriter Header Title
-    const logoTW = new Typewriter(document.getElementById('typewriter-text'), { speed: 75 });
+    // Typewriter Header Title — ONLY Product / MotionW Branding (NO by Biswadeep Tewari)
+    const logoTW = new Typewriter(document.getElementById('typewriter-text'), { speed: 70 });
     logoTW
-        .type('MotionW')
+        .type('Air Gesture Engine')
         .wait(3000)
         .clear()
-        .type('Air Gesture Engine')
+        .type('Spatial Vision 3D')
         .wait(2500)
         .clear()
-        .type('by Biswadeep Tewari')
+        .type('Real-Time MediaPipe')
+        .wait(2500)
+        .clear()
+        .type('Zero-Latency Tracking')
         .wait(2500)
         .clear()
         .loop()
