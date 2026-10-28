@@ -1278,3 +1278,115 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
+
+
+// ═══════════════════════════════════════════════════════════════
+//  ANIME CHIBI SOCIALS CINEMATIC LOADING CONTROLLER
+//  (Itachi -> Cat -> Gojo with Speech Bubbles & Warp Redirect)
+// ═══════════════════════════════════════════════════════════════
+
+let socialsLoaderTimer = null;
+let socialsStepTimers = [];
+let targetSocialsUrl = 'https://link-tree-by-raj.vercel.app';
+
+function openSocialsAnimeLoader(event, url) {
+    if (event) {
+        event.preventDefault();
+        event.stopPropagation();
+    }
+    targetSocialsUrl = url || 'https://link-tree-by-raj.vercel.app';
+
+    const overlay = document.getElementById('socials-loader-overlay');
+    if (!overlay) {
+        window.open(targetSocialsUrl, '_blank');
+        return;
+    }
+
+    // Clear any previous running sequence
+    clearAnimeLoaderTimers();
+
+    const itachi = document.getElementById('anime-actor-itachi');
+    const cat = document.getElementById('anime-actor-cat');
+    const gojo = document.getElementById('anime-actor-gojo');
+    const fill = document.getElementById('socials-progress-bar-fill');
+    const pct = document.getElementById('socials-progress-percent');
+    const statusText = document.getElementById('socials-loader-status-text');
+
+    if (itachi) itachi.classList.remove('active');
+    if (cat) cat.classList.remove('active');
+    if (gojo) gojo.classList.remove('active');
+    if (fill) fill.style.width = '0%';
+    if (pct) pct.textContent = '0%';
+    if (statusText) statusText.textContent = 'Connecting to Socials...';
+
+    overlay.classList.remove('hidden', 'leaving');
+    overlay.classList.add('visible');
+
+    // Step 1: Itachi pops in (t = 150ms) -> "Wait, we are loading your link..."
+    socialsStepTimers.push(setTimeout(() => {
+        if (!overlay.classList.contains('visible')) return;
+        if (itachi) itachi.classList.add('active');
+        if (fill) fill.style.width = '35%';
+        if (pct) pct.textContent = '35%';
+        if (statusText) statusText.textContent = 'Itachi is fetching links...';
+    }, 150));
+
+    // Step 2: Cat bounces in (t = 850ms) -> "Meow ~ 🐾"
+    socialsStepTimers.push(setTimeout(() => {
+        if (!overlay.classList.contains('visible')) return;
+        if (cat) cat.classList.add('active');
+        if (fill) fill.style.width = '70%';
+        if (pct) pct.textContent = '70%';
+        if (statusText) statusText.textContent = 'Cat says Meow!';
+    }, 850));
+
+    // Step 3: Gojo bursts in as progress hits 100% (t = 1750ms) -> "Let's go...! ⚡"
+    socialsStepTimers.push(setTimeout(() => {
+        if (!overlay.classList.contains('visible')) return;
+        if (fill) fill.style.width = '100%';
+        if (pct) pct.textContent = '100%';
+        if (statusText) statusText.textContent = 'Ready! Redirecting...';
+        if (gojo) gojo.classList.add('active');
+    }, 1750));
+
+    // Step 4: Smooth warp transition & Redirect (t = 2850ms)
+    socialsLoaderTimer = setTimeout(() => {
+        if (!overlay.classList.contains('visible')) return;
+        executeSocialsRedirect();
+    }, 2850);
+}
+
+function executeSocialsRedirect() {
+    clearAnimeLoaderTimers();
+    const overlay = document.getElementById('socials-loader-overlay');
+    if (overlay) {
+        overlay.classList.add('leaving');
+        setTimeout(() => {
+            overlay.classList.remove('visible', 'leaving');
+            overlay.classList.add('hidden');
+            window.open(targetSocialsUrl, '_blank');
+        }, 300);
+    } else {
+        window.open(targetSocialsUrl, '_blank');
+    }
+}
+
+function closeSocialsAnimeLoader() {
+    clearAnimeLoaderTimers();
+    const overlay = document.getElementById('socials-loader-overlay');
+    if (overlay) {
+        overlay.classList.remove('visible', 'leaving');
+        overlay.classList.add('hidden');
+    }
+}
+
+function clearAnimeLoaderTimers() {
+    if (socialsLoaderTimer) {
+        clearTimeout(socialsLoaderTimer);
+        socialsLoaderTimer = null;
+    }
+    for (const t of socialsStepTimers) {
+        clearTimeout(t);
+    }
+    socialsStepTimers = [];
+}
