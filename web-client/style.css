@@ -763,6 +763,35 @@ body {
     color: #0f172a;
 }
 
+.emerald-bubble {
+    background: rgba(46, 125, 50, 0.16) !important;
+    color: #1e702c !important;
+}
+
+.zen-download-card:hover .emerald-bubble {
+    background: rgba(46, 125, 50, 0.28) !important;
+    transform: scale(1.08);
+}
+
+.cv-badge-pill {
+    padding: 5px 12px;
+    border-radius: 9999px;
+    background: #0f172a;
+    color: #ffffff;
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    flex-shrink: 0;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
+    transition: background 0.2s, transform 0.2s;
+}
+
+.zen-download-card:hover .cv-badge-pill {
+    background: #1e702c;
+    transform: scale(1.05);
+}
+
 /* Section Header & Typography */
 .zen-section-header {
     display: flex;
