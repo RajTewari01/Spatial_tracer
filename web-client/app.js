@@ -175,19 +175,10 @@ function createParticleSphere() {
         base[i * 3] = x; base[i * 3 + 1] = yp; base[i * 3 + 2] = z;
 
         const t = (y + 1) / 2;
-        if (t < 0.5) {
-            const s = t * 2;
-            // Obsidian to Titanium Silver
-            col[i * 3] = 0.12 * (1 - s) + 0.55 * s;
-            col[i * 3 + 1] = 0.12 * (1 - s) + 0.55 * s;
-            col[i * 3 + 2] = 0.14 * (1 - s) + 0.58 * s;
-        } else {
-            const s = (t - 0.5) * 2;
-            // Titanium Silver to Warm Gold & Pure White
-            col[i * 3] = 0.55 * (1 - s) + 0.85 * s;
-            col[i * 3 + 1] = 0.55 * (1 - s) + 0.72 * s;
-            col[i * 3 + 2] = 0.58 * (1 - s) + 0.35 * s;
-        }
+        // Deep Ruby to Radiant Crimson Red Sphere
+        col[i * 3] = 0.88 + 0.12 * Math.sin(t * Math.PI);
+        col[i * 3 + 1] = 0.05 + 0.10 * t;
+        col[i * 3 + 2] = 0.08 + 0.14 * (1 - t);
     }
 
     geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
@@ -242,15 +233,19 @@ function updateSphere(time) {
             tx += fx; ty += fy; tz += fz;
             if (totalF > 0.03) {
                 const t = Math.min(1, totalF * 3);
-                col[i * 3] += (1 - col[i * 3]) * t * 0.1;
-                col[i * 3 + 1] += (1 - col[i * 3 + 1]) * t * 0.1;
-                col[i * 3 + 2] += (1 - col[i * 3 + 2]) * t * 0.05;
+                // Intense bright scarlet / neon red flare
+                col[i * 3] += (1.0 - col[i * 3]) * t * 0.15;
+                col[i * 3 + 1] += (0.22 - col[i * 3 + 1]) * t * 0.12;
+                col[i * 3 + 2] += (0.25 - col[i * 3 + 2]) * t * 0.12;
             }
         } else {
             const ot = (by / 1.6 + 1) / 2;
-            col[i * 3] += (0.55 * (1 - ot) + 0.85 * ot - col[i * 3]) * 0.01;
-            col[i * 3 + 1] += (0.55 * (1 - ot) + 0.72 * ot - col[i * 3 + 1]) * 0.01;
-            col[i * 3 + 2] += (0.58 * (1 - ot) + 0.35 * ot - col[i * 3 + 2]) * 0.01;
+            const targetR = 0.88 + 0.12 * Math.sin(ot * Math.PI);
+            const targetG = 0.05 + 0.10 * ot;
+            const targetB = 0.08 + 0.14 * (1 - ot);
+            col[i * 3] += (targetR - col[i * 3]) * 0.02;
+            col[i * 3 + 1] += (targetG - col[i * 3 + 1]) * 0.02;
+            col[i * 3 + 2] += (targetB - col[i * 3 + 2]) * 0.02;
         }
 
         pos[i * 3] += (tx - pos[i * 3]) * 0.07;
@@ -603,12 +598,15 @@ async function startCamera() {
         const fpsPill = document.getElementById('floating-fps-pill');
         if (fpsPill) fpsPill.classList.add('active');
 
-        // Update mobile dock button
+        // Update mobile dock button icon (Switch to solid stop icon)
         const mBtn = document.getElementById('mobile-btn-camera');
-        const mTxt = document.getElementById('mobile-cam-text');
-        if (mBtn && mTxt) {
+        if (mBtn) {
             mBtn.classList.add('active');
-            mTxt.textContent = 'Stop';
+            mBtn.innerHTML = `
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                    <rect x="5" y="5" width="14" height="14" rx="2"></rect>
+                </svg>
+            `;
         }
 
         addEventLog('Camera started');
@@ -648,12 +646,15 @@ function stopCamera() {
         btnStart.disabled = false;
     }
 
-    // Update mobile dock button
+    // Update mobile dock button icon (Switch to play icon)
     const mBtn = document.getElementById('mobile-btn-camera');
-    const mTxt = document.getElementById('mobile-cam-text');
-    if (mBtn && mTxt) {
+    if (mBtn) {
         mBtn.classList.remove('active');
-        mTxt.textContent = 'Start';
+        mBtn.innerHTML = `
+            <svg id="mobile-cam-icon" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                <polygon points="6 4 20 12 6 20 6 4"></polygon>
+            </svg>
+        `;
     }
 
     clearFingerStatus();
@@ -831,13 +832,43 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ── Draggable Camera PiP (Mobile Touch + Desktop Drag) ──
+    // ── Draggable & Resizable Camera PiP (Mobile Touch + Desktop Drag) ──
     const panel = document.getElementById('camera-panel');
     if (panel) {
         let isDragging = false;
         let startX = 0, startY = 0, origLeft = 0, origTop = 0;
+        let dragDist = 0;
+
+        window.togglePipSize = function (e) {
+            if (e) {
+                e.stopPropagation();
+                e.preventDefault();
+            }
+            panel.classList.toggle('expanded');
+            const isExp = panel.classList.contains('expanded');
+            const icon = document.getElementById('pip-expand-icon');
+            if (icon) {
+                if (isExp) {
+                    icon.innerHTML = `
+                        <polyline points="4 14 10 14 10 20"></polyline>
+                        <polyline points="20 10 14 10 14 4"></polyline>
+                        <line x1="14" y1="10" x2="21" y2="3"></line>
+                        <line x1="3" y1="21" x2="10" y2="14"></line>
+                    `;
+                } else {
+                    icon.innerHTML = `
+                        <polyline points="15 3 21 3 21 9"></polyline>
+                        <polyline points="9 21 3 21 3 15"></polyline>
+                        <line x1="21" y1="3" x2="14" y2="10"></line>
+                        <line x1="3" y1="21" x2="10" y2="14"></line>
+                    `;
+                }
+            }
+        };
 
         function startDrag(clientX, clientY) {
             isDragging = true;
+            dragDist = 0;
             const rect = panel.getBoundingClientRect();
             startX = clientX;
             startY = clientY;
@@ -851,12 +882,13 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!isDragging) return;
             const dx = clientX - startX;
             const dy = clientY - startY;
+            dragDist = Math.hypot(dx, dy);
 
             let newLeft = origLeft + dx;
             let newTop = origTop + dy;
 
-            const pw = panel.offsetWidth || 176;
-            const ph = panel.offsetHeight || 99;
+            const pw = panel.offsetWidth || 230;
+            const ph = panel.offsetHeight || 130;
             const maxW = window.innerWidth - pw - 8;
             const maxH = window.innerHeight - ph - 16;
 
@@ -877,6 +909,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // Touch event handlers for mobile
+        let lastTapTime = 0;
         panel.addEventListener('touchstart', function (e) {
             if (e.target.closest('button, a')) return;
             const t = e.touches[0];
@@ -890,7 +923,17 @@ document.addEventListener('DOMContentLoaded', () => {
             moveDrag(t.clientX, t.clientY);
         }, { passive: false });
 
-        window.addEventListener('touchend', endDrag);
+        window.addEventListener('touchend', function (e) {
+            if (!isDragging) return;
+            if (dragDist < 8) {
+                const now = Date.now();
+                if (now - lastTapTime < 320) {
+                    togglePipSize(e);
+                }
+                lastTapTime = now;
+            }
+            endDrag();
+        });
         window.addEventListener('touchcancel', endDrag);
 
         // Mouse event handlers for desktop
@@ -907,5 +950,10 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         window.addEventListener('mouseup', endDrag);
+
+        panel.addEventListener('dblclick', function (e) {
+            if (e.target.closest('button, a')) return;
+            togglePipSize(e);
+        });
     }
 });
