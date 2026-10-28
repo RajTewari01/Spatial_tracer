@@ -54,6 +54,23 @@ const G = {
     spiderman: { label: 'SPIDERMAN', color: 0xffffff },
 };
 
+const GESTURE_SVGS = {
+    no_hand: `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="2" y1="2" x2="22" y2="22"></line><path d="M18 11V6a2 2 0 0 0-2-2 2 2 0 0 0-2 2v2"></path><path d="M14 10V4a2 2 0 0 0-2-2 2 2 0 0 0-2 2v6"></path><path d="M10 10.5V6a2 2 0 0 0-2-2 2 2 0 0 0-2 2v8"></path><path d="M6 14.5v3.5a6 6 0 0 0 6 6h1a6 6 0 0 0 5.4-3.4"></path></svg>`,
+    fist: `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 10a2 2 0 0 0-2-2h-1a2 2 0 0 0-2-2h-1a2 2 0 0 0-2-2H9a2 2 0 0 0-2 2v8a5 5 0 0 0 5 5h3a5 5 0 0 0 5-5v-4z"></path><path d="M7 8h10"></path><path d="M7 11h10"></path></svg>`,
+    open_palm: `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 11V6a2 2 0 0 0-4 0v2"></path><path d="M14 8V4a2 2 0 0 0-4 0v6"></path><path d="M10 10V6a2 2 0 0 0-4 0v8"></path><path d="M6 14v1a6 6 0 0 0 6 6h2a6 6 0 0 0 6-6V9a2 2 0 0 0-4 0"></path></svg>`,
+    thumbs_up: `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path></svg>`,
+    thumbs_down: `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h3a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-3"></path></svg>`,
+    peace: `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12V4a2 2 0 0 1 3.5 0v8"></path><path d="M12.5 12V3a2 2 0 0 1 3.5 0v9"></path><path d="M8 12a4 4 0 0 0-4 4v2a4 4 0 0 0 4 4h6a4 4 0 0 0 4-4v-6"></path></svg>`,
+    pointing: `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v9"></path><path d="M12 12a4 4 0 0 0-4 4v2a4 4 0 0 0 4 4h6a4 4 0 0 0 4-4v-6a2 2 0 0 0-4 0"></path><circle cx="12" cy="3" r="1.5"></circle></svg>`,
+    rock: `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 12V4a2 2 0 0 1 4 0v8"></path><path d="M17 12V4a2 2 0 0 1 4 0v10a6 6 0 0 1-6 6H9a6 6 0 0 1-6-6v-2"></path><path d="M11 12h6"></path></svg>`,
+    ok: `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="9" r="4"></circle><path d="M13 9V3a2 2 0 0 1 4 0v8"></path><path d="M17 11V5a2 2 0 0 1 4 0v9a6 6 0 0 1-6 6h-4a6 6 0 0 1-6-6"></path></svg>`,
+    pinch: `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 8a3 3 0 0 1 5 2l-2 2"></path><path d="M11 12l2-2a3 3 0 0 1 4 4l-4 4"></path><path d="M7 14a5 5 0 0 0 5 5h4a5 5 0 0 0 5-5"></path></svg>`,
+    call_me: `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8l3-3a2 2 0 0 1 2.8 0L11 6a2 2 0 0 1 0 2.8L10 10a12 12 0 0 0 4 4l1.2-1a2 2 0 0 1 2.8 0l1.2 1.2a2 2 0 0 1 0 2.8l-3 3a4 4 0 0 1-4.2.8A16 16 0 0 1 3.2 8.2 4 4 0 0 1 4 8z"></path></svg>`,
+    three: `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 12V4a2 2 0 0 1 4 0v8"></path><path d="M12 12V3a2 2 0 0 1 4 0v9"></path><path d="M16 12V4a2 2 0 0 1 4 0v10a6 6 0 0 1-6 6H8a6 6 0 0 1-6-6"></path></svg>`,
+    spiderman: `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 12V4a2 2 0 0 1 4 0v8"></path><path d="M18 12V4a2 2 0 0 1 4 0v10a6 6 0 0 1-6 6H8a6 6 0 0 1-6-6"></path><path d="M10 12h4"></path></svg>`,
+    middle_finger: `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v9"></path><path d="M8 12a4 4 0 0 0-4 4v2a4 4 0 0 0 4 4h6a4 4 0 0 0 4-4v-4"></path></svg>`,
+};
+
 
 // ═══════════════════════════════════════════════════════════════
 //  TYPEWRITER ENGINE
@@ -519,13 +536,21 @@ function showGestureTags(gestures) {
         }
     }
 
-    // Update Mobile Cupertino Dock Pill
+    // Update Mobile Cupertino Dock Pill (Icon + Label)
+    const mobileIcon = document.getElementById('mobile-gesture-icon');
     const mobileLabel = document.getElementById('mobile-gesture-label');
     if (mobileLabel) {
         if (gestures.length > 0 && G[gestures[0]]) {
-            mobileLabel.textContent = G[gestures[0]].label;
+            const gKey = gestures[0];
+            mobileLabel.textContent = G[gKey].label;
+            if (mobileIcon) {
+                mobileIcon.innerHTML = GESTURE_SVGS[gKey] || GESTURE_SVGS.open_palm;
+            }
         } else {
             mobileLabel.textContent = 'Tracking';
+            if (mobileIcon) {
+                mobileIcon.innerHTML = GESTURE_SVGS.open_palm;
+            }
         }
     }
 }
@@ -552,9 +577,13 @@ function clearFingerStatus() {
     if (gDisplay) {
         gDisplay.innerHTML = '<span class="gesture-placeholder">No hands in frame</span>';
     }
+    const mobileIcon = document.getElementById('mobile-gesture-icon');
     const mobileLabel = document.getElementById('mobile-gesture-label');
     if (mobileLabel) {
         mobileLabel.textContent = 'No Hand';
+    }
+    if (mobileIcon) {
+        mobileIcon.innerHTML = GESTURE_SVGS.no_hand;
     }
 }
 
@@ -598,14 +627,15 @@ async function startCamera() {
         const fpsPill = document.getElementById('floating-fps-pill');
         if (fpsPill) fpsPill.classList.add('active');
 
-        // Update mobile dock button icon (Switch to solid stop icon)
+        // Update mobile dock button icon and text (Switch to Stop)
         const mBtn = document.getElementById('mobile-btn-camera');
         if (mBtn) {
             mBtn.classList.add('active');
             mBtn.innerHTML = `
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                <svg id="mobile-cam-icon" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
                     <rect x="5" y="5" width="14" height="14" rx="2"></rect>
                 </svg>
+                <span id="mobile-cam-text">Stop</span>
             `;
         }
 
@@ -646,14 +676,15 @@ function stopCamera() {
         btnStart.disabled = false;
     }
 
-    // Update mobile dock button icon (Switch to play icon)
+    // Update mobile dock button icon and text (Switch to Start)
     const mBtn = document.getElementById('mobile-btn-camera');
     if (mBtn) {
         mBtn.classList.remove('active');
         mBtn.innerHTML = `
-            <svg id="mobile-cam-icon" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+            <svg id="mobile-cam-icon" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
                 <polygon points="6 4 20 12 6 20 6 4"></polygon>
             </svg>
+            <span id="mobile-cam-text">Start</span>
         `;
     }
 

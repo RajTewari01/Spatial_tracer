@@ -200,9 +200,9 @@ body {
     bottom: 24px;
     left: 24px;
     z-index: 120;
-    width: 360px;
+    width: 260px;
     aspect-ratio: 16 / 9;
-    border-radius: 18px;
+    border-radius: 16px;
     background: #000000;
     border: 1px solid var(--border);
     overflow: hidden;
@@ -215,7 +215,7 @@ body {
 }
 
 #camera-panel.expanded {
-    width: 540px;
+    width: 380px;
 }
 
 .pip-expand-btn {
@@ -866,9 +866,9 @@ body {
         left: 16px !important;
         top: auto !important;
         right: auto !important;
-        width: 230px !important;
+        width: 160px !important;
         aspect-ratio: 16 / 9 !important;
-        border-radius: 16px !important;
+        border-radius: 14px !important;
         box-shadow: 0 16px 44px rgba(0, 0, 0, 0.9) !important;
         border: 1px solid var(--border) !important;
         z-index: 120 !important;
@@ -879,7 +879,7 @@ body {
     }
 
     #camera-panel.expanded {
-        width: 320px !important;
+        width: 240px !important;
     }
 
     .camera-body {
@@ -966,12 +966,18 @@ body {
         box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
     }
 
-    .dock-dot {
-        width: 6px;
-        height: 6px;
-        border-radius: 50%;
-        background: #000000 !important;
+    .dock-gesture-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 18px;
+        height: 18px;
+        color: #000000;
         flex-shrink: 0;
+    }
+
+    .dock-gesture-icon svg {
+        display: block;
     }
 
     /* ── Mobile Portfolio Sheet ─────────────────────────────── */

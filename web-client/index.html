@@ -114,12 +114,21 @@
     <!-- Mobile Bottom Dock (Solid White Premium Floating Pills) -->
     <div id="mobile-dock">
         <button id="mobile-btn-camera" class="dock-btn-primary" onclick="toggleCameraMobile()" aria-label="Toggle Camera">
-            <svg id="mobile-cam-icon" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+            <svg id="mobile-cam-icon" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
                 <polygon points="6 4 20 12 6 20 6 4"></polygon>
             </svg>
+            <span id="mobile-cam-text">Start</span>
         </button>
         <div id="mobile-gesture-pill" class="dock-pill">
-            <span class="dock-dot"></span>
+            <span id="mobile-gesture-icon" class="dock-gesture-icon">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="2" y1="2" x2="22" y2="22"></line>
+                    <path d="M18 11V6a2 2 0 0 0-2-2 2 2 0 0 0-2 2v2"></path>
+                    <path d="M14 10V4a2 2 0 0 0-2-2 2 2 0 0 0-2 2v6"></path>
+                    <path d="M10 10.5V6a2 2 0 0 0-2-2 2 2 0 0 0-2 2v8"></path>
+                    <path d="M6 14.5v3.5a6 6 0 0 0 6 6h1a6 6 0 0 0 5.4-3.4"></path>
+                </svg>
+            </span>
             <span id="mobile-gesture-label">No Hand</span>
         </div>
     </div>
