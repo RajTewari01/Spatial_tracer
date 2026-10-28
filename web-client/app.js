@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════════
-   Spatial_Tracer — In-Browser MediaPipe + Three.js
+   MotionW — In-Browser MediaPipe + Three.js
    
    ✦ Zero emojis — premium monospace labels
    ✦ Typewriter effects on logo + bio
@@ -687,7 +687,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // ── Logo typewriter ──
     const logoTW = new Typewriter(document.getElementById('typewriter-text'), { speed: 80 });
     logoTW
-        .type('Spatial_Tracer')
+        .type('MotionW')
         .wait(3000)
         .clear()
         .type('Air Gesture Engine')
@@ -724,7 +724,7 @@ document.addEventListener('DOMContentLoaded', () => {
         .loop()
         .start();
 
-    addEventLog('Spatial_Tracer initialized');
+    addEventLog('MotionW initialized');
     addEventLog('Click Start Camera to begin');
 });
 
