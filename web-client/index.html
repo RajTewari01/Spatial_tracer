@@ -15,22 +15,26 @@
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils@0.3.1675466124/drawing_utils.min.js" crossorigin="anonymous"></script>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&family=Pacifico&display=swap" rel="stylesheet">
 </head>
 <body>
     <!-- Three.js Canvas Container -->
     <div id="canvas-container"></div>
 
-    <!-- Camera PiP (Completely Widescreen Rectangle 16:9) -->
+    <!-- Camera PiP (Completely Widescreen Rectangle 16:9 - No inner header) -->
     <div id="camera-panel">
-        <div class="camera-header">
-            <span class="cam-dot"></span>
-            <span class="cam-label">CAMERA</span>
-            <button id="btn-toggle-cam" class="btn-icon" onclick="toggleCameraSize()" title="Toggle Size" aria-label="Toggle Size">
-                <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M1 4V1h3M8 1h3v3M11 8v3H8M4 11H1V8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-            </button>
-        </div>
         <div class="camera-body">
+            <!-- Sleek Camera Off State Placeholder -->
+            <div id="camera-off-state" class="camera-off-placeholder">
+                <div class="cam-off-icon-circle">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="1" y1="1" x2="23" y2="23"></line>
+                        <path d="M21 21H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h3m3-3h6l2 3h4a2 2 0 0 1 2 2v9.34"></path>
+                        <path d="M14.12 14.12a3 3 0 1 1-4.24-4.24"></path>
+                    </svg>
+                </div>
+                <span class="cam-off-text">Camera Inactive</span>
+            </div>
             <video id="webcam" autoplay playsinline></video>
             <canvas id="hand-overlay"></canvas>
         </div>

@@ -597,6 +597,10 @@ async function startCamera() {
             btnStart.disabled = true;
         }
 
+        // Hide camera off placeholder
+        const offState = document.getElementById('camera-off-state');
+        if (offState) offState.classList.add('hidden');
+
         // Update mobile dock button
         const mBtn = document.getElementById('mobile-btn-camera');
         const mTxt = document.getElementById('mobile-cam-text');
@@ -621,6 +625,10 @@ function stopCamera() {
         v.srcObject = null;
     }
     handData = [];
+
+    // Show camera off placeholder
+    const offState = document.getElementById('camera-off-state');
+    if (offState) offState.classList.remove('hidden');
 
     const ind = document.getElementById('connection-indicator');
     if (ind) {

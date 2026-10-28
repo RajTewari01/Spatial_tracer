@@ -103,11 +103,12 @@ html, body {
 }
 
 .brand-name {
-    font-size: 15px;
-    font-weight: 800;
-    color: var(--text-primary);
+    font-family: 'Pacifico', cursive !important;
+    font-size: 20px;
+    font-weight: 400;
+    color: #FFFFFF;
     line-height: 1.1;
-    letter-spacing: -0.3px;
+    letter-spacing: 0.8px;
 }
 
 .brand-sub {
@@ -157,42 +158,52 @@ html, body {
     letter-spacing: 0.5px;
 }
 
-/* Right Settings Button Only */
+/* Right Settings Button Only — Naked Icon (NO background pill, NO border, NO shadow) */
+#btn-settings,
 .header-settings-btn {
     pointer-events: auto;
-    width: 42px;
-    height: 42px;
-    border-radius: 50%;
-    background: var(--surface-1);
-    border: 1px solid var(--border);
-    color: var(--text-primary);
+    width: 38px;
+    height: 38px;
+    border-radius: 0 !important;
+    background: transparent !important;
+    background-color: transparent !important;
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    color: var(--text-secondary);
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.7);
-    transition: transform 0.15s ease, background 0.15s ease;
+    padding: 0;
+    transition: transform 0.15s ease, color 0.15s ease;
 }
 
+#btn-settings:hover,
 .header-settings-btn:hover {
-    background: var(--surface-3);
-    border-color: var(--border-light);
-    color: var(--gold);
+    color: #FFFFFF;
+    background: transparent !important;
 }
 
+#btn-settings:active,
 .header-settings-btn:active {
-    transform: scale(0.92);
+    transform: scale(0.88);
+    color: #FFFFFF;
+    background: transparent !important;
 }
 
-/* ── Camera PiP Panel (Completely 16:9 Widescreen Rectangle) ── */
+/* ── Camera PiP Panel (Completely 16:9 Widescreen Rectangle — No Inner Header) ── */
 #camera-panel {
     position: fixed;
     bottom: 24px;
     left: 24px;
     z-index: 120;
-    width: 280px;
+    width: 320px;
+    aspect-ratio: 16 / 9;
     border-radius: 16px;
-    background: var(--surface-1);
+    background: #000000;
     border: 1px solid var(--border);
     overflow: hidden;
     box-shadow: 0 16px 48px rgba(0,0,0,0.85);
@@ -200,56 +211,58 @@ html, body {
 }
 
 #camera-panel.expanded {
-    width: 440px;
-}
-
-.camera-header {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 8px 14px;
-    font-family: var(--mono);
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 1.5px;
-    color: var(--text-secondary);
-    background: var(--surface-2);
-    border-bottom: 1px solid var(--border);
-}
-
-.cam-dot {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: var(--green-live);
-}
-
-.btn-icon {
-    margin-left: auto;
-    background: transparent;
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    color: var(--text-secondary);
-    padding: 3px 6px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s;
-}
-
-.btn-icon:hover {
-    color: var(--text-primary);
-    background: var(--surface-3);
-    border-color: var(--border-light);
+    width: 460px;
 }
 
 .camera-body {
     position: relative;
     width: 100%;
+    height: 100%;
     aspect-ratio: 16 / 9;
     background: #000000;
     overflow: hidden;
+}
+
+/* Camera Inactive State Placeholder (Matte Solid Apple Style) */
+.camera-off-placeholder {
+    position: absolute;
+    inset: 0;
+    z-index: 5;
+    background: #0c0c0e;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    color: var(--text-tertiary);
+    transition: opacity 0.25s ease, visibility 0.25s ease;
+}
+
+.camera-off-placeholder.hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+.cam-off-icon-circle {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-secondary);
+}
+
+.cam-off-text {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+    color: var(--text-secondary);
+    text-transform: uppercase;
 }
 
 #webcam {
@@ -860,7 +873,8 @@ html, body {
         right: 14px !important;
         left: auto !important;
         bottom: auto !important;
-        width: 136px !important;
+        width: 176px !important;
+        aspect-ratio: 16 / 9 !important;
         border-radius: 14px !important;
         box-shadow: 0 12px 32px rgba(0, 0, 0, 0.9) !important;
         border: 1px solid var(--border) !important;
@@ -870,19 +884,27 @@ html, body {
     }
 
     #camera-panel.expanded {
-        width: 240px !important;
-    }
-
-    .camera-header {
-        padding: 4px 10px;
-        font-size: 8px;
-        letter-spacing: 1px;
+        width: 260px !important;
     }
 
     .camera-body {
         aspect-ratio: 16 / 9 !important;
         width: 100% !important;
-        height: auto !important;
+        height: 100% !important;
+    }
+
+    .cam-off-icon-circle {
+        width: 32px;
+        height: 32px;
+    }
+
+    .cam-off-icon-circle svg {
+        width: 18px;
+        height: 18px;
+    }
+
+    .cam-off-text {
+        font-size: 9px;
     }
 
     /* ── Mobile Bottom Floating Dock ────────── */
