@@ -777,48 +777,125 @@ document.addEventListener('DOMContentLoaded', () => {
 
     addEventLog('MotionW initialized');
 
-    // Draggable camera PiP on mobile
+    // ── Brand Typewriter Cycle: MotionW <-> Made by alypion every minute ──
+    const brandEl = document.getElementById('brand-title');
+    if (brandEl) {
+        async function runBrandCycle() {
+            while (true) {
+                // Hold MotionW for 60 seconds (every minute)
+                await sleep(60000);
+
+                // Typewriter backspace / erase "MotionW"
+                while (brandEl.textContent.length > 0) {
+                    brandEl.textContent = brandEl.textContent.slice(0, -1);
+                    await sleep(40);
+                }
+                await sleep(250);
+
+                // Type "Made by alypion"
+                const authorText = "Made by alypion";
+                for (let i = 0; i < authorText.length; i++) {
+                    brandEl.textContent += authorText[i];
+                    await sleep(55);
+                }
+
+                // Hold "Made by alypion" so it is clearly readable
+                await sleep(4500);
+
+                // Typewriter backspace / erase "Made by alypion"
+                while (brandEl.textContent.length > 0) {
+                    brandEl.textContent = brandEl.textContent.slice(0, -1);
+                    await sleep(35);
+                }
+                await sleep(250);
+
+                // Type back "MotionW"
+                const brandText = "MotionW";
+                for (let i = 0; i < brandText.length; i++) {
+                    brandEl.textContent += brandText[i];
+                    await sleep(60);
+                }
+            }
+        }
+        runBrandCycle();
+    }
+
+    // ── Draggable Camera PiP (Mobile Touch + Desktop Drag) ──
     const panel = document.getElementById('camera-panel');
     if (panel) {
-        let dragging = false;
+        let isDragging = false;
         let startX = 0, startY = 0, origLeft = 0, origTop = 0;
 
-        panel.addEventListener('touchstart', function(e) {
-            if (e.target.closest('button')) return;
-            if (window.innerWidth > 768) return;
-
-            dragging = true;
-            const touch = e.touches[0];
-            startX = touch.clientX;
-            startY = touch.clientY;
+        function startDrag(clientX, clientY) {
+            isDragging = true;
             const rect = panel.getBoundingClientRect();
+            startX = clientX;
+            startY = clientY;
             origLeft = rect.left;
             origTop = rect.top;
             panel.style.transition = 'none';
-        }, { passive: false });
+            panel.style.cursor = 'grabbing';
+        }
 
-        panel.addEventListener('touchmove', function(e) {
-            if (!dragging) return;
-            e.preventDefault();
-            const touch = e.touches[0];
-            const dx = touch.clientX - startX;
-            const dy = touch.clientY - startY;
+        function moveDrag(clientX, clientY) {
+            if (!isDragging) return;
+            const dx = clientX - startX;
+            const dy = clientY - startY;
 
             let newLeft = origLeft + dx;
             let newTop = origTop + dy;
-            const pw = panel.offsetWidth, ph = panel.offsetHeight;
-            newLeft = Math.max(8, Math.min(window.innerWidth - pw - 8, newLeft));
-            newTop = Math.max(56, Math.min(window.innerHeight - ph - 80, newTop));
 
-            panel.style.left = newLeft + 'px';
-            panel.style.top = newTop + 'px';
-            panel.style.right = 'auto';
-            panel.style.bottom = 'auto';
+            const pw = panel.offsetWidth || 176;
+            const ph = panel.offsetHeight || 99;
+            const maxW = window.innerWidth - pw - 8;
+            const maxH = window.innerHeight - ph - 16;
+
+            newLeft = Math.max(8, Math.min(maxW, newLeft));
+            newTop = Math.max(10, Math.min(maxH, newTop));
+
+            panel.style.setProperty('left', newLeft + 'px', 'important');
+            panel.style.setProperty('top', newTop + 'px', 'important');
+            panel.style.setProperty('right', 'auto', 'important');
+            panel.style.setProperty('bottom', 'auto', 'important');
+        }
+
+        function endDrag() {
+            if (!isDragging) return;
+            isDragging = false;
+            panel.style.cursor = 'grab';
+            panel.style.transition = 'width 0.35s cubic-bezier(0.16, 1, 0.3, 1)';
+        }
+
+        // Touch event handlers for mobile
+        panel.addEventListener('touchstart', function(e) {
+            if (e.target.closest('button, a')) return;
+            const t = e.touches[0];
+            startDrag(t.clientX, t.clientY);
+        }, { passive: true });
+
+        window.addEventListener('touchmove', function(e) {
+            if (!isDragging) return;
+            if (e.cancelable) e.preventDefault();
+            const t = e.touches[0];
+            moveDrag(t.clientX, t.clientY);
         }, { passive: false });
 
-        panel.addEventListener('touchend', function() {
-            dragging = false;
-            panel.style.transition = 'width 0.35s cubic-bezier(0.16, 1, 0.3, 1)';
+        window.addEventListener('touchend', endDrag);
+        window.addEventListener('touchcancel', endDrag);
+
+        // Mouse event handlers for desktop
+        panel.addEventListener('mousedown', function(e) {
+            if (e.target.closest('button, a')) return;
+            startDrag(e.clientX, e.clientY);
+            e.preventDefault();
         });
+
+        window.addEventListener('mousemove', function(e) {
+            if (!isDragging) return;
+            e.preventDefault();
+            moveDrag(e.clientX, e.clientY);
+        });
+
+        window.addEventListener('mouseup', endDrag);
     }
 });

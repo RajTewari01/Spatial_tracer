@@ -223,18 +223,15 @@ html, body {
     overflow: hidden;
 }
 
-/* Camera Inactive State Placeholder (Matte Solid Apple Style) */
+/* Camera Inactive State Placeholder (Solid OLED Black + Minimal Apple Lens) */
 .camera-off-placeholder {
     position: absolute;
     inset: 0;
     z-index: 5;
-    background: #0c0c0e;
+    background: #000000;
     display: flex;
-    flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 8px;
-    color: var(--text-tertiary);
     transition: opacity 0.25s ease, visibility 0.25s ease;
 }
 
@@ -245,24 +242,14 @@ html, body {
 }
 
 .cam-off-icon-circle {
-    width: 38px;
-    height: 38px;
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
-    background: var(--surface-2);
-    border: 1px solid var(--border);
+    background: #0c0c0e;
+    border: 1px solid rgba(255, 255, 255, 0.14);
     display: flex;
     align-items: center;
     justify-content: center;
-    color: var(--text-secondary);
-}
-
-.cam-off-text {
-    font-family: var(--mono);
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 0.8px;
-    color: var(--text-secondary);
-    text-transform: uppercase;
 }
 
 #webcam {
@@ -868,11 +855,11 @@ html, body {
 
     /* ── Mobile PiP Camera: Completely 16:9 Widescreen Rectangle ── */
     #camera-panel {
-        position: fixed !important;
-        top: 66px !important;
-        right: 14px !important;
-        left: auto !important;
-        bottom: auto !important;
+        position: fixed;
+        top: 66px;
+        right: 14px;
+        left: auto;
+        bottom: auto;
         width: 176px !important;
         aspect-ratio: 16 / 9 !important;
         border-radius: 14px !important;
@@ -881,6 +868,8 @@ html, body {
         z-index: 120 !important;
         touch-action: none;
         cursor: grab;
+        user-select: none;
+        -webkit-user-select: none;
     }
 
     #camera-panel.expanded {
