@@ -175,10 +175,10 @@ function createParticleSphere() {
         base[i * 3] = x; base[i * 3 + 1] = yp; base[i * 3 + 2] = z;
 
         const t = (y + 1) / 2;
-        // Deep Ruby to Radiant Crimson Red Sphere
-        col[i * 3] = 0.88 + 0.12 * Math.sin(t * Math.PI);
-        col[i * 3 + 1] = 0.05 + 0.10 * t;
-        col[i * 3 + 2] = 0.08 + 0.14 * (1 - t);
+        // Smooth gradient from Pure White (top) to Vibrant Red (bottom)
+        col[i * 3] = 1.0;
+        col[i * 3 + 1] = 0.08 + 0.92 * t;
+        col[i * 3 + 2] = 0.10 + 0.90 * t;
     }
 
     geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
@@ -233,16 +233,16 @@ function updateSphere(time) {
             tx += fx; ty += fy; tz += fz;
             if (totalF > 0.03) {
                 const t = Math.min(1, totalF * 3);
-                // Intense bright scarlet / neon red flare
+                // Luminous flare on hand interaction
                 col[i * 3] += (1.0 - col[i * 3]) * t * 0.15;
-                col[i * 3 + 1] += (0.22 - col[i * 3 + 1]) * t * 0.12;
-                col[i * 3 + 2] += (0.25 - col[i * 3 + 2]) * t * 0.12;
+                col[i * 3 + 1] += (0.9 - col[i * 3 + 1]) * t * 0.1;
+                col[i * 3 + 2] += (0.9 - col[i * 3 + 2]) * t * 0.1;
             }
         } else {
-            const ot = (by / 1.6 + 1) / 2;
-            const targetR = 0.88 + 0.12 * Math.sin(ot * Math.PI);
-            const targetG = 0.05 + 0.10 * ot;
-            const targetB = 0.08 + 0.14 * (1 - ot);
+            const ot = Math.max(0, Math.min(1, (by / 1.6 + 1) / 2));
+            const targetR = 1.0;
+            const targetG = 0.08 + 0.92 * ot;
+            const targetB = 0.10 + 0.90 * ot;
             col[i * 3] += (targetR - col[i * 3]) * 0.02;
             col[i * 3 + 1] += (targetG - col[i * 3 + 1]) * 0.02;
             col[i * 3 + 2] += (targetB - col[i * 3 + 2]) * 0.02;
