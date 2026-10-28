@@ -513,330 +513,383 @@ body {
     pointer-events: none;
 }
 
-.portfolio-modal {
+.portfolio-modal.zen-container {
+    position: relative;
     width: 100%;
-    max-width: 560px;
-    max-height: 88vh;
-    background: var(--surface-1);
-    border: 1px solid var(--border);
-    border-radius: 28px;
-    box-shadow: 0 32px 80px rgba(0, 0, 0, 0.95);
+    max-width: 580px;
+    max-height: 90vh;
+    background-color: #06090f;
+    background-image: linear-gradient(180deg, rgba(6, 9, 15, 0.45) 0%, rgba(6, 9, 15, 0.65) 100%), url('./assets/images/light_bg.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    border: 1.5px solid rgba(255, 255, 255, 0.22);
+    border-radius: 32px;
+    box-shadow: 0 35px 90px rgba(0, 0, 0, 0.88), 0 0 0 1px rgba(255, 255, 255, 0.1) inset;
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    animation: modal-enter 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    animation: modal-enter 0.28s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 @keyframes modal-enter {
     0% {
-        transform: scale(0.96) translateY(8px);
+        transform: scale(0.95) translateY(12px);
         opacity: 0;
     }
-
     100% {
         transform: scale(1) translateY(0);
         opacity: 1;
     }
 }
 
-.modal-handle {
-    display: none;
+/* Zen Physics Canvas Overlay */
+#zen-physics-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1;
 }
 
-.modal-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 20px 24px 16px;
-    border-bottom: 1px solid var(--border);
-    background: var(--surface-1);
+/* Parallax Calligraphy Kanji Characters in Background */
+.zen-kanji-bg {
+    position: absolute;
+    font-family: 'Times New Roman', 'Noto Serif JP', serif;
+    font-weight: 900;
+    color: rgba(255, 255, 255, 0.07);
+    user-select: none;
+    pointer-events: none;
+    z-index: 1;
+    text-shadow: 0 0 45px rgba(212, 175, 55, 0.25);
 }
 
-.modal-title-group {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
+.zen-kanji-right {
+    top: 50px;
+    right: 32px;
+    font-size: 110px;
+    line-height: 1;
 }
 
-.modal-subtitle {
-    font-family: var(--mono);
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 2px;
-    color: var(--gold);
+.zen-kanji-left {
+    top: 220px;
+    left: 24px;
+    font-size: 130px;
+    line-height: 1;
 }
 
-.modal-title {
-    font-size: 20px;
-    font-weight: 800;
-    color: var(--text-primary);
-    letter-spacing: -0.5px;
-}
-
-.modal-close-btn {
-    width: 32px;
-    height: 32px;
+/* Floating Top Close Button */
+.zen-close-btn {
+    position: absolute;
+    top: 18px;
+    right: 18px;
+    z-index: 25;
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
-    background: var(--surface-2);
-    border: 1px solid var(--border);
-    color: var(--text-secondary);
+    background: rgba(255, 255, 255, 0.92);
+    border: 1.5px solid rgba(255, 255, 255, 0.95);
+    color: #0f172a;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    transition: all 0.2s;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.modal-close-btn:hover {
-    background: var(--surface-3);
-    color: var(--text-primary);
-    border-color: var(--border-light);
+.zen-close-btn:hover {
+    transform: scale(1.08);
+    background: #ffffff;
+    color: #b8860b;
 }
 
-.modal-scroll-body {
-    padding: 20px 24px 28px;
+.zen-close-btn:active {
+    transform: scale(0.94);
+}
+
+/* Scrollable Container Body */
+.zen-scroll-body {
+    position: relative;
+    z-index: 5;
+    padding: 38px 26px 42px;
     overflow-y: auto;
+    overflow-x: hidden;
     display: flex;
     flex-direction: column;
     gap: 20px;
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
 }
 
-/* Portfolio Hero Card */
-.portfolio-hero-card {
-    display: flex;
-    align-items: flex-start;
-    gap: 16px;
-    padding: 20px;
-    border-radius: 20px;
-    background: var(--surface-card);
-    border: 1px solid var(--border);
-}
-
-.portfolio-avatar {
-    width: 58px;
-    height: 58px;
-    border-radius: 50%;
-    background: #000000;
-    border: 2px solid var(--gold);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-family: var(--mono);
-    font-size: 20px;
-    font-weight: 900;
-    color: var(--gold);
-    flex-shrink: 0;
-}
-
-.portfolio-meta {
+/* Hero Header: Avatar + Name + Role Pill */
+.zen-hero-header {
     display: flex;
     flex-direction: column;
-    gap: 6px;
-}
-
-.portfolio-name {
-    font-size: 20px;
-    font-weight: 800;
-    color: var(--text-primary);
-    line-height: 1.1;
-}
-
-.portfolio-role-badge {
-    align-self: flex-start;
-    padding: 3px 10px;
-    border-radius: var(--radius-pill);
-    background: var(--gold-pill);
-    border: 1px solid rgba(212, 175, 55, 0.3);
-    font-family: var(--mono);
-    font-size: 9px;
-    font-weight: 800;
-    letter-spacing: 1.5px;
-    color: var(--gold-light);
-}
-
-.portfolio-tagline {
-    font-size: 13px;
-    line-height: 1.5;
-    color: var(--text-secondary);
-    margin-top: 2px;
-}
-
-.portfolio-location {
-    display: flex;
     align-items: center;
-    gap: 6px;
-    font-size: 11px;
-    color: var(--text-tertiary);
-    margin-top: 2px;
-}
-
-/* Portfolio Sections */
-.portfolio-section {
-    display: flex;
-    flex-direction: column;
+    text-align: center;
+    padding: 10px 0 8px;
     gap: 12px;
 }
 
-.section-title {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 13px;
-    font-weight: 700;
-    color: var(--text-primary);
-    letter-spacing: -0.2px;
-}
-
-/* Project Cards */
-.project-card {
-    background: var(--surface-card);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 16px;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-
-.project-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-
-.project-name {
-    font-size: 14px;
-    font-weight: 700;
-    color: var(--text-primary);
-}
-
-.project-tag {
-    font-family: var(--mono);
-    font-size: 9px;
-    font-weight: 700;
-    letter-spacing: 1px;
-    padding: 3px 8px;
-    border-radius: var(--radius-pill);
-    background: var(--surface-3);
-    border: 1px solid var(--border);
-    color: var(--gold);
-}
-
-.project-desc {
-    font-size: 12px;
-    line-height: 1.6;
-    color: var(--text-secondary);
-}
-
-.project-chips {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-    margin-top: 4px;
-}
-
-.mini-chip {
-    font-family: var(--mono);
-    font-size: 10px;
-    padding: 4px 10px;
-    border-radius: var(--radius-pill);
-    background: var(--surface-2);
-    border: 1px solid var(--border);
-    color: var(--titanium);
-}
-
-/* Philosophy Card */
-.philosophy-card {
-    background: var(--surface-card);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 14px 16px;
-}
-
-.philosophy-text {
-    font-size: 12px;
-    line-height: 1.65;
-    color: var(--text-secondary);
-}
-
-.philosophy-text strong {
-    color: var(--text-primary);
-}
-
-/* Zen Card */
-.zen-card {
+.zen-avatar-frame {
+    width: 126px;
+    height: 126px;
+    border-radius: 50%;
+    border: 3.5px solid rgba(255, 255, 255, 0.96);
+    box-shadow: 0 0 38px 8px rgba(212, 175, 55, 0.45), 0 12px 28px rgba(0, 0, 0, 0.4);
+    overflow: hidden;
     background: #000000;
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 16px;
-    display: flex;
-    align-items: center;
-    gap: 16px;
+    flex-shrink: 0;
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.zen-symbol {
+.zen-avatar-frame:hover {
+    transform: scale(1.04);
+}
+
+.zen-avatar-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.zen-creator-name {
     font-size: 32px;
-    font-weight: 800;
-    color: var(--gold);
-    line-height: 1;
+    font-weight: 900;
+    letter-spacing: -1px;
+    color: #ffffff;
+    text-shadow: 0 3px 18px rgba(0, 0, 0, 0.8), 0 0 24px rgba(212, 175, 55, 0.25);
+    margin: 0;
+    line-height: 1.15;
 }
 
-.zen-text {
-    font-style: italic;
-    font-size: 12px;
-    color: var(--text-secondary);
-}
-
-/* Skills Grid */
-.skills-grid {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-}
-
-.skill-pill {
+.zen-role-pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 18px;
+    border-radius: 9999px;
+    background: rgba(255, 255, 255, 0.95);
+    border: 1.5px solid rgba(212, 175, 55, 0.65);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
     font-family: var(--mono);
     font-size: 11px;
-    font-weight: 600;
-    padding: 6px 14px;
-    border-radius: var(--radius-pill);
-    background: var(--surface-card);
-    border: 1px solid var(--border);
-    color: var(--titanium);
+    font-weight: 800;
+    letter-spacing: 2.2px;
+    color: #9a6b05;
 }
 
-/* Portfolio Action Buttons */
-.portfolio-actions {
+/* User-Friendly Frosted White Pill Boxes (100% Readable Against Artwork Background) */
+.zen-glass-pill {
+    background: rgba(255, 255, 255, 0.94);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1.5px solid rgba(255, 255, 255, 0.95);
+    border-radius: 26px;
+    padding: 24px 26px;
+    box-shadow: 0 14px 36px rgba(0, 0, 0, 0.25), 0 2px 8px rgba(0, 0, 0, 0.08);
     display: flex;
-    gap: 10px;
-    margin-top: 4px;
+    flex-direction: column;
+    gap: 14px;
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s;
 }
 
-.portfolio-btn {
-    flex: 1;
+.zen-glass-pill:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 18px 44px rgba(0, 0, 0, 0.32), 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Professional CV Card */
+.zen-cv-card {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 16px;
+    padding: 18px 22px;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.cv-icon-bubble {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: rgba(212, 175, 55, 0.18);
+    color: #a17305;
     display: flex;
     align-items: center;
     justify-content: center;
+    flex-shrink: 0;
+    transition: transform 0.2s;
+}
+
+.zen-cv-card:hover .cv-icon-bubble {
+    transform: scale(1.08);
+    background: rgba(212, 175, 55, 0.28);
+}
+
+.cv-text-group {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.cv-title {
+    font-size: 16px;
+    font-weight: 800;
+    color: #0f172a;
+    line-height: 1.2;
+}
+
+.cv-subtitle {
+    font-size: 12px;
+    font-weight: 500;
+    color: #475569;
+}
+
+.cv-chevron {
+    color: #94a3b8;
+    transition: transform 0.2s, color 0.2s;
+}
+
+.zen-cv-card:hover .cv-chevron {
+    transform: translateX(4px);
+    color: #0f172a;
+}
+
+/* Section Header & Typography */
+.zen-section-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.section-icon-wrap {
+    width: 36px;
+    height: 36px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.gold-sparkle {
+    background: rgba(212, 175, 55, 0.16);
+    color: #b8860b;
+}
+
+.emerald-memory {
+    background: rgba(46, 125, 50, 0.14);
+    color: #1e702c;
+}
+
+.zen-section-title {
+    font-size: 18px;
+    font-weight: 800;
+    color: #0f172a;
+    letter-spacing: -0.4px;
+    margin: 0;
+}
+
+.zen-section-text {
+    font-size: 14.5px;
+    line-height: 1.68;
+    color: #1f2937;
+    margin: 0;
+    font-weight: 450;
+}
+
+/* Tech Chips Inside Pill Box */
+.zen-chips-wrap {
+    display: flex;
+    flex-wrap: wrap;
     gap: 8px;
-    padding: 12px 14px;
-    border-radius: var(--radius-pill);
-    background: var(--surface-card);
-    border: 1px solid var(--border);
-    color: var(--text-primary);
+    margin-top: 4px;
+}
+
+.zen-tech-chip {
+    padding: 7px 14px;
+    border-radius: 14px;
+    background: rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    font-size: 12px;
+    font-weight: 600;
+    color: #1e293b;
+    font-family: var(--font-sans);
+    transition: background 0.2s, color 0.2s;
+}
+
+.zen-tech-chip:hover {
+    background: rgba(212, 175, 55, 0.14);
+    color: #855b00;
+    border-color: rgba(212, 175, 55, 0.3);
+}
+
+/* Satori Center Card */
+.zen-center-card {
+    align-items: center;
+    text-align: center;
+    padding: 24px 20px;
+    gap: 8px;
+}
+
+.satori-kanji {
+    font-size: 48px;
+    line-height: 1;
+    color: #b8860b;
+    font-weight: 800;
+    text-shadow: 0 2px 10px rgba(212, 175, 55, 0.3);
+    font-family: 'Times New Roman', 'Noto Serif JP', serif;
+}
+
+.satori-quote {
+    font-style: italic;
+    font-size: 14px;
+    color: #475569;
+    font-weight: 500;
+}
+
+/* Social Icon Circles Row */
+.zen-social-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 24px;
+    padding: 10px 0 16px;
+}
+
+.zen-social-circle {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.94);
+    border: 2px solid rgba(255, 255, 255, 0.95);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #0f172a;
     text-decoration: none;
-    font-size: 13px;
-    font-weight: 700;
-    transition: all 0.2s ease;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.portfolio-btn:hover {
-    background: var(--surface-3);
-    border-color: var(--border-light);
-    color: var(--gold);
+.zen-social-circle:hover {
+    transform: translateY(-4px) scale(1.08);
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.4), 0 0 24px rgba(212, 175, 55, 0.4);
+    color: #b8860b;
 }
 
-.portfolio-btn:active {
-    transform: scale(0.97);
+.zen-social-circle:active {
+    transform: scale(0.95);
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -986,10 +1039,10 @@ body {
         align-items: flex-end;
     }
 
-    .portfolio-modal {
+    .portfolio-modal.zen-container {
         max-width: 100%;
-        max-height: 85vh;
-        border-radius: 28px 28px 0 0;
+        max-height: 88vh;
+        border-radius: 32px 32px 0 0;
         border-bottom: none;
         animation: modal-slide-up 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     }
@@ -1004,22 +1057,30 @@ body {
         }
     }
 
-    .modal-handle {
-        display: block;
-        width: 38px;
-        height: 5px;
-        border-radius: 3px;
-        background: var(--border-light);
-        margin: 10px auto 4px;
-        flex-shrink: 0;
+    .zen-scroll-body {
+        padding: 28px 18px 44px;
+        padding-bottom: calc(44px + env(safe-area-inset-bottom, 0px));
+        gap: 16px;
     }
 
-    .modal-header {
-        padding: 12px 20px 14px;
+    .zen-avatar-frame {
+        width: 108px;
+        height: 108px;
     }
 
-    .modal-scroll-body {
-        padding: 16px 20px 32px;
-        padding-bottom: calc(32px + env(safe-area-inset-bottom, 0px));
+    .zen-creator-name {
+        font-size: 27px;
+    }
+
+    .zen-glass-pill {
+        padding: 20px 18px;
+        border-radius: 22px;
+    }
+
+    .zen-close-btn {
+        top: 14px;
+        right: 14px;
+        width: 36px;
+        height: 36px;
     }
 }

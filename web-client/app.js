@@ -732,14 +732,151 @@ function addEventLog(msg) {
 
 
 // ═══════════════════════════════════════════════════════════════
-//  CREATOR PROFILE MODAL (Biswadeep Tewari)
+//  CREATOR PROFILE MODAL & LIVING ZEN PHYSICS (Biswadeep Tewari)
 // ═══════════════════════════════════════════════════════════════
+
+let zenPhysicsAnimId = null;
+const ZEN_PARTICLE_COUNT = 42;
+const zenParticles = [];
+
+// Precomputed pseudo-random harmonic particles matching mobile_client_v2
+(function initZenParticles() {
+    for (let i = 0; i < ZEN_PARTICLE_COUNT; i++) {
+        const s1 = Math.sin(i * 997 + 13) * 10000;
+        const s2 = Math.sin(i * 389 + 71) * 10000;
+        const r1 = s1 - Math.floor(s1);
+        const r2 = s2 - Math.floor(s2);
+        const r3 = ((s1 + s2) * 5) - Math.floor((s1 + s2) * 5);
+
+        zenParticles.push({
+            xSeed: r1,
+            ySeed: r2,
+            speed: 0.025 + r3 * 0.045,
+            amplitude: 15.0 + r1 * 25.0,
+            frequency: 1.0 + r2 * 2.5,
+            radius: 1.4 + r3 * 2.0,
+            phase: r1 * 2 * Math.PI,
+            maxOpacity: 0.35 + r2 * 0.45
+        });
+    }
+})();
+
+function renderZenPhysics(timestamp) {
+    const canvas = document.getElementById('zen-physics-canvas');
+    const modal = document.querySelector('.portfolio-modal.zen-container');
+    if (!canvas || !modal || document.getElementById('creator-modal').classList.contains('hidden')) {
+        return;
+    }
+
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const rect = modal.getBoundingClientRect();
+    const width = rect.width;
+    const height = rect.height;
+
+    if (canvas.width !== Math.floor(width * dpr) || canvas.height !== Math.floor(height * dpr)) {
+        canvas.width = Math.floor(width * dpr);
+        canvas.height = Math.floor(height * dpr);
+    }
+
+    const ctx = canvas.getContext('2d');
+    ctx.save();
+    ctx.scale(dpr, dpr);
+    ctx.clearRect(0, 0, width, height);
+
+    // Continuous 30-second repeating cycle (matches Flutter AnimationController duration: 30s)
+    const time = (timestamp % 30000) / 30000.0;
+
+    // 1. Living Floating Zen Golden Particles / Fireflies
+    for (const p of zenParticles) {
+        const pTime = (time + p.phase) % 1.0;
+        let y = ((p.ySeed - (pTime * p.speed * 4.0)) % 1.0) * height;
+        if (y < 0) y += height;
+
+        let x = ((p.xSeed * width) + Math.sin(pTime * 2 * Math.PI * p.frequency + p.phase) * p.amplitude) % width;
+        if (x < 0) x += width;
+
+        const alpha = (Math.abs(Math.sin(pTime * 2 * Math.PI)) * 0.7 + 0.3) * p.maxOpacity;
+
+        // Radiant golden aura
+        const glowRadius = p.radius * 3.2;
+        const grad = ctx.createRadialGradient(x, y, 0, x, y, glowRadius);
+        grad.addColorStop(0, `rgba(255, 238, 160, ${alpha * 0.9})`);
+        grad.addColorStop(0.45, `rgba(212, 175, 55, ${alpha * 0.45})`);
+        grad.addColorStop(1, 'rgba(212, 175, 55, 0)');
+
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        ctx.arc(x, y, glowRadius, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Core light seed
+        ctx.fillStyle = `rgba(255, 255, 230, ${alpha * 0.95})`;
+        ctx.beginPath();
+        ctx.arc(x, y, p.radius, 0, Math.PI * 2);
+        ctx.fill();
+    }
+
+    // 2. Flying Zen Birds Kinematics Flock (High-frequency wing flap & sinusoidal traversal)
+    const flap = Math.sin(time * 2 * Math.PI * 14.0);
+    const flightX = (time * width * 1.35) % (width + 160) - 80;
+    const flightY = height * 0.15 + Math.sin(time * 2 * Math.PI * 1.5) * 16.0;
+
+    function drawZenBird(bx, by, scale) {
+        const wingH = 5.5 * scale;
+        const wingY = by - wingH + (flap * 4.5 * scale);
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.42)';
+        ctx.lineWidth = 1.35 * scale;
+        ctx.lineCap = 'round';
+        ctx.beginPath();
+        ctx.moveTo(bx - (10 * scale), wingY);
+        ctx.quadraticCurveTo(bx - (5 * scale), by + (2 * scale), bx, by);
+        ctx.quadraticCurveTo(bx + (5 * scale), by + (2 * scale), bx + (10 * scale), wingY);
+        ctx.stroke();
+    }
+
+    // V-formation flock
+    drawZenBird(flightX, flightY, 1.05);
+    drawZenBird(flightX - 22, flightY + 12, 0.88);
+    drawZenBird(flightX - 42, flightY + 24, 0.72);
+    drawZenBird(flightX + 20, flightY + 11, 0.92);
+    drawZenBird(flightX + 38, flightY + 22, 0.78);
+
+    ctx.restore();
+    zenPhysicsAnimId = requestAnimationFrame(renderZenPhysics);
+}
+
+function startZenPhysics() {
+    if (!zenPhysicsAnimId) {
+        zenPhysicsAnimId = requestAnimationFrame(renderZenPhysics);
+    }
+}
+
+function stopZenPhysics() {
+    if (zenPhysicsAnimId) {
+        cancelAnimationFrame(zenPhysicsAnimId);
+        zenPhysicsAnimId = null;
+    }
+}
 
 function openCreatorModal() {
     const modal = document.getElementById('creator-modal');
     if (modal) {
         modal.classList.remove('hidden');
         document.body.style.overflow = 'hidden';
+        startZenPhysics();
+
+        // Parallax kanji scroll setup
+        const scrollBody = modal.querySelector('.zen-scroll-body');
+        const kanjiRight = modal.querySelector('.zen-kanji-right');
+        const kanjiLeft = modal.querySelector('.zen-kanji-left');
+        if (scrollBody && kanjiRight && kanjiLeft && !scrollBody._hasZenScroll) {
+            scrollBody._hasZenScroll = true;
+            scrollBody.addEventListener('scroll', () => {
+                const offset = scrollBody.scrollTop;
+                kanjiRight.style.transform = `translateY(${offset * -0.25}px)`;
+                kanjiLeft.style.transform = `translateY(${offset * -0.42}px)`;
+            }, { passive: true });
+        }
     }
 }
 
@@ -748,6 +885,7 @@ function closeCreatorModal() {
     if (modal) {
         modal.classList.add('hidden');
         document.body.style.overflow = '';
+        stopZenPhysics();
     }
 }
 

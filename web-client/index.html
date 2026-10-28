@@ -136,153 +136,136 @@
     <!-- Gesture Flash (HUD) -->
     <div id="gesture-flash" class="gesture-flash hidden"></div>
 
-    <!-- Settings: Biswadeep Tewari Full Developer Portfolio Modal (Zero Neon) -->
+    <!-- Settings: Biswadeep Tewari Developer Portfolio Modal (Cat Background, Living Zen Physics & White Glass Pills) -->
     <div id="creator-modal" class="modal-backdrop hidden" onclick="handleModalBackdrop(event)">
-        <div class="cupertino-modal-card portfolio-modal" onclick="event.stopPropagation()">
-            <!-- iOS Drag Handle -->
-            <div class="modal-handle"></div>
+        <div class="portfolio-modal zen-container" onclick="event.stopPropagation()">
+            <!-- Living Zen Physics Canvas -->
+            <canvas id="zen-physics-canvas"></canvas>
 
-            <!-- Modal Header -->
-            <div class="modal-header">
-                <div class="modal-title-group">
-                    <span class="modal-subtitle">DEVELOPER PORTFOLIO</span>
-                    <h2 class="modal-title">Biswadeep Tewari</h2>
-                </div>
-                <button class="modal-close-btn" onclick="closeCreatorModal()" aria-label="Close">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
-                        <line x1="18" y1="6" x2="6" y2="18"></line>
-                        <line x1="6" y1="6" x2="18" y2="18"></line>
-                    </svg>
-                </button>
-            </div>
+            <!-- Parallax Floating Zen Calligraphy characters -->
+            <div class="zen-kanji-bg zen-kanji-right" aria-hidden="true">禅</div>
+            <div class="zen-kanji-bg zen-kanji-left" aria-hidden="true">道</div>
 
-            <div class="modal-scroll-body">
-                <!-- Portfolio Hero Card -->
-                <div class="portfolio-hero-card">
-                    <div class="portfolio-avatar">BT</div>
-                    <div class="portfolio-meta">
-                        <h3 class="portfolio-name">Biswadeep Tewari</h3>
-                        <div class="portfolio-role-badge">AI ARCHITECT & ENGINEER</div>
-                        <p class="portfolio-tagline">Architecting intelligent autonomous engines, real-time spatial computing pipelines, and zero-latency human-machine interfaces.</p>
-                        <div class="portfolio-location">
-                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-                            <span>MAKAUT University | Kolkata, West Bengal</span>
-                        </div>
+            <!-- Floating Top Close Button -->
+            <button class="zen-close-btn" onclick="closeCreatorModal()" aria-label="Close Portfolio">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+
+            <!-- Scrollable Content Stack -->
+            <div class="zen-scroll-body">
+                <!-- Avatar & Hero Header (Living Gold Aura) -->
+                <div class="zen-hero-header">
+                    <div class="zen-avatar-frame">
+                        <img src="./assets/images/raj_profile.jpg" alt="Biswadeep Tewari" class="zen-avatar-img">
+                    </div>
+                    <h2 class="zen-creator-name">Biswadeep Tewari</h2>
+                    <div class="zen-role-pill">
+                        <span>AI ARCHITECT & ENGINEER</span>
                     </div>
                 </div>
 
-                <!-- Featured Systems Built -->
-                <div class="portfolio-section">
-                    <h4 class="section-title">
-                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" stroke-width="2.2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-                        <span>Featured Systems</span>
-                    </h4>
-                    
-                    <div class="project-card">
-                        <div class="project-header">
-                            <span class="project-name">MotionW (Spatial Tracer)</span>
-                            <span class="project-tag">Spatial Computing</span>
-                        </div>
-                        <p class="project-desc">In-browser real-time 3D air gesture tracking powered by MediaPipe and Three.js with zero server roundtrips, sub-15ms landmark pipeline, and 13 discrete air gestures.</p>
-                        <div class="project-chips">
-                            <span class="mini-chip">Three.js</span>
-                            <span class="mini-chip">MediaPipe</span>
-                            <span class="mini-chip">WebRTC</span>
-                            <span class="mini-chip">Vanilla JS</span>
-                        </div>
+                <!-- Interactive Professional CV Card (Crisp White Pill Box) -->
+                <a href="./assets/docs/CV.pdf" target="_blank" rel="noopener noreferrer" class="zen-glass-pill zen-cv-card" aria-label="Open Professional CV">
+                    <div class="cv-icon-bubble">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                            <polyline points="10 9 9 9 8 9"></polyline>
+                        </svg>
                     </div>
+                    <div class="cv-text-group">
+                        <div class="cv-title">Professional CV</div>
+                        <div class="cv-subtitle">Tap to view interactive PDF</div>
+                    </div>
+                    <div class="cv-chevron">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="9 18 15 12 9 6"></polyline>
+                        </svg>
+                    </div>
+                </a>
 
-                    <div class="project-card">
-                        <div class="project-header">
-                            <span class="project-name">Neural Citadel</span>
-                            <span class="project-tag">Agentic Core</span>
+                <!-- Section 1: A Dialogue with Machines (Crisp White Pill Box) -->
+                <div class="zen-glass-pill">
+                    <div class="zen-section-header">
+                        <div class="section-icon-wrap gold-sparkle">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/>
+                                <path d="M5 3v4"/>
+                                <path d="M19 17v4"/>
+                                <path d="M3 5h4"/>
+                                <path d="M17 19h4"/>
+                            </svg>
                         </div>
-                        <p class="project-desc">Autonomous multi-agent orchestration infrastructure with self-correcting telemetry, asynchronous execution, and containerized runtime.</p>
-                        <div class="project-chips">
-                            <span class="mini-chip">Python</span>
-                            <span class="mini-chip">FastAPI</span>
-                            <span class="mini-chip">Docker</span>
-                            <span class="mini-chip">Agentic AI</span>
-                        </div>
+                        <h3 class="zen-section-title">A Dialogue with Machines</h3>
                     </div>
-
-                    <div class="project-card">
-                        <div class="project-header">
-                            <span class="project-name">Headless Vision Engine</span>
-                            <span class="project-tag">Computer Vision</span>
-                        </div>
-                        <p class="project-desc">High-performance OpenCV + MediaPipe heuristic streaming landmark data over WebSockets with virtual OS keystroke injection via pynput.</p>
-                        <div class="project-chips">
-                            <span class="mini-chip">Python</span>
-                            <span class="mini-chip">MediaPipe</span>
-                            <span class="mini-chip">pynput</span>
-                            <span class="mini-chip">WebSockets</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Philosophy / Ethos -->
-                <div class="portfolio-section">
-                    <h4 class="section-title">
-                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" stroke-width="2.2"><circle cx="12" cy="12" r="10"></circle><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
-                        <span>Philosophy & Architecture</span>
-                    </h4>
-                    <div class="philosophy-card">
-                        <p class="philosophy-text"><strong>A Dialogue with Machines:</strong> Weaving human intention into the cold, beautiful logic of machines. By stripping away traditional interfaces, I invite a pure dialogue—where a quiet gesture speaks directly to the ether. An intimate dance between thought and digital reality.</p>
-                    </div>
-                    <div class="philosophy-card">
-                        <p class="philosophy-text"><strong>Invisible Mathematics:</strong> Operating like a ghost within the system, this tracking heuristic requires no hardware, no gloves, and no tethers. Pure geometric logic translating whisper motions into action.</p>
+                    <p class="zen-section-text">
+                        I am an architect of unseen threads, weaving human intention into the cold, beautiful logic of machines. By stripping away traditional interfaces, I invite a pure dialogue—where a quiet gesture speaks directly to the ether. This is not just an engine; it is an intimate dance between thought and digital reality.
+                    </p>
+                    <div class="zen-chips-wrap">
+                        <span class="zen-tech-chip">Flutter</span>
+                        <span class="zen-tech-chip">Python / FastAPI</span>
+                        <span class="zen-tech-chip">LangChain</span>
+                        <span class="zen-tech-chip">MediaPipe</span>
+                        <span class="zen-tech-chip">Kotlin</span>
+                        <span class="zen-tech-chip">TensorFlow</span>
+                        <span class="zen-tech-chip">Three.js</span>
                     </div>
                 </div>
 
-                <!-- Satori Zen Quote -->
-                <div class="zen-card">
-                    <span class="zen-symbol">悟</span>
-                    <p class="zen-text">"Where the mind wanders, the engine follows."</p>
-                </div>
-
-                <!-- Technical Arsenal / Skills -->
-                <div class="portfolio-section">
-                    <h4 class="section-title">
-                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" stroke-width="2.2"><rect x="4" y="4" width="16" height="16" rx="2" ry="2"></rect><rect x="9" y="9" width="6" height="6"></rect></svg>
-                        <span>Technical Arsenal</span>
-                    </h4>
-                    <div class="skills-grid">
-                        <span class="skill-pill">Python</span>
-                        <span class="skill-pill">FastAPI</span>
-                        <span class="skill-pill">Flutter / Dart</span>
-                        <span class="skill-pill">MediaPipe</span>
-                        <span class="skill-pill">Three.js</span>
-                        <span class="skill-pill">PyTorch</span>
-                        <span class="skill-pill">LangChain</span>
-                        <span class="skill-pill">Kotlin</span>
-                        <span class="skill-pill">Docker</span>
-                        <span class="skill-pill">WebSockets</span>
+                <!-- Section 2: Invisible Mathematics (Crisp White Pill Box) -->
+                <div class="zen-glass-pill">
+                    <div class="zen-section-header">
+                        <div class="section-icon-wrap emerald-memory">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect width="16" height="16" x="4" y="4" rx="2"/>
+                                <rect width="6" height="6" x="9" y="9" rx="1"/>
+                                <path d="M15 2v2"/>
+                                <path d="M15 20v2"/>
+                                <path d="M2 15h2"/>
+                                <path d="M2 9h2"/>
+                                <path d="M20 15h2"/>
+                                <path d="M20 9h2"/>
+                                <path d="M9 2v2"/>
+                                <path d="M9 20v2"/>
+                            </svg>
+                        </div>
+                        <h3 class="zen-section-title">Invisible Mathematics</h3>
                     </div>
+                    <p class="zen-section-text">
+                        Operating like a ghost within the system, this tracking heuristic requires no hardware, no gloves, and no tethers. It is simply mathematics in its most elegant, invisible form. Every movement is caught by pure geometric logic—a whisper of motion translated into instantaneous action.
+                    </p>
                 </div>
 
-                <!-- Connect Links -->
-                <div class="portfolio-actions">
-                    <a href="https://github.com/RajTewari01" target="_blank" rel="noopener noreferrer" class="portfolio-btn">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                <!-- Section 3: Satori Zen (Crisp White Pill Box) -->
+                <div class="zen-glass-pill zen-center-card">
+                    <div class="satori-kanji">悟</div>
+                    <div class="satori-quote">"Where the mind wanders, the engine follows."</div>
+                </div>
+
+                <!-- Action / Social Links Row -->
+                <div class="zen-social-row">
+                    <a href="https://github.com/RajTewari01" target="_blank" rel="noopener noreferrer" class="zen-social-circle" aria-label="GitHub Profile" title="GitHub">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
                             <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
                         </svg>
-                        <span>GitHub</span>
                     </a>
-                    <a href="mailto:tewari765@gmail.com" class="portfolio-btn">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
-                            <polyline points="22,6 12,13 2,6"></polyline>
+                    <a href="mailto:tewari765@gmail.com" class="zen-social-circle" aria-label="Send Email" title="Email">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect width="20" height="16" x="2" y="4" rx="2"></rect>
+                            <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>
                         </svg>
-                        <span>Email</span>
                     </a>
-                    <a href="https://biswadeep.pythonanywhere.com" target="_blank" rel="noopener noreferrer" class="portfolio-btn">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <a href="https://biswadeep.pythonanywhere.com" target="_blank" rel="noopener noreferrer" class="zen-social-circle" aria-label="Personal Website" title="Website">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <circle cx="12" cy="12" r="10"></circle>
                             <line x1="2" y1="12" x2="22" y2="12"></line>
                             <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
                         </svg>
-                        <span>Website</span>
                     </a>
                 </div>
             </div>
