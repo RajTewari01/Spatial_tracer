@@ -27,3 +27,5 @@ build/
 *.log
 
 shutup.md
+.vercel
+.env*

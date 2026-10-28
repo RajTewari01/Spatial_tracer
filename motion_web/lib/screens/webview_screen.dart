@@ -72,6 +72,14 @@ class _WebViewScreenState extends State<WebViewScreen> {
             onPageFinished: (String url) {
               _onPageReady();
             },
+            onNavigationRequest: (NavigationRequest request) {
+              final lowerUrl = request.url.toLowerCase();
+              if (lowerUrl.endsWith('.apk') || lowerUrl.contains('/assets/binaries/')) {
+                _downloadApkNative(request.url);
+                return NavigationDecision.prevent;
+              }
+              return NavigationDecision.navigate;
+            },
             onWebResourceError: (WebResourceError error) {
               if (error.isForMainFrame ?? true) {
                 if (mounted) {
@@ -110,6 +118,26 @@ class _WebViewScreenState extends State<WebViewScreen> {
     }
   }
 
+  static const MethodChannel _downloaderChannel =
+      MethodChannel('com.rajtewari.motion_web/downloader');
+
+  Future<void> _downloadApkNative(String url) async {
+    try {
+      String fullUrl = url;
+      if (url.startsWith('/')) {
+        fullUrl = 'https://motionw.vercel.app$url';
+      } else if (url.startsWith('./')) {
+        fullUrl = 'https://motionw.vercel.app/${url.substring(2)}';
+      }
+      await _downloaderChannel.invokeMethod('downloadApk', {
+        'url': fullUrl,
+        'fileName': 'MotionW.apk',
+      });
+    } catch (e) {
+      debugPrint('Native download error: $e');
+    }
+  }
+
   void _onPageReady() {
     if (!mounted) return;
     setState(() {
@@ -122,6 +150,7 @@ class _WebViewScreenState extends State<WebViewScreen> {
       await [
         Permission.camera,
         Permission.microphone,
+        Permission.notification,
       ].request();
     } catch (e) {
       debugPrint('Permission error: $e');

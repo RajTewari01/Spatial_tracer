@@ -67,7 +67,7 @@ body {
     background: var(--bg-black);
 }
 
-/* ── Native App Floating Header (Only Two Floating Elements) ── */
+/* ── Native App Floating Header (Left FPS + Center MotionW + Right Settings) ── */
 #top-bar {
     position: fixed;
     top: 0;
@@ -76,63 +76,61 @@ body {
     z-index: 100;
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    padding: 14px 18px;
+    justify-content: flex-start;
+    padding: 0 18px;
+    height: 60px;
     background: transparent;
     border: none;
     pointer-events: none;
+    box-sizing: border-box;
 }
 
-/* Left Brand: Just the name (No M SVG, no outer pill) */
-.header-brand-clean {
+/* Left: Live FPS Indicator in Navbar (Hidden by default, shown ONLY when camera is open) */
+.navbar-fps-badge {
+    pointer-events: auto;
+    display: none; /* Only show when camera is active */
+    align-items: center;
+    gap: 6px;
+    height: 32px;
+    padding: 0 12px;
+    border-radius: var(--radius-pill);
+    background: rgba(15, 23, 42, 0.85);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.65), 0 2px 6px rgba(0, 0, 0, 0.35);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    transition: opacity 0.2s ease;
+    z-index: 105;
+}
+
+.navbar-fps-badge.active {
+    display: flex;
+}
+
+/* Center Brand: MotionW Centered in the Middle of the Navbar (Pacifico Font, No Typewriter) */
+.header-brand-center {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
     pointer-events: auto;
     display: flex;
     align-items: center;
-    padding: 6px 0;
+    justify-content: center;
+    z-index: 105;
 }
 
 .brand-name {
     font-family: 'Pacifico', cursive !important;
-    font-size: 22px;
+    font-size: 24px;
     font-weight: 400;
     color: #FFFFFF;
     line-height: 1.1;
     letter-spacing: 0.8px;
     white-space: nowrap;
     display: inline-block;
-    transition: opacity 0.2s ease, font-size 0.2s ease;
-}
-
-/* When rotating to author text: clean normal typography (NOT Pacifico) */
-.brand-name.author-mode {
-    font-family: var(--font), -apple-system, sans-serif !important;
-    font-size: 13px !important;
-    font-weight: 600 !important;
-    letter-spacing: 0.5px !important;
-    color: var(--text-secondary) !important;
-}
-
-/* Floating Live FPS Indicator — Down Below the Navbar */
-/* Floating Live FPS Indicator — Down Below the Navbar (Only shown when active) */
-#floating-fps-pill {
-    position: fixed;
-    top: 68px;
-    left: 18px;
-    z-index: 95;
-    display: none;
-    align-items: center;
-    gap: 6px;
-    height: 30px;
-    padding: 0 12px;
-    border-radius: var(--radius-pill);
-    background: var(--surface-1);
-    border: 1px solid var(--border);
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.6);
-    pointer-events: auto;
-}
-
-#floating-fps-pill.active {
-    display: flex;
+    text-shadow: 0 2px 14px rgba(0, 0, 0, 0.8), 0 0 25px rgba(255, 255, 255, 0.25);
+    filter: drop-shadow(0 2px 10px rgba(0, 0, 0, 0.7));
 }
 
 .fps-indicator-dot {
@@ -157,9 +155,13 @@ body {
     letter-spacing: 0.5px;
 }
 
-/* Right Settings Button Only — Naked Icon (NO background pill, NO border, NO shadow) */
+/* Right Settings Button: ALWAYS PINNED TO THE FAR RIGHT */
 #btn-settings,
 .header-settings-btn {
+    position: absolute;
+    right: 18px;
+    top: 50%;
+    transform: translateY(-50%);
     pointer-events: auto;
     width: 38px;
     height: 38px;
@@ -178,6 +180,7 @@ body {
     cursor: pointer;
     padding: 0;
     transition: transform 0.15s ease, color 0.15s ease;
+    z-index: 106;
 }
 
 #btn-settings:hover,
@@ -188,7 +191,7 @@ body {
 
 #btn-settings:active,
 .header-settings-btn:active {
-    transform: scale(0.88);
+    transform: translateY(-50%) scale(0.88);
     color: #FFFFFF;
     background: transparent !important;
 }
@@ -513,19 +516,313 @@ body {
     pointer-events: none;
 }
 
+/* ═══════════════════════════════════════════════════════════════
+   FULLSCREEN SETTINGS MODAL (Ultra-Clean, Minimalist, Normal Fonts)
+   ═══════════════════════════════════════════════════════════════ */
+
+#settings-modal {
+    padding: 0 !important;
+    align-items: stretch !important;
+    justify-content: stretch !important;
+}
+
+.settings-modal-card {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100vw;
+    height: 100vh;
+    height: 100dvh;
+    max-width: none !important;
+    max-height: none !important;
+    background-color: #06060a !important;
+    background-image: linear-gradient(180deg, rgba(6, 6, 10, 0.78) 0%, rgba(3, 3, 6, 0.92) 100%), url('./assets/images/creator_black.jpg') !important;
+    background-position: center !important;
+    background-size: cover !important;
+    background-repeat: no-repeat !important;
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    z-index: 999;
+    animation: settings-fade-in 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes settings-fade-in {
+    0% {
+        opacity: 0;
+        transform: scale(0.99);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Cupertino Style Navbar */
+.settings-modal-header.cupertino-nav {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    position: relative;
+    padding: max(16px, env(safe-area-inset-top, 16px)) 20px 14px;
+    background: rgba(10, 10, 14, 0.55);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    flex-shrink: 0;
+    z-index: 20;
+}
+
+/* Cupertino Back Button (< Back) with Added Rich Shadows */
+.cupertino-nav-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: rgba(255, 255, 255, 0.16);
+    border: 1px solid rgba(255, 255, 255, 0.24);
+    color: #ffffff;
+    font-size: 14.5px;
+    font-weight: 500;
+    cursor: pointer;
+    padding: 7px 18px;
+    border-radius: 9999px;
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.65), 0 2px 6px rgba(0, 0, 0, 0.4);
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    z-index: 2;
+}
+
+.cupertino-nav-back:hover {
+    background: rgba(255, 255, 255, 0.28);
+    transform: translateX(-2px);
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.75), 0 3px 8px rgba(0, 0, 0, 0.5);
+}
+
+.cupertino-nav-back:active {
+    transform: scale(0.95);
+}
+
+/* Centered Pacifico Title for Settings */
+.settings-modal-title.pacifico-title {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: 'Pacifico', cursive !important;
+    font-weight: 400 !important;
+    font-size: 26px;
+    color: #ffffff;
+    text-shadow: 0 2px 14px rgba(0, 0, 0, 0.9), 0 0 20px rgba(255, 255, 255, 0.2);
+    margin: 0;
+    letter-spacing: 0.5px;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.settings-scroll-body {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    padding: 36px 20px 48px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* ── Unified Cupertino Settings Group (One card, not divided into separate boxes) ── */
+.cupertino-settings-group {
+    width: 100%;
+    max-width: 540px;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(32px);
+    -webkit-backdrop-filter: blur(32px);
+    border-radius: 24px;
+    border: 1px solid rgba(255, 255, 255, 0.95);
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.7), 0 4px 18px rgba(0, 0, 0, 0.4);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.cupertino-settings-row {
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    text-decoration: none;
+    color: #0f172a;
+    cursor: pointer;
+    transition: background 0.18s ease;
+}
+
+.cupertino-settings-row:hover {
+    background: rgba(0, 0, 0, 0.04);
+}
+
+.cupertino-settings-row:active {
+    background: rgba(0, 0, 0, 0.08);
+}
+
+.cupertino-row-title {
+    flex: 1;
+    font-size: 16px;
+    font-weight: 500 !important;
+    color: #0f172a;
+    letter-spacing: -0.2px;
+}
+
+.cupertino-row-divider {
+    height: 1px;
+    background: rgba(0, 0, 0, 0.07);
+    margin-left: 74px;
+}
+
+.option-icon-wrap {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: transform 0.2s;
+}
+
+.cupertino-settings-row:hover .option-icon-wrap {
+    transform: scale(1.08);
+}
+
+.emerald-icon-box {
+    background: rgba(46, 125, 50, 0.12);
+    color: #1e702c;
+}
+
+.avatar-icon-box {
+    border-radius: 50% !important;
+    overflow: hidden;
+    border: 1.5px solid rgba(15, 23, 42, 0.15) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12) !important;
+}
+
+.option-avatar-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 25%;
+    display: block;
+}
+
+.cyan-icon-box {
+    background: rgba(14, 165, 233, 0.12);
+    color: #0284c7;
+}
+
+.option-badge-pill {
+    padding: 4px 10px;
+    border-radius: 9999px;
+    background: #0f172a;
+    color: #ffffff;
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 500 !important;
+    letter-spacing: 1px;
+    flex-shrink: 0;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+.option-chevron {
+    color: #94a3b8;
+    transition: transform 0.2s, color 0.2s;
+}
+
+.cupertino-settings-row:hover .option-chevron {
+    transform: translateX(3px);
+    color: #0f172a;
+}
+
+/* ── Centered Settings Footer (MotionW • Spatial Tracer • Made by alypion) ── */
+.settings-footer-pill {
+    margin-top: 36px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.settings-footer-pill span {
+    font-family: var(--font);
+    font-size: 13px;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.9);
+    background: rgba(0, 0, 0, 0.65);
+    padding: 9px 26px;
+    border-radius: 9999px;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    letter-spacing: 0.5px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.7);
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   CREATOR INFO MODAL — EDITORIAL PAGE SPOTLIGHT ANIMATION
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Floating Top Back Button (Creator Modal) with Added Rich Shadows */
+.zen-back-btn {
+    position: absolute;
+    top: 18px;
+    left: 18px;
+    z-index: 25;
+    padding: 8px 18px;
+    border-radius: 9999px;
+    background: rgba(255, 255, 255, 0.94);
+    border: 1.5px solid rgba(255, 255, 255, 0.95);
+    color: #0f172a;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.65), 0 2px 8px rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.zen-back-btn:hover {
+    transform: scale(1.06);
+    background: #ffffff;
+    color: #000000;
+    box-shadow: 0 12px 34px rgba(0, 0, 0, 0.75);
+}
+
+.zen-back-btn:active {
+    transform: scale(0.95);
+}
+
 .portfolio-modal.zen-container {
     position: relative;
     width: 100%;
-    max-width: 580px;
-    max-height: 90vh;
-    background-color: #06090f;
-    background-image: linear-gradient(180deg, rgba(6, 9, 15, 0.45) 0%, rgba(6, 9, 15, 0.65) 100%), url('./assets/images/light_bg.png');
+    max-width: 600px;
+    max-height: 92vh;
+    background-color: #050508;
+    background-image: linear-gradient(180deg, rgba(8, 8, 12, 0.74) 0%, rgba(4, 4, 7, 0.90) 100%), url('./assets/images/creator_black.jpg');
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
-    border: 1.5px solid rgba(255, 255, 255, 0.22);
+    border: 1.5px solid rgba(255, 255, 255, 0.18);
     border-radius: 32px;
-    box-shadow: 0 35px 90px rgba(0, 0, 0, 0.88), 0 0 0 1px rgba(255, 255, 255, 0.1) inset;
+    box-shadow: 0 40px 100px rgba(0, 0, 0, 0.95), 0 0 0 1px rgba(255, 255, 255, 0.08) inset;
     display: flex;
     flex-direction: column;
     overflow: hidden;
@@ -534,7 +831,7 @@ body {
 
 @keyframes modal-enter {
     0% {
-        transform: scale(0.95) translateY(12px);
+        transform: scale(0.96) translateY(12px);
         opacity: 0;
     }
     100% {
@@ -559,11 +856,10 @@ body {
     position: absolute;
     font-family: 'Times New Roman', 'Noto Serif JP', serif;
     font-weight: 900;
-    color: rgba(255, 255, 255, 0.07);
+    color: rgba(255, 255, 255, 0.05);
     user-select: none;
     pointer-events: none;
     z-index: 1;
-    text-shadow: 0 0 45px rgba(212, 175, 55, 0.25);
 }
 
 .zen-kanji-right {
@@ -580,93 +876,66 @@ body {
     line-height: 1;
 }
 
-/* Floating Top Close Button */
-.zen-close-btn {
-    position: absolute;
-    top: 18px;
-    right: 18px;
-    z-index: 25;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.92);
-    border: 1.5px solid rgba(255, 255, 255, 0.95);
-    color: #0f172a;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
-    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.zen-close-btn:hover {
-    transform: scale(1.08);
-    background: #ffffff;
-    color: #b8860b;
-}
-
-.zen-close-btn:active {
-    transform: scale(0.94);
-}
-
 /* Scrollable Container Body */
 .zen-scroll-body {
     position: relative;
     z-index: 5;
-    padding: 38px 26px 42px;
+    padding: 38px 24px 44px;
     overflow-y: auto;
     overflow-x: hidden;
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 18px;
     -webkit-overflow-scrolling: touch;
     scroll-behavior: smooth;
 }
 
-/* Hero Header: Avatar + Name + Role Pill */
+/* Hero Header: Avatar + Pacifico Normal Name + Minimalist Role Pill */
 .zen-hero-header {
     display: flex;
     flex-direction: column;
     align-items: center;
     text-align: center;
-    padding: 10px 0 8px;
-    gap: 12px;
+    padding: 8px 0 6px;
+    gap: 10px;
 }
 
+/* Minimalist Clean Avatar Frame (NO gold circle!) */
 .zen-avatar-frame {
-    width: 126px;
-    height: 126px;
+    width: 122px;
+    height: 122px;
     border-radius: 50%;
-    border: 3.5px solid rgba(255, 255, 255, 0.96);
-    box-shadow: 0 0 38px 8px rgba(212, 175, 55, 0.45), 0 12px 28px rgba(0, 0, 0, 0.4);
+    border: 2.5px solid #ffffff !important;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.75), 0 0 24px rgba(255, 255, 255, 0.4) !important;
     overflow: hidden;
     background: #000000;
     flex-shrink: 0;
-    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s;
 }
 
 .zen-avatar-frame:hover {
     transform: scale(1.04);
+    box-shadow: 0 20px 48px rgba(0, 0, 0, 0.85), 0 0 32px rgba(255, 255, 255, 0.55) !important;
 }
 
 .zen-avatar-img {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    object-position: center 30%;
     display: block;
 }
 
+/* Biswadeep Tewari: In Pacifico font, NORMAL weight (not bold), Always Selected Bright White */
 .zen-creator-name {
-    font-size: 32px;
-    font-weight: 900;
-    letter-spacing: -1px;
-    color: #ffffff;
-    text-shadow: 0 3px 18px rgba(0, 0, 0, 0.8), 0 0 24px rgba(212, 175, 55, 0.25);
-    margin: 0;
-    line-height: 1.15;
+    font-family: 'Pacifico', cursive !important;
+    font-weight: 400 !important; /* Normal font, not bold */
+    font-size: 38px;
+    color: #ffffff !important;
+    text-shadow: 0 3px 18px rgba(0, 0, 0, 0.85), 0 0 28px rgba(255, 255, 255, 0.45) !important;
+    margin: 4px 0 2px;
+    line-height: 1.25;
+    letter-spacing: 0.5px;
 }
 
 .zen-role-pill {
@@ -674,17 +943,97 @@ body {
     align-items: center;
     padding: 6px 18px;
     border-radius: 9999px;
-    background: rgba(255, 255, 255, 0.95);
-    border: 1.5px solid rgba(212, 175, 55, 0.65);
-    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
+    background: #ffffff !important;
+    border: none !important;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45);
     font-family: var(--mono);
-    font-size: 11px;
-    font-weight: 800;
-    letter-spacing: 2.2px;
-    color: #9a6b05;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: #000000 !important;
 }
 
-/* User-Friendly Frosted White Pill Boxes (100% Readable Against Artwork Background) */
+/* Hero Header: Always remains 100% Selected White, never dimmed or blurred */
+.zen-hero-header {
+    opacity: 1 !important;
+    filter: none !important;
+    transform: none !important;
+}
+
+.zen-scroll-body.spotlight-mode .zen-hero-header {
+    opacity: 1 !important;
+    filter: none !important;
+    transform: none !important;
+}
+
+/* ── Page-Type Editorial Spotlight (Lag-Free 60/120fps Composited Scrolling) ── */
+
+/* Chapter Reading Selector Pills */
+.page-nav-bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 4px 12px 10px;
+    flex-wrap: wrap;
+    z-index: 10;
+}
+
+.page-nav-pill {
+    padding: 5px 14px;
+    border-radius: 9999px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    color: rgba(255, 255, 255, 0.75);
+    font-family: var(--font);
+    font-size: 11px;
+    font-weight: 500;
+    cursor: pointer;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.page-nav-pill:hover {
+    background: rgba(255, 255, 255, 0.22);
+    color: #ffffff;
+    transform: translateY(-1px);
+}
+
+.page-nav-pill.active {
+    background: #ffffff;
+    color: #000000;
+    border-color: #ffffff;
+    box-shadow: 0 4px 16px rgba(255, 255, 255, 0.4);
+    transform: translateY(-1px);
+}
+
+/* Page Portions — Optimized for Zero Scroll Lag (NO blur filter, NO scale transforms) */
+.page-portion {
+    transition: opacity 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease;
+    will-change: opacity, border-color, box-shadow;
+    position: relative;
+    cursor: pointer;
+}
+
+/* Unfocused Cards: Clean, semi-opaque, NO filter re-rasterization during scroll */
+.zen-scroll-body.spotlight-mode .page-portion:not(.portion-highlighted) {
+    opacity: 0.48;
+    border-color: rgba(255, 255, 255, 0.35);
+}
+
+.zen-scroll-body.spotlight-mode .page-portion:not(.portion-highlighted):hover {
+    opacity: 0.82;
+}
+
+/* Selected White Card: Crisp Pure White Outline & Elegant Illumination */
+.page-portion.portion-highlighted {
+    opacity: 1 !important;
+    border-color: #ffffff !important;
+    box-shadow: 0 20px 52px rgba(0, 0, 0, 0.5), 0 0 0 1.5px #ffffff, 0 0 28px rgba(255, 255, 255, 0.28) !important;
+}
+
+/* User-Friendly Frosted White Pill Boxes */
 .zen-glass-pill {
     background: rgba(255, 255, 255, 0.94);
     backdrop-filter: blur(24px);
@@ -696,11 +1045,9 @@ body {
     display: flex;
     flex-direction: column;
     gap: 14px;
-    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s;
 }
 
 .zen-glass-pill:hover {
-    transform: translateY(-2px);
     box-shadow: 0 18px 44px rgba(0, 0, 0, 0.32), 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
@@ -716,11 +1063,11 @@ body {
 }
 
 .cv-icon-bubble {
-    width: 48px;
-    height: 48px;
+    width: 46px;
+    height: 46px;
     border-radius: 50%;
-    background: rgba(212, 175, 55, 0.18);
-    color: #a17305;
+    background: rgba(15, 23, 42, 0.08);
+    color: #0f172a;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -730,7 +1077,7 @@ body {
 
 .zen-cv-card:hover .cv-icon-bubble {
     transform: scale(1.08);
-    background: rgba(212, 175, 55, 0.28);
+    background: rgba(15, 23, 42, 0.14);
 }
 
 .cv-text-group {
@@ -742,7 +1089,7 @@ body {
 
 .cv-title {
     font-size: 16px;
-    font-weight: 800;
+    font-weight: 700;
     color: #0f172a;
     line-height: 1.2;
 }
@@ -763,35 +1110,6 @@ body {
     color: #0f172a;
 }
 
-.emerald-bubble {
-    background: rgba(46, 125, 50, 0.16) !important;
-    color: #1e702c !important;
-}
-
-.zen-download-card:hover .emerald-bubble {
-    background: rgba(46, 125, 50, 0.28) !important;
-    transform: scale(1.08);
-}
-
-.cv-badge-pill {
-    padding: 5px 12px;
-    border-radius: 9999px;
-    background: #0f172a;
-    color: #ffffff;
-    font-family: var(--mono);
-    font-size: 11px;
-    font-weight: 800;
-    letter-spacing: 1px;
-    flex-shrink: 0;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
-    transition: background 0.2s, transform 0.2s;
-}
-
-.zen-download-card:hover .cv-badge-pill {
-    background: #1e702c;
-    transform: scale(1.05);
-}
-
 /* Section Header & Typography */
 .zen-section-header {
     display: flex;
@@ -809,14 +1127,14 @@ body {
     flex-shrink: 0;
 }
 
-.gold-sparkle {
-    background: rgba(212, 175, 55, 0.16);
-    color: #b8860b;
+.silver-sparkle {
+    background: rgba(15, 23, 42, 0.08);
+    color: #0f172a;
 }
 
-.emerald-memory {
-    background: rgba(46, 125, 50, 0.14);
-    color: #1e702c;
+.silver-memory {
+    background: rgba(15, 23, 42, 0.08);
+    color: #0f172a;
 }
 
 .zen-section-title {
@@ -844,7 +1162,7 @@ body {
 }
 
 .zen-tech-chip {
-    padding: 7px 14px;
+    padding: 6px 14px;
     border-radius: 14px;
     background: rgba(0, 0, 0, 0.05);
     border: 1px solid rgba(0, 0, 0, 0.08);
@@ -856,9 +1174,8 @@ body {
 }
 
 .zen-tech-chip:hover {
-    background: rgba(212, 175, 55, 0.14);
-    color: #855b00;
-    border-color: rgba(212, 175, 55, 0.3);
+    background: #0f172a;
+    color: #ffffff;
 }
 
 /* Satori Center Card */
@@ -872,9 +1189,8 @@ body {
 .satori-kanji {
     font-size: 48px;
     line-height: 1;
-    color: #b8860b;
+    color: #0f172a; /* Clean monochrome */
     font-weight: 800;
-    text-shadow: 0 2px 10px rgba(212, 175, 55, 0.3);
     font-family: 'Times New Roman', 'Noto Serif JP', serif;
 }
 
@@ -895,8 +1211,8 @@ body {
 }
 
 .zen-social-circle {
-    width: 60px;
-    height: 60px;
+    width: 58px;
+    height: 58px;
     border-radius: 50%;
     background: rgba(255, 255, 255, 0.94);
     border: 2px solid rgba(255, 255, 255, 0.95);
@@ -913,8 +1229,8 @@ body {
 
 .zen-social-circle:hover {
     transform: translateY(-4px) scale(1.08);
-    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.4), 0 0 24px rgba(212, 175, 55, 0.4);
-    color: #b8860b;
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45);
+    color: #000000;
 }
 
 .zen-social-circle:active {
@@ -931,14 +1247,13 @@ body {
     }
 
     #top-bar {
-        padding: 12px 14px;
+        padding: 0 14px;
+        height: 52px;
     }
 
-    #floating-fps-pill {
-        top: 66px !important;
-        left: 14px !important;
-        height: 28px;
-        padding: 0 10px;
+    #btn-settings,
+    .header-settings-btn {
+        right: 14px !important;
     }
 
     /* ── Mobile PiP Camera: Completely 16:9 Widescreen Rectangle (Default Down & Draggable) ── */
@@ -1070,10 +1385,21 @@ body {
 
     .portfolio-modal.zen-container {
         max-width: 100%;
-        max-height: 88vh;
+        max-height: 90vh;
         border-radius: 32px 32px 0 0;
         border-bottom: none;
         animation: modal-slide-up 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .settings-modal-card {
+        width: 100vw !important;
+        height: 100vh !important;
+        height: 100dvh !important;
+        max-width: 100% !important;
+        max-height: 100% !important;
+        border-radius: 0 !important;
+        border: none !important;
+        animation: none !important;
     }
 
     @keyframes modal-slide-up {
@@ -1093,12 +1419,14 @@ body {
     }
 
     .zen-avatar-frame {
-        width: 108px;
-        height: 108px;
+        width: 106px;
+        height: 106px;
     }
 
     .zen-creator-name {
-        font-size: 27px;
+        font-family: 'Pacifico', cursive !important;
+        font-weight: 400 !important;
+        font-size: 32px !important;
     }
 
     .zen-glass-pill {

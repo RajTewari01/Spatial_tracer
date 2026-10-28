@@ -4,8 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>MotionW — Air Gesture Engine</title>
-    <meta name="description" content="MotionW real-time 3D air gesture tracking by alypion. Portfolio of Biswadeep Tewari.">
-    <link rel="stylesheet" href="./style.css">
+    <link rel="icon" type="image/png" sizes="32x32" href="./assets/images/favicon-32.png">
+    <link rel="icon" type="image/png" sizes="64x64" href="./favicon.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="./assets/images/apple-touch-icon.png">
+    <link rel="stylesheet" href="./style.css?v=2.2">
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
@@ -37,28 +39,28 @@
         </div>
     </div>
 
-    <!-- Native App Floating Header: Clean Brand (Just MotionW) + Right Settings -->
+    <!-- Native App Floating Header: Left FPS (shown when camera open) + Center MotionW (No Typewriter) + Right Settings -->
     <header id="top-bar">
-        <!-- Left: Just the brand name (No M SVG at all) -->
-        <div class="header-brand-clean">
+        <!-- Left: Live FPS Indicator in Navbar (Hidden by default, shown when camera is active) -->
+        <div id="navbar-fps-pill" class="navbar-fps-badge">
+            <span class="fps-indicator-dot"></span>
+            <span id="fps-value" class="fps-num">0</span>
+            <span class="fps-unit">FPS</span>
+        </div>
+
+        <!-- Center: MotionW Brand (Pacifico Font, Centered, No Typewriter) -->
+        <div class="header-brand-center">
             <span id="brand-title" class="brand-name">MotionW</span>
         </div>
 
         <!-- Right: Settings Icon Only -->
-        <button id="btn-settings" class="header-settings-btn" onclick="openCreatorModal()" aria-label="Settings and Portfolio" title="Settings & Portfolio">
+        <button id="btn-settings" class="header-settings-btn" onclick="openSettingsModal()" aria-label="Settings" title="Settings">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                 <circle cx="12" cy="12" r="3"></circle>
                 <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
             </svg>
         </button>
     </header>
-
-    <!-- Floating Live FPS Indicator (Down Below the Navbar) -->
-    <div id="floating-fps-pill" class="floating-fps-badge">
-        <span class="fps-indicator-dot"></span>
-        <span id="fps-value" class="fps-num">60</span>
-        <span class="fps-unit">FPS</span>
-    </div>
 
     <!-- Desktop Sidebar Panel (Matte Solid Cupertino Style - Hidden on Mobile) -->
     <aside id="info-panel">
@@ -136,7 +138,87 @@
     <!-- Gesture Flash (HUD) -->
     <div id="gesture-flash" class="gesture-flash hidden"></div>
 
-    <!-- Settings: Biswadeep Tewari Developer Portfolio Modal (Cat Background, Living Zen Physics & White Glass Pills) -->
+    <!-- Settings Menu Modal (Full Screen, Cupertino Navbar, Pacifico Title, Unified Grouped Inset) -->
+    <div id="settings-modal" class="modal-backdrop hidden" onclick="handleSettingsBackdrop(event)">
+        <div class="settings-modal-card fullscreen-settings" onclick="event.stopPropagation()">
+            <!-- Cupertino Style Navbar with Centered Pacifico Title -->
+            <div class="settings-modal-header cupertino-nav">
+                <button class="cupertino-nav-back" onclick="closeSettingsModal()" aria-label="Back to App">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="15 18 9 12 15 6"></polyline>
+                    </svg>
+                    <span>Back</span>
+                </button>
+                <h2 class="settings-modal-title pacifico-title">Settings</h2>
+            </div>
+
+            <!-- Scrollable Content Area: Single Unified Cupertino Grouped Card -->
+            <div class="settings-scroll-body">
+                <div class="cupertino-settings-group">
+                    <!-- Row 1: Download APK -->
+                    <a href="./assets/binaries/MotionW.apk" download="MotionW.apk" class="cupertino-settings-row" aria-label="Download APK">
+                        <div class="option-icon-wrap emerald-icon-box">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="7 10 12 15 17 10"></polyline>
+                                <line x1="12" y1="15" x2="12" y2="3"></line>
+                            </svg>
+                        </div>
+                        <span class="cupertino-row-title">Download APK</span>
+                        <div class="option-badge-pill">
+                            <span>APK</span>
+                        </div>
+                        <div class="option-chevron">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="9 18 15 12 9 6"></polyline>
+                            </svg>
+                        </div>
+                    </a>
+
+                    <div class="cupertino-row-divider"></div>
+
+                    <!-- Row 2: Creator Info (Black Option) -->
+                    <div class="cupertino-settings-row" onclick="openCreatorFromSettings()" aria-label="Open Creator Info">
+                        <div class="option-icon-wrap avatar-icon-box">
+                            <img src="./assets/images/creator_black.jpg" alt="Biswadeep Tewari" class="option-avatar-img">
+                        </div>
+                        <span class="cupertino-row-title">Creator Info</span>
+                        <div class="option-chevron">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="9 18 15 12 9 6"></polyline>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <div class="cupertino-row-divider"></div>
+
+                    <!-- Row 3: Socials / Links -->
+                    <a href="https://link-tree-by-raj.vercel.app" target="_blank" rel="noopener noreferrer" class="cupertino-settings-row" aria-label="Open Socials Hub">
+                        <div class="option-icon-wrap cyan-icon-box">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                                <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+                            </svg>
+                        </div>
+                        <span class="cupertino-row-title">Socials</span>
+                        <div class="option-chevron">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="7" y1="17" x2="17" y2="7"></line>
+                                <polyline points="7 7 17 7 17 17"></polyline>
+                            </svg>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- Footer: Centered MotionW • Spatial Tracer • Made by alypion -->
+                <div class="settings-footer-pill">
+                    <span>MotionW &bull; Spatial Tracer &bull; Made by alypion</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Creator Info: Biswadeep Tewari Developer Portfolio Modal (Editorial Page Spotlight Animation) -->
     <div id="creator-modal" class="modal-backdrop hidden" onclick="handleModalBackdrop(event)">
         <div class="portfolio-modal zen-container" onclick="event.stopPropagation()">
             <!-- Living Zen Physics Canvas -->
@@ -146,72 +228,41 @@
             <div class="zen-kanji-bg zen-kanji-right" aria-hidden="true">禅</div>
             <div class="zen-kanji-bg zen-kanji-left" aria-hidden="true">道</div>
 
-            <!-- Floating Top Close Button -->
-            <button class="zen-close-btn" onclick="closeCreatorModal()" aria-label="Close Portfolio">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
-                    <line x1="18" y1="6" x2="6" y2="18"></line>
-                    <line x1="6" y1="6" x2="18" y2="18"></line>
+            <!-- Floating Top Back Button (Returns to Settings) -->
+            <button class="zen-back-btn" onclick="backToSettings()" aria-label="Back to Settings">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="15 18 9 12 15 6"></polyline>
                 </svg>
+                <span>Back</span>
             </button>
 
-            <!-- Scrollable Content Stack -->
-            <div class="zen-scroll-body">
-                <!-- Avatar & Hero Header (Living Gold Aura) -->
-                <div class="zen-hero-header">
+            <!-- Scrollable Content Stack with Page Spotlight Animation -->
+            <div class="zen-scroll-body" id="creator-scroll-body">
+                <!-- Avatar & Hero Header (Always Selected Bright White, Frameless Minimalist Portrait, Pacifico Normal Font) -->
+                <div class="zen-hero-header" id="portion-hero">
                     <div class="zen-avatar-frame">
-                        <img src="./assets/images/raj_profile.jpg" alt="Biswadeep Tewari" class="zen-avatar-img">
+                        <img src="./assets/images/creator_black.jpg" alt="Biswadeep Tewari" class="zen-avatar-img">
                     </div>
                     <h2 class="zen-creator-name">Biswadeep Tewari</h2>
                     <div class="zen-role-pill">
-                        <span>AI ARCHITECT & ENGINEER</span>
+                        <span>AI ARCHITECT &bull; DEVELOPER</span>
                     </div>
                 </div>
 
-                <!-- Native Flutter Android Binary Download (Crisp White Pill Box) -->
-                <a href="./assets/binaries/MotionW.apk" download="MotionW.apk" class="zen-glass-pill zen-cv-card zen-download-card" aria-label="Download MotionW Android App">
-                    <div class="cv-icon-bubble emerald-bubble">
-                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                            <polyline points="7 10 12 15 17 10"></polyline>
-                            <line x1="12" y1="15" x2="12" y2="3"></line>
-                        </svg>
-                    </div>
-                    <div class="cv-text-group">
-                        <div class="cv-title">Download Flutter App</div>
-                        <div class="cv-subtitle">Native Android APK &bull; Direct Install (82 MB)</div>
-                    </div>
-                    <div class="cv-badge-pill">
-                        <span>APK</span>
-                    </div>
-                </a>
+                <!-- Page Reading Chapter Pills (Interactive Spotlight Selectors) -->
+                <div class="page-nav-bar" aria-label="Page Highlight Navigation">
+                    <button class="page-nav-pill active" onclick="highlightPortion('all')" id="pill-all">All</button>
+                    <button class="page-nav-pill" onclick="highlightPortion('dialogue')" id="pill-dialogue">Dialogue</button>
+                    <button class="page-nav-pill" onclick="highlightPortion('math')" id="pill-math">Mathematics</button>
+                    <button class="page-nav-pill" onclick="highlightPortion('cv')" id="pill-cv">CV</button>
+                    <button class="page-nav-pill" onclick="highlightPortion('satori')" id="pill-satori">Satori</button>
+                </div>
 
-                <!-- Interactive Professional CV Card (Crisp White Pill Box) -->
-                <a href="./assets/docs/CV.pdf" target="_blank" rel="noopener noreferrer" class="zen-glass-pill zen-cv-card" aria-label="Open Professional CV">
-                    <div class="cv-icon-bubble">
-                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                            <polyline points="14 2 14 8 20 8"></polyline>
-                            <line x1="16" y1="13" x2="8" y2="13"></line>
-                            <line x1="16" y1="17" x2="8" y2="17"></line>
-                            <polyline points="10 9 9 9 8 9"></polyline>
-                        </svg>
-                    </div>
-                    <div class="cv-text-group">
-                        <div class="cv-title">Professional CV</div>
-                        <div class="cv-subtitle">Tap to view interactive PDF</div>
-                    </div>
-                    <div class="cv-chevron">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
-                            <polyline points="9 18 15 12 9 6"></polyline>
-                        </svg>
-                    </div>
-                </a>
-
-                <!-- Section 1: A Dialogue with Machines (Crisp White Pill Box) -->
-                <div class="zen-glass-pill">
+                <!-- Portion 1: Section 1 — A Dialogue with Machines (Crisp Frosted Glass Card) -->
+                <div class="zen-glass-pill page-portion" id="portion-dialogue" onclick="highlightPortion('dialogue')">
                     <div class="zen-section-header">
-                        <div class="section-icon-wrap gold-sparkle">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <div class="section-icon-wrap silver-sparkle">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/>
                                 <path d="M5 3v4"/>
                                 <path d="M19 17v4"/>
@@ -235,11 +286,11 @@
                     </div>
                 </div>
 
-                <!-- Section 2: Invisible Mathematics (Crisp White Pill Box) -->
-                <div class="zen-glass-pill">
+                <!-- Portion 2: Section 2 — Invisible Mathematics (Crisp Frosted Glass Card) -->
+                <div class="zen-glass-pill page-portion" id="portion-math" onclick="highlightPortion('math')">
                     <div class="zen-section-header">
-                        <div class="section-icon-wrap emerald-memory">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <div class="section-icon-wrap silver-memory">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <rect width="16" height="16" x="4" y="4" rx="2"/>
                                 <rect width="6" height="6" x="9" y="9" rx="1"/>
                                 <path d="M15 2v2"/>
@@ -259,14 +310,36 @@
                     </p>
                 </div>
 
-                <!-- Section 3: Satori Zen (Crisp White Pill Box) -->
-                <div class="zen-glass-pill zen-center-card">
+                <!-- Portion 3: Interactive Professional CV Card (Crisp Frosted Glass Card) -->
+                <a href="./assets/docs/CV.pdf" target="_blank" rel="noopener noreferrer" class="zen-glass-pill zen-cv-card page-portion" id="portion-cv" onclick="highlightPortion('cv')" aria-label="Open Professional CV">
+                    <div class="cv-icon-bubble">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                            <polyline points="10 9 9 9 8 9"></polyline>
+                        </svg>
+                    </div>
+                    <div class="cv-text-group">
+                        <div class="cv-title">Professional CV</div>
+                        <div class="cv-subtitle">Tap to view interactive PDF</div>
+                    </div>
+                    <div class="cv-chevron">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="9 18 15 12 9 6"></polyline>
+                        </svg>
+                    </div>
+                </a>
+
+                <!-- Portion 4: Satori Zen (Crisp Frosted Glass Card) -->
+                <div class="zen-glass-pill zen-center-card page-portion" id="portion-satori" onclick="highlightPortion('satori')">
                     <div class="satori-kanji">悟</div>
                     <div class="satori-quote">"Where the mind wanders, the engine follows."</div>
                 </div>
 
-                <!-- Action / Social Links Row -->
-                <div class="zen-social-row">
+                <!-- Portion 5: Social Links Row -->
+                <div class="zen-social-row page-portion" id="portion-socials">
                     <a href="https://github.com/RajTewari01" target="_blank" rel="noopener noreferrer" class="zen-social-circle" aria-label="GitHub Profile" title="GitHub">
                         <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
                             <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
@@ -290,6 +363,6 @@
         </div>
     </div>
 
-    <script src="./app.js"></script>
+    <script src="./app.js?v=2.2"></script>
 </body>
 </html>

@@ -621,11 +621,13 @@ async function startCamera() {
             btnStart.disabled = true;
         }
 
-        // Show PiP and floating FPS indicator when active
+        // Show PiP and navbar FPS badge when camera is open
         const camPanel = document.getElementById('camera-panel');
         if (camPanel) camPanel.classList.add('active');
-        const fpsPill = document.getElementById('floating-fps-pill');
+        const fpsPill = document.getElementById('navbar-fps-pill') || document.getElementById('floating-fps-pill');
         if (fpsPill) fpsPill.classList.add('active');
+        const fpsVal = document.getElementById('fps-value');
+        if (fpsVal) fpsVal.textContent = '0';
 
         // Update mobile dock button icon and text (Switch to Stop)
         const mBtn = document.getElementById('mobile-btn-camera');
@@ -656,11 +658,13 @@ function stopCamera() {
     }
     handData = [];
 
-    // Hide PiP and floating FPS indicator when inactive
+    // Hide PiP and navbar FPS badge when camera is closed
     const camPanel = document.getElementById('camera-panel');
     if (camPanel) camPanel.classList.remove('active');
-    const fpsPill = document.getElementById('floating-fps-pill');
+    const fpsPill = document.getElementById('navbar-fps-pill') || document.getElementById('floating-fps-pill');
     if (fpsPill) fpsPill.classList.remove('active');
+    const fpsVal = document.getElementById('fps-value');
+    if (fpsVal) fpsVal.textContent = '0';
 
     const ind = document.getElementById('connection-indicator');
     if (ind) {
@@ -858,6 +862,168 @@ function stopZenPhysics() {
     }
 }
 
+// ═══════════════════════════════════════════════════════════════
+//  SETTINGS & CREATOR MODAL NAVIGATION
+// ═══════════════════════════════════════════════════════════════
+
+function openSettingsModal() {
+    const modal = document.getElementById('settings-modal');
+    if (modal) {
+        modal.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+    }
+}
+
+function closeSettingsModal() {
+    const modal = document.getElementById('settings-modal');
+    if (modal) {
+        modal.classList.add('hidden');
+        document.body.style.overflow = '';
+    }
+}
+
+function handleSettingsBackdrop(event) {
+    if (event.target.id === 'settings-modal') {
+        closeSettingsModal();
+    }
+}
+
+function openCreatorFromSettings() {
+    closeSettingsModal();
+    openCreatorModal();
+}
+
+function backToSettings() {
+    closeCreatorModal();
+    openSettingsModal();
+}
+
+function triggerApkDownload(event) {
+    const downloadUrl = './assets/binaries/MotionW.apk';
+    if (window.flutter_inappwebview || window.Android) {
+        window.location.href = downloadUrl;
+    }
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  PAGE SPOTLIGHT READING ANIMATION (Creator Info)
+//  "The white moves by itself as we scroll down" — Lag-Free 60/120fps
+// ═══════════════════════════════════════════════════════════════
+
+let pageSpotlightTimer = null;
+let isProgrammaticScroll = false;
+let scrollTicking = false;
+let currentSpotlightPortion = null;
+
+function onCreatorScroll() {
+    if (isProgrammaticScroll) return;
+    if (!scrollTicking) {
+        requestAnimationFrame(() => {
+            updateSpotlightOnScroll();
+            scrollTicking = false;
+        });
+        scrollTicking = true;
+    }
+}
+
+// Automatically shifts the white illuminated highlight to the card in current reading focus
+// Uses zero-layout-thrashing offset checks and early exit to ensure 60/120fps butter-smooth scroll
+function updateSpotlightOnScroll() {
+    const modal = document.getElementById('creator-modal');
+    if (!modal || modal.classList.contains('hidden')) return;
+    const scrollBody = modal.querySelector('.zen-scroll-body');
+    if (!scrollBody) return;
+
+    const scrollTop = scrollBody.scrollTop;
+
+    // Fast parallax kanji transform update (in same animation frame)
+    const kanjiRight = modal.querySelector('.zen-kanji-right');
+    const kanjiLeft = modal.querySelector('.zen-kanji-left');
+    if (kanjiRight) kanjiRight.style.transform = `translateY(${scrollTop * -0.22}px)`;
+    if (kanjiLeft) kanjiLeft.style.transform = `translateY(${scrollTop * -0.38}px)`;
+
+    // Trackable portions in visual reading order
+    const portionIds = ['dialogue', 'math', 'cv', 'satori', 'socials'];
+    const focalY = scrollTop + (scrollBody.clientHeight * 0.38);
+
+    let bestPortion = null;
+    let minDistance = Infinity;
+
+    for (const id of portionIds) {
+        const el = document.getElementById('portion-' + id);
+        if (!el) continue;
+        const centerY = el.offsetTop + (el.offsetHeight * 0.5);
+        const dist = Math.abs(centerY - focalY);
+        if (dist < minDistance) {
+            minDistance = dist;
+            bestPortion = id;
+        }
+    }
+
+    if (bestPortion && bestPortion !== currentSpotlightPortion) {
+        applySpotlightSilent(bestPortion);
+    }
+}
+
+function applySpotlightSilent(portionId) {
+    if (currentSpotlightPortion === portionId) return; // Exit immediately if already active!
+    currentSpotlightPortion = portionId;
+
+    const modal = document.getElementById('creator-modal');
+    if (!modal) return;
+    const scrollBody = modal.querySelector('.zen-scroll-body');
+    if (!scrollBody) return;
+
+    scrollBody.classList.add('spotlight-mode');
+
+    const portions = modal.querySelectorAll('.page-portion');
+    const pills = modal.querySelectorAll('.page-nav-pill');
+
+    portions.forEach(p => {
+        if (p.id === 'portion-' + portionId) {
+            p.classList.add('portion-highlighted');
+        } else {
+            p.classList.remove('portion-highlighted');
+        }
+    });
+
+    pills.forEach(p => {
+        if (p.id === 'pill-' + portionId) {
+            p.classList.add('active');
+        } else {
+            p.classList.remove('active');
+        }
+    });
+}
+
+function highlightPortion(portionId, scrollIntoView = true) {
+    const modal = document.getElementById('creator-modal');
+    if (!modal) return;
+    const scrollBody = modal.querySelector('.zen-scroll-body');
+    if (!scrollBody) return;
+
+    if (portionId === 'all') {
+        currentSpotlightPortion = 'all';
+        scrollBody.classList.remove('spotlight-mode');
+        modal.querySelectorAll('.page-portion').forEach(p => p.classList.remove('portion-highlighted'));
+        modal.querySelectorAll('.page-nav-pill').forEach(p => p.classList.remove('active'));
+        const pillAll = document.getElementById('pill-all');
+        if (pillAll) pillAll.classList.add('active');
+        return;
+    }
+
+    applySpotlightSilent(portionId);
+
+    if (scrollIntoView) {
+        const target = document.getElementById('portion-' + portionId);
+        if (target) {
+            isProgrammaticScroll = true;
+            target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            setTimeout(() => { isProgrammaticScroll = false; }, 450);
+        }
+    }
+}
+
 function openCreatorModal() {
     const modal = document.getElementById('creator-modal');
     if (modal) {
@@ -865,22 +1031,33 @@ function openCreatorModal() {
         document.body.style.overflow = 'hidden';
         startZenPhysics();
 
-        // Parallax kanji scroll setup
         const scrollBody = modal.querySelector('.zen-scroll-body');
-        const kanjiRight = modal.querySelector('.zen-kanji-right');
-        const kanjiLeft = modal.querySelector('.zen-kanji-left');
-        if (scrollBody && kanjiRight && kanjiLeft && !scrollBody._hasZenScroll) {
-            scrollBody._hasZenScroll = true;
-            scrollBody.addEventListener('scroll', () => {
-                const offset = scrollBody.scrollTop;
-                kanjiRight.style.transform = `translateY(${offset * -0.25}px)`;
-                kanjiLeft.style.transform = `translateY(${offset * -0.42}px)`;
-            }, { passive: true });
+        if (scrollBody) {
+            // Step 1: Whole page is shown first in its entirety (overview mode)
+            currentSpotlightPortion = null;
+            scrollBody.classList.remove('spotlight-mode');
+            modal.querySelectorAll('.page-portion').forEach(p => p.classList.remove('portion-highlighted'));
+            modal.querySelectorAll('.page-nav-pill').forEach(p => p.classList.remove('active'));
+            const pillAll = document.getElementById('pill-all');
+            if (pillAll) pillAll.classList.add('active');
+
+            // Step 2: Like reading a book, spotlight first portion after initial display
+            clearTimeout(pageSpotlightTimer);
+            pageSpotlightTimer = setTimeout(() => {
+                applySpotlightSilent('dialogue');
+            }, 600);
+
+            // Single high-efficiency scroll listener
+            if (!scrollBody._hasCreatorScrollListener) {
+                scrollBody._hasCreatorScrollListener = true;
+                scrollBody.addEventListener('scroll', onCreatorScroll, { passive: true });
+            }
         }
     }
 }
 
 function closeCreatorModal() {
+    clearTimeout(pageSpotlightTimer);
     const modal = document.getElementById('creator-modal');
     if (modal) {
         modal.classList.add('hidden');
@@ -896,7 +1073,10 @@ function handleModalBackdrop(event) {
 }
 
 document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') closeCreatorModal();
+    if (e.key === 'Escape') {
+        closeSettingsModal();
+        closeCreatorModal();
+    }
 });
 
 
@@ -905,11 +1085,11 @@ document.addEventListener('keydown', (e) => {
 function animate(time) {
     requestAnimationFrame(animate);
 
-    // Live continuous FPS calculation driven by actual 3D render loop
+    // Live continuous FPS calculation driven by actual 3D render loop (updates when camera is active)
     animFrames++;
     const now = performance.now();
     if (now - lastAnimTime >= 500) {
-        currentFps = Math.round((animFrames * 1000) / (now - lastAnimTime));
+        currentFps = cameraRunning ? Math.round((animFrames * 1000) / (now - lastAnimTime)) : 0;
         animFrames = 0;
         lastAnimTime = now;
         const fpsEl = document.getElementById('fps-value');
@@ -928,77 +1108,7 @@ function animate(time) {
 document.addEventListener('DOMContentLoaded', () => {
     initThreeJS();
     animate(0);
-
-    const twEl = document.getElementById('typewriter-text');
-    if (twEl) {
-        const logoTW = new Typewriter(twEl, { speed: 70 });
-        logoTW
-            .type('Air Gesture Engine')
-            .wait(3000)
-            .clear()
-            .type('Spatial Vision 3D')
-            .wait(2500)
-            .clear()
-            .type('Real-Time MediaPipe')
-            .wait(2500)
-            .clear()
-            .type('Zero-Latency Tracking')
-            .wait(2500)
-            .clear()
-            .loop()
-            .start();
-    }
-
     addEventLog('MotionW initialized');
-
-    // ── Brand Typewriter Cycle: MotionW (Pacifico) <-> Made by alypion (Normal Text) ──
-    const brandEl = document.getElementById('brand-title');
-    if (brandEl) {
-        async function runBrandCycle() {
-            while (true) {
-                // Hold MotionW for 60 seconds (every minute)
-                await sleep(60000);
-
-                // Typewriter backspace / erase "MotionW"
-                while (brandEl.textContent.length > 0) {
-                    brandEl.textContent = brandEl.textContent.slice(0, -1);
-                    await sleep(40);
-                }
-                await sleep(250);
-
-                // Switch to normal text font for author
-                brandEl.classList.add('author-mode');
-
-                // Type "Made by alypion" in clean normal text
-                const authorText = "Made by alypion";
-                for (let i = 0; i < authorText.length; i++) {
-                    brandEl.textContent += authorText[i];
-                    await sleep(55);
-                }
-
-                // Hold "Made by alypion" so it is clearly readable
-                await sleep(4500);
-
-                // Typewriter backspace / erase "Made by alypion"
-                while (brandEl.textContent.length > 0) {
-                    brandEl.textContent = brandEl.textContent.slice(0, -1);
-                    await sleep(35);
-                }
-                await sleep(250);
-
-                // Switch back to Pacifico font for MotionW
-                brandEl.classList.remove('author-mode');
-
-                // Type back "MotionW" in Pacifico
-                const brandText = "MotionW";
-                for (let i = 0; i < brandText.length; i++) {
-                    brandEl.textContent += brandText[i];
-                    await sleep(60);
-                }
-            }
-        }
-        runBrandCycle();
-    }
 
     // ── Draggable Camera PiP (Mobile Touch + Desktop Drag) ──
     // ── Draggable & Resizable Camera PiP (Mobile Touch + Desktop Drag) ──
