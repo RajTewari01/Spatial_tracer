@@ -35,21 +35,21 @@ const MCP = [2, 5, 9,  13, 17];
 const FNAMES = ['thumb','index','middle','ring','pinky'];
 const FLABELS = ['THM','IDX','MID','RNG','PNK'];
 
-// ── Gesture catalog (no emojis, just clean labels) ─────────────
+// ── Gesture catalog (luxury velvet wine & gold palette) ─────────
 const G = {
-    thumbs_up:     { label: 'THUMBS UP',     color: 0x34d399 },
-    thumbs_down:   { label: 'THUMBS DOWN',   color: 0xf472b6 },
-    peace:         { label: 'PEACE',          color: 0x7c6aff },
-    middle_finger: { label: 'MIDDLE FINGER', color: 0xfb923c },
-    rock:          { label: 'ROCK',           color: 0xfbbf24 },
-    ok:            { label: 'OK SIGN',        color: 0x38bdf8 },
-    pinch:         { label: 'PINCH',          color: 0xfbbf24 },
-    open_palm:     { label: 'OPEN PALM',      color: 0x22d3ee },
-    fist:          { label: 'FIST',           color: 0xef4444 },
-    pointing:      { label: 'POINTING',       color: 0x34d399 },
-    call_me:       { label: 'CALL ME',        color: 0x22d3ee },
-    three:         { label: 'THREE',          color: 0xa393ff },
-    spiderman:     { label: 'SPIDERMAN',      color: 0xf472b6 },
+    thumbs_up:     { label: 'THUMBS UP',     color: 0xd4af37 },
+    thumbs_down:   { label: 'THUMBS DOWN',   color: 0xa32850 },
+    peace:         { label: 'PEACE',          color: 0xe6c56e },
+    middle_finger: { label: 'MIDDLE FINGER', color: 0x781939 },
+    rock:          { label: 'ROCK',           color: 0xd4af37 },
+    ok:            { label: 'OK SIGN',        color: 0xffffff },
+    pinch:         { label: 'PINCH',          color: 0xa32850 },
+    open_palm:     { label: 'OPEN PALM',      color: 0xd4af37 },
+    fist:          { label: 'FIST',           color: 0x781939 },
+    pointing:      { label: 'POINTING',       color: 0xe6c56e },
+    call_me:       { label: 'CALL ME',        color: 0xa32850 },
+    three:         { label: 'THREE',          color: 0xd4af37 },
+    spiderman:     { label: 'SPIDERMAN',      color: 0x781939 },
 };
 
 
@@ -119,7 +119,7 @@ function initThreeJS() {
     renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
     renderer.setSize(innerWidth, innerHeight);
     renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
-    renderer.setClearColor(0x000000, 1);
+    renderer.setClearColor(0x070103, 1);
     container.appendChild(renderer.domElement);
 
     controls = new THREE.OrbitControls(camera, renderer.domElement);
@@ -131,12 +131,12 @@ function initThreeJS() {
     controls.autoRotate = true;
     controls.autoRotateSpeed = 0.35;
 
-    scene.add(new THREE.AmbientLight(0x101020, 0.4));
-    const p1 = new THREE.PointLight(0x7c6aff, 2, 15);
+    scene.add(new THREE.AmbientLight(0x0d0206, 0.6));
+    const p1 = new THREE.PointLight(0x781939, 2.5, 15);
     p1.position.set(3, 3, 5); scene.add(p1);
-    const p2 = new THREE.PointLight(0x22d3ee, 1, 15);
+    const p2 = new THREE.PointLight(0xa32850, 1.8, 15);
     p2.position.set(-3, -2, 4); scene.add(p2);
-    const p3 = new THREE.PointLight(0x34d399, 0.5, 12);
+    const p3 = new THREE.PointLight(0xd4af37, 1.0, 12);
     p3.position.set(0, -3, 3); scene.add(p3);
 
     createParticleSphere();
@@ -169,10 +169,12 @@ function createParticleSphere() {
         const t = (y+1)/2;
         if (t < 0.5) {
             const s = t*2;
-            col[i*3]=0.49*(1-s)+0.13*s; col[i*3+1]=0.42*(1-s)+0.83*s; col[i*3+2]=1.0;
+            // Obsidian to Velvet Wine
+            col[i*3]=0.08*(1-s)+0.47*s; col[i*3+1]=0.01*(1-s)+0.10*s; col[i*3+2]=0.04*(1-s)+0.22*s;
         } else {
             const s = (t-0.5)*2;
-            col[i*3]=0.13*(1-s)+0.2*s; col[i*3+1]=0.83*(1-s)+0.83*s; col[i*3+2]=0.93*(1-s)+0.6*s;
+            // Velvet Wine to Warm Gold / Silver highlight
+            col[i*3]=0.47*(1-s)+0.83*s; col[i*3+1]=0.10*(1-s)+0.69*s; col[i*3+2]=0.22*(1-s)+0.22*s;
         }
     }
 
@@ -341,7 +343,7 @@ function onResults(results) {
             if (trailFrameSkip % 3 === 0) {
                 for (const tid of [8, 4]) { // index + thumb only
                     const l=lm[tid];
-                    spawnTrail((l.x-0.5)*4, -(l.y-0.5)*4, -l.z*2, h===0?0x7c6aff:0x22d3ee);
+                    spawnTrail((l.x-0.5)*4, -(l.y-0.5)*4, -l.z*2, h===0?0xa32850:0xd4af37);
                 }
             }
 
@@ -365,11 +367,11 @@ function onResults(results) {
 
 
 function drawHand(ctx, lm, w, h, hIdx) {
-    const c = hIdx===0 ? '#7c6aff' : '#22d3ee';
-    const glow = hIdx===0 ? 'rgba(124,106,255,0.3)' : 'rgba(34,211,238,0.3)';
+    const c = hIdx===0 ? '#A32850' : '#D4AF37';
+    const glow = hIdx===0 ? 'rgba(163,40,80,0.35)' : 'rgba(212,175,55,0.35)';
 
     ctx.strokeStyle=c; ctx.lineWidth=2;
-    ctx.shadowColor=glow; ctx.shadowBlur=10;
+    ctx.shadowColor=glow; ctx.shadowBlur=8;
 
     for (const [a,b] of CONN) {
         ctx.beginPath(); ctx.moveTo(lm[a].x*w, lm[a].y*h);
