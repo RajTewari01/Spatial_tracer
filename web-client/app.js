@@ -777,22 +777,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
     addEventLog('MotionW initialized');
 
-    // ── Brand Typewriter Cycle: MotionW <-> Made by alypion every minute ──
+    // ── Brand Typewriter Cycle: Motion W (Pacifico) <-> Made by alypion (Normal Text) ──
     const brandEl = document.getElementById('brand-title');
     if (brandEl) {
         async function runBrandCycle() {
             while (true) {
-                // Hold MotionW for 60 seconds (every minute)
+                // Hold Motion W for 60 seconds (every minute)
                 await sleep(60000);
 
-                // Typewriter backspace / erase "MotionW"
+                // Typewriter backspace / erase "Motion W"
                 while (brandEl.textContent.length > 0) {
                     brandEl.textContent = brandEl.textContent.slice(0, -1);
                     await sleep(40);
                 }
                 await sleep(250);
 
-                // Type "Made by alypion"
+                // Switch to normal text font for author
+                brandEl.classList.add('author-mode');
+
+                // Type "Made by alypion" in clean normal text
                 const authorText = "Made by alypion";
                 for (let i = 0; i < authorText.length; i++) {
                     brandEl.textContent += authorText[i];
@@ -809,8 +812,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 await sleep(250);
 
-                // Type back "MotionW"
-                const brandText = "MotionW";
+                // Switch back to Pacifico font for Motion W
+                brandEl.classList.remove('author-mode');
+
+                // Type back "Motion W" in Pacifico
+                const brandText = "Motion W";
                 for (let i = 0; i < brandText.length; i++) {
                     brandEl.textContent += brandText[i];
                     await sleep(60);

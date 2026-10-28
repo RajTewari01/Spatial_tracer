@@ -82,40 +82,33 @@ html, body {
     pointer-events: none;
 }
 
-/* Left Brand: Clean SVG M vector and brand text (No outer pill) */
+/* Left Brand: Just the name (No M SVG, no outer pill) */
 .header-brand-clean {
     pointer-events: auto;
     display: flex;
     align-items: center;
-    gap: 12px;
     padding: 6px 0;
-}
-
-.brand-m-svg {
-    display: block;
-    flex-shrink: 0;
-}
-
-.brand-text-clean {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
 }
 
 .brand-name {
     font-family: 'Pacifico', cursive !important;
-    font-size: 20px;
+    font-size: 22px;
     font-weight: 400;
     color: #FFFFFF;
     line-height: 1.1;
     letter-spacing: 0.8px;
+    white-space: nowrap;
+    display: inline-block;
+    transition: opacity 0.2s ease, font-size 0.2s ease;
 }
 
-.brand-sub {
-    font-size: 10px;
-    font-weight: 500;
-    color: var(--text-secondary);
-    letter-spacing: 0.2px;
+/* When rotating to author text: clean normal typography (NOT Pacifico) */
+.brand-name.author-mode {
+    font-family: var(--font), -apple-system, sans-serif !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.5px !important;
+    color: var(--text-secondary) !important;
 }
 
 /* Floating Live FPS Indicator — Down Below the Navbar */
