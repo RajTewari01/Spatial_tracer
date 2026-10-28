@@ -171,6 +171,33 @@ function initThreeJS() {
 }
 
 
+// ── Multi-Stop 3D Globe Particle Sphere Gradient ───────────────
+// Progression: White -> Light Red -> Vivid Ruby -> Deep Blood Red -> Garnet -> Light Coral Glow
+function getGlobeColor(normY) {
+    const t = Math.max(0, Math.min(1, (normY + 1) / 2));
+    const stops = [
+        [0.00, 1.00, 0.45, 0.50], // Luminous light coral/ember glow at bottom pole
+        [0.15, 0.72, 0.04, 0.12], // Rich garnet crimson
+        [0.35, 0.42, 0.01, 0.05], // Deep luxurious blood red
+        [0.58, 0.96, 0.08, 0.20], // Vivid radiant ruby crimson
+        [0.82, 1.00, 0.48, 0.56], // Delicate luminous light red / rose
+        [1.00, 1.00, 1.00, 1.00]  // Pure brilliant white at top pole
+    ];
+    for (let s = 0; s < stops.length - 1; s++) {
+        const s0 = stops[s];
+        const s1 = stops[s + 1];
+        if (t >= s0[0] && t <= s1[0]) {
+            const f = (t - s0[0]) / (s1[0] - s0[0]);
+            return [
+                s0[1] + (s1[1] - s0[1]) * f,
+                s0[2] + (s1[2] - s0[2]) * f,
+                s0[3] + (s1[3] - s0[3]) * f
+            ];
+        }
+    }
+    return [1.0, 1.0, 1.0];
+}
+
 function createParticleSphere() {
     const isMobile = window.innerWidth <= 768;
     const count = isMobile ? 3200 : 4000;
@@ -178,6 +205,7 @@ function createParticleSphere() {
     const pos = new Float32Array(count * 3);
     const col = new Float32Array(count * 3);
     const base = new Float32Array(count * 3);
+    const baseCol = new Float32Array(count * 3);
 
     // Smaller radius on mobile from the start
     const R = isMobile ? 1.05 : 1.6;
@@ -191,16 +219,20 @@ function createParticleSphere() {
         pos[i * 3] = x; pos[i * 3 + 1] = yp; pos[i * 3 + 2] = z;
         base[i * 3] = x; base[i * 3 + 1] = yp; base[i * 3 + 2] = z;
 
-        const t = (y + 1) / 2;
-        // Smooth gradient from Pure White (top) to Vibrant Red (bottom)
-        col[i * 3] = 1.0;
-        col[i * 3 + 1] = 0.08 + 0.92 * t;
-        col[i * 3 + 2] = 0.10 + 0.90 * t;
+        // Rich Multi-stop gradient: White -> Light Red -> Ruby -> Deep Blood Red -> Garnet -> Light Coral Glow
+        const [cr, cg, cb] = getGlobeColor(y);
+        col[i * 3] = cr;
+        col[i * 3 + 1] = cg;
+        col[i * 3 + 2] = cb;
+
+        baseCol[i * 3] = cr;
+        baseCol[i * 3 + 1] = cg;
+        baseCol[i * 3 + 2] = cb;
     }
 
     geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
     geo.setAttribute('color', new THREE.BufferAttribute(col, 3));
-    geo.userData = { basePositions: base };
+    geo.userData = { basePositions: base, baseColors: baseCol };
 
     particleSphere = new THREE.Points(geo, new THREE.PointsMaterial({
         size: isMobile ? 0.026 : 0.022,
@@ -219,6 +251,7 @@ function updateSphere(time) {
     if (!particleSphere) return;
     const pos = particleSphere.geometry.attributes.position.array;
     const base = particleSphere.geometry.userData.basePositions;
+    const baseCol = particleSphere.geometry.userData.baseColors;
     const col = particleSphere.geometry.attributes.color.array;
     const n = pos.length / 3;
 
@@ -252,14 +285,14 @@ function updateSphere(time) {
                 const t = Math.min(1, totalF * 3);
                 // Luminous flare on hand interaction
                 col[i * 3] += (1.0 - col[i * 3]) * t * 0.15;
-                col[i * 3 + 1] += (0.9 - col[i * 3 + 1]) * t * 0.1;
-                col[i * 3 + 2] += (0.9 - col[i * 3 + 2]) * t * 0.1;
+                col[i * 3 + 1] += (0.95 - col[i * 3 + 1]) * t * 0.1;
+                col[i * 3 + 2] += (0.95 - col[i * 3 + 2]) * t * 0.1;
             }
-        } else {
-            const ot = Math.max(0, Math.min(1, (by / 1.6 + 1) / 2));
-            const targetR = 1.0;
-            const targetG = 0.08 + 0.92 * ot;
-            const targetB = 0.10 + 0.90 * ot;
+        } else if (baseCol) {
+            // Restore back to original rich multi-stop gradient
+            const targetR = baseCol[i * 3];
+            const targetG = baseCol[i * 3 + 1];
+            const targetB = baseCol[i * 3 + 2];
             col[i * 3] += (targetR - col[i * 3]) * 0.02;
             col[i * 3 + 1] += (targetG - col[i * 3 + 1]) * 0.02;
             col[i * 3 + 2] += (targetB - col[i * 3 + 2]) * 0.02;
@@ -629,6 +662,10 @@ async function startCamera() {
         const fpsVal = document.getElementById('fps-value');
         if (fpsVal) fpsVal.textContent = '0';
 
+        // Update mobile dock: morph from single Start pill into Stop + Posture pill
+        const mobileDock = document.getElementById('mobile-dock');
+        if (mobileDock) mobileDock.classList.add('camera-active');
+
         // Update mobile dock button icon and text (Switch to Stop)
         const mBtn = document.getElementById('mobile-btn-camera');
         if (mBtn) {
@@ -679,6 +716,10 @@ function stopCamera() {
         btnStart.textContent = 'Start Camera';
         btnStart.disabled = false;
     }
+
+    // Update mobile dock: morph back into single centered Start pill
+    const mobileDock = document.getElementById('mobile-dock');
+    if (mobileDock) mobileDock.classList.remove('camera-active');
 
     // Update mobile dock button icon and text (Switch to Start)
     const mBtn = document.getElementById('mobile-btn-camera');
