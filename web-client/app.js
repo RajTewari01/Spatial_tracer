@@ -1281,112 +1281,96 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 // ═══════════════════════════════════════════════════════════════
-//  ANIME CHIBI SOCIALS CINEMATIC LOADING CONTROLLER
-//  (Itachi -> Cat -> Gojo with Speech Bubbles & Warp Redirect)
+//  ANIME CHIBI REDIRECT FLOATING BUBBLES CONTROLLER
+//  (Itachi + Cat Typewriter -> Vanish -> Gojo "Let's Go!" -> Redirect)
 // ═══════════════════════════════════════════════════════════════
 
-let socialsLoaderTimer = null;
-let socialsStepTimers = [];
-let targetSocialsUrl = 'https://link-tree-by-raj.vercel.app';
+let redirectTimer = null;
+let catTypeInterval = null;
+let redirectStepTimers = [];
 
 function openSocialsAnimeLoader(event, url) {
     if (event) {
         event.preventDefault();
         event.stopPropagation();
     }
-    targetSocialsUrl = url || 'https://link-tree-by-raj.vercel.app';
+    const targetUrl = url || 'https://link-tree-by-raj.vercel.app';
 
-    const overlay = document.getElementById('socials-loader-overlay');
+    const overlay = document.getElementById('socials-redirect-overlay');
     if (!overlay) {
-        window.open(targetSocialsUrl, '_blank');
+        window.open(targetUrl, '_blank');
         return;
     }
 
-    // Clear any previous running sequence
-    clearAnimeLoaderTimers();
+    // Reset everything
+    clearAnimeRedirectTimers();
 
-    const itachi = document.getElementById('anime-actor-itachi');
-    const cat = document.getElementById('anime-actor-cat');
-    const gojo = document.getElementById('anime-actor-gojo');
-    const fill = document.getElementById('socials-progress-bar-fill');
-    const pct = document.getElementById('socials-progress-percent');
-    const statusText = document.getElementById('socials-loader-status-text');
+    const itachi = document.getElementById('redirect-actor-itachi');
+    const cat = document.getElementById('redirect-actor-cat');
+    const gojo = document.getElementById('redirect-actor-gojo');
+    const catText = document.getElementById('cat-typewriter-text');
 
-    if (itachi) itachi.classList.remove('active');
-    if (cat) cat.classList.remove('active');
-    if (gojo) gojo.classList.remove('active');
-    if (fill) fill.style.width = '0%';
-    if (pct) pct.textContent = '0%';
-    if (statusText) statusText.textContent = 'Connecting to Socials...';
+    if (itachi) itachi.className = 'redirect-actor actor-left';
+    if (cat) cat.className = 'redirect-actor actor-right';
+    if (gojo) gojo.className = 'redirect-actor actor-center';
+    if (catText) catText.textContent = '';
 
-    overlay.classList.remove('hidden', 'leaving');
+    // Show translucent backdrop overlay on the same page
+    overlay.classList.remove('hidden');
     overlay.classList.add('visible');
 
-    // Step 1: Itachi pops in (t = 150ms) -> "Wait, we are loading your link..."
-    socialsStepTimers.push(setTimeout(() => {
+    // Step 1: Itachi & Cat appear (t = 80ms)
+    redirectStepTimers.push(setTimeout(() => {
         if (!overlay.classList.contains('visible')) return;
         if (itachi) itachi.classList.add('active');
-        if (fill) fill.style.width = '35%';
-        if (pct) pct.textContent = '35%';
-        if (statusText) statusText.textContent = 'Itachi is fetching links...';
-    }, 150));
-
-    // Step 2: Cat bounces in (t = 850ms) -> "Meow ~ 🐾"
-    socialsStepTimers.push(setTimeout(() => {
-        if (!overlay.classList.contains('visible')) return;
         if (cat) cat.classList.add('active');
-        if (fill) fill.style.width = '70%';
-        if (pct) pct.textContent = '70%';
-        if (statusText) statusText.textContent = 'Cat says Meow!';
-    }, 850));
 
-    // Step 3: Gojo bursts in as progress hits 100% (t = 1750ms) -> "Let's go...! ⚡"
-    socialsStepTimers.push(setTimeout(() => {
+        // Typewriter effect on Cat: "Meow.. meow.."
+        const phrase = "Meow.. meow..";
+        let charIndex = 0;
+        catTypeInterval = setInterval(() => {
+            if (charIndex < phrase.length) {
+                if (catText) catText.textContent += phrase[charIndex];
+                charIndex++;
+            } else {
+                clearInterval(catTypeInterval);
+            }
+        }, 70);
+    }, 80));
+
+    // Step 2: Itachi & Cat vanish ("AND THEY WILL BE GONE") (t = 1350ms)
+    redirectStepTimers.push(setTimeout(() => {
         if (!overlay.classList.contains('visible')) return;
-        if (fill) fill.style.width = '100%';
-        if (pct) pct.textContent = '100%';
-        if (statusText) statusText.textContent = 'Ready! Redirecting...';
+        if (itachi) itachi.classList.add('gone');
+        if (cat) cat.classList.add('gone');
+    }, 1350));
+
+    // Step 3: In the middle Gojo appears in message bubble saying "Let's Go!" (t = 1680ms)
+    redirectStepTimers.push(setTimeout(() => {
+        if (!overlay.classList.contains('visible')) return;
         if (gojo) gojo.classList.add('active');
-    }, 1750));
+    }, 1680));
 
-    // Step 4: Smooth warp transition & Redirect (t = 2850ms)
-    socialsLoaderTimer = setTimeout(() => {
+    // Step 4: Smooth Redirect to link (t = 2650ms)
+    redirectTimer = setTimeout(() => {
         if (!overlay.classList.contains('visible')) return;
-        executeSocialsRedirect();
-    }, 2850);
-}
-
-function executeSocialsRedirect() {
-    clearAnimeLoaderTimers();
-    const overlay = document.getElementById('socials-loader-overlay');
-    if (overlay) {
-        overlay.classList.add('leaving');
-        setTimeout(() => {
-            overlay.classList.remove('visible', 'leaving');
-            overlay.classList.add('hidden');
-            window.open(targetSocialsUrl, '_blank');
-        }, 300);
-    } else {
-        window.open(targetSocialsUrl, '_blank');
-    }
-}
-
-function closeSocialsAnimeLoader() {
-    clearAnimeLoaderTimers();
-    const overlay = document.getElementById('socials-loader-overlay');
-    if (overlay) {
-        overlay.classList.remove('visible', 'leaving');
+        overlay.classList.remove('visible');
         overlay.classList.add('hidden');
-    }
+        window.open(targetUrl, '_blank');
+    }, 2650);
 }
 
-function clearAnimeLoaderTimers() {
-    if (socialsLoaderTimer) {
-        clearTimeout(socialsLoaderTimer);
-        socialsLoaderTimer = null;
+function clearAnimeRedirectTimers() {
+    if (redirectTimer) {
+        clearTimeout(redirectTimer);
+        redirectTimer = null;
     }
-    for (const t of socialsStepTimers) {
+    if (catTypeInterval) {
+        clearInterval(catTypeInterval);
+        catTypeInterval = null;
+    }
+    for (const t of redirectStepTimers) {
         clearTimeout(t);
     }
-    socialsStepTimers = [];
+    redirectStepTimers = [];
 }

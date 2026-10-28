@@ -1526,368 +1526,211 @@ body {
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   ANIME CHIBI SOCIALS CINEMATIC LOADING OVERLAY
-   (Itachi, Cat, Gojo with Real Chat Bubbles & Progress Bar)
+   ANIME CHIBI REDIRECT FLOATING BUBBLES OVERLAY
+   (Translucent Backdrop, Floating White Speech Bubbles, Chibi Actors)
    ═══════════════════════════════════════════════════════════════ */
 
-.socials-loader-overlay {
+.socials-redirect-overlay {
     position: fixed;
     inset: 0;
-    z-index: 500;
+    z-index: 600;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 20px;
-    background: rgba(0, 0, 0, 0.88);
-    backdrop-filter: blur(22px);
-    -webkit-backdrop-filter: blur(22px);
+    background: rgba(0, 0, 0, 0.65);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     opacity: 0;
     visibility: hidden;
     pointer-events: none;
-    transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1),
-                visibility 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: opacity 0.35s ease, visibility 0.35s ease;
+    overflow: hidden;
 }
 
-.socials-loader-overlay.visible {
+.socials-redirect-overlay.visible {
     opacity: 1;
     visibility: visible;
     pointer-events: auto;
 }
 
-.socials-loader-overlay.leaving {
+/* Actors: positioned directly on the translucent screen */
+.redirect-actor {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     opacity: 0;
-    transform: scale(1.08);
-    filter: blur(8px);
-    transition: opacity 0.35s ease, transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), filter 0.35s ease;
-}
-
-.socials-loader-backdrop {
-    position: absolute;
-    inset: 0;
-    background: transparent;
-}
-
-.socials-loader-stage {
-    position: relative;
-    width: 100%;
-    max-width: 440px;
-    background: #0D0D11;
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    border-radius: 28px;
-    padding: 22px 20px 20px 20px;
-    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.85), 0 0 40px rgba(255, 255, 255, 0.05);
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    z-index: 2;
-    transform: scale(0.92) translateY(16px);
-    transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.socials-loader-overlay.visible .socials-loader-stage {
-    transform: scale(1) translateY(0);
-}
-
-/* Top Status Header */
-.socials-loader-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 8px;
-    position: relative;
-    z-index: 5;
-}
-
-.socials-loader-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 6px 14px;
-    border-radius: var(--radius-pill);
-    background: rgba(255, 255, 255, 0.08);
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    font-size: 11px;
-    font-weight: 700;
-    color: #E5E5EA;
-    letter-spacing: 0.3px;
-    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", Inter, sans-serif;
-}
-
-.loader-pulse-dot {
-    width: 7px;
-    height: 7px;
-    border-radius: 50%;
-    background: #30D158;
-    box-shadow: 0 0 10px #30D158;
-    animation: pulseDot 1.5s infinite;
-}
-
-@keyframes pulseDot {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.4; transform: scale(0.75); }
-}
-
-.socials-loader-close {
-    background: rgba(255, 255, 255, 0.08);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    color: #8E8E93;
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: background 0.15s, color 0.15s, transform 0.15s;
-}
-
-.socials-loader-close:hover {
-    background: rgba(255, 255, 255, 0.16);
-    color: #FFFFFF;
-}
-
-.socials-loader-close:active {
-    transform: scale(0.92);
-}
-
-/* Characters Arena */
-.anime-characters-arena {
-    position: relative;
-    width: 100%;
-    height: 260px;
-    margin: 8px 0;
-    overflow: visible;
-}
-
-/* Actors */
-.anime-actor {
-    position: absolute;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1),
-                transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
     pointer-events: none;
+    transition: opacity 0.38s cubic-bezier(0.16, 1, 0.3, 1),
+                transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-.actor-itachi {
-    left: 4px;
-    bottom: 0px;
-    opacity: 0;
-    transform: translateY(40px) scale(0.65);
+/* 1. Itachi: Left side */
+.actor-left {
+    left: 8%;
+    bottom: 22%;
+    transform: translateY(40px) scale(0.6);
 }
 
-.actor-itachi.active {
+@media (max-width: 768px) {
+    .actor-left {
+        left: 4%;
+        bottom: 24%;
+    }
+}
+
+.actor-left.active {
     opacity: 1;
     transform: translateY(0) scale(1);
 }
 
-.actor-cat {
-    right: 4px;
-    bottom: 0px;
+.actor-left.gone {
     opacity: 0;
-    transform: translateY(40px) scale(0.65);
+    transform: translateY(-20px) scale(0.7);
+    transition: opacity 0.3s ease, transform 0.35s ease;
 }
 
-.actor-cat.active {
+/* 2. Cat: Right side */
+.actor-right {
+    right: 8%;
+    bottom: 22%;
+    transform: translateY(40px) scale(0.6);
+}
+
+@media (max-width: 768px) {
+    .actor-right {
+        right: 4%;
+        bottom: 24%;
+    }
+}
+
+.actor-right.active {
     opacity: 1;
     transform: translateY(0) scale(1);
-    animation: catWiggle 2s infinite ease-in-out 0.6s;
 }
 
-@keyframes catWiggle {
-    0%, 100% { transform: translateY(0) rotate(0deg); }
-    30% { transform: translateY(-4px) rotate(-3deg); }
-    70% { transform: translateY(-2px) rotate(3deg); }
+.actor-right.gone {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.7);
+    transition: opacity 0.3s ease, transform 0.35s ease;
 }
 
-.actor-gojo {
+/* 3. Gojo: Dead Center */
+.actor-center {
     left: 50%;
-    bottom: 0px;
-    transform: translateX(-50%) translateY(40px) scale(0.5);
+    top: 50%;
+    transform: translate(-50%, -50%) scale(0.4);
     opacity: 0;
-    z-index: 10;
+    z-index: 20;
 }
 
-.actor-gojo.active {
+.actor-center.active {
     opacity: 1;
-    transform: translateX(-50%) translateY(0) scale(1);
-    animation: gojoPowerPop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    transform: translate(-50%, -50%) scale(1);
+    animation: gojoCenterPop 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
 }
 
-@keyframes gojoPowerPop {
-    0% { transform: translateX(-50%) scale(0.4) rotate(-8deg); opacity: 0; }
-    65% { transform: translateX(-50%) scale(1.16) rotate(3deg); opacity: 1; filter: drop-shadow(0 0 25px rgba(255, 255, 255, 0.8)); }
-    100% { transform: translateX(-50%) scale(1) rotate(0deg); opacity: 1; filter: drop-shadow(0 8px 24px rgba(0, 0, 0, 0.6)); }
+@keyframes gojoCenterPop {
+    0% { transform: translate(-50%, -50%) scale(0.3) rotate(-8deg); opacity: 0; }
+    65% { transform: translate(-50%, -50%) scale(1.15) rotate(2deg); opacity: 1; }
+    100% { transform: translate(-50%, -50%) scale(1) rotate(0deg); opacity: 1; }
 }
 
-.anime-chibi-wrap {
+/* Chibi Frames */
+.redirect-chibi-frame {
     width: 140px;
     height: 140px;
     display: flex;
-    align-items: flex-end;
+    align-items: center;
     justify-content: center;
 }
 
-.actor-cat .anime-chibi-wrap {
-    width: 120px;
-    height: 120px;
+@media (max-width: 768px) {
+    .redirect-chibi-frame {
+        width: 120px;
+        height: 120px;
+    }
+    .frame-gojo {
+        width: 145px !important;
+        height: 145px !important;
+    }
 }
 
-.actor-gojo .anime-chibi-wrap {
-    width: 155px;
-    height: 155px;
+.frame-gojo {
+    width: 165px;
+    height: 165px;
 }
 
-.anime-chibi-img {
-    max-width: 100%;
-    max-height: 100%;
+.redirect-chibi-img {
+    width: 100%;
+    height: 100%;
     object-fit: contain;
-    filter: drop-shadow(0 8px 20px rgba(0, 0, 0, 0.6));
+    filter: drop-shadow(0 12px 24px rgba(0, 0, 0, 0.65));
 }
 
-/* Chat Bubbles */
-.anime-chat-bubble {
+/* ── Pure White Floating Comic Speech Bubbles ─────────────────── */
+.comic-speech-bubble {
     position: relative;
     background: #FFFFFF;
-    color: #0A0A0C;
-    padding: 9px 15px;
-    border-radius: 18px;
-    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", sans-serif;
-    font-size: 12.5px;
-    font-weight: 700;
-    line-height: 1.35;
-    letter-spacing: 0.2px;
-    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.5), 0 2px 6px rgba(0, 0, 0, 0.2);
-    white-space: nowrap;
-    opacity: 0;
-    transform: scale(0.6) translateY(10px);
-    transition: opacity 0.32s cubic-bezier(0.16, 1, 0.3, 1),
-                transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
-    margin-bottom: 8px;
-}
-
-.actor-itachi.active .bubble-itachi,
-.actor-cat.active .bubble-cat,
-.actor-gojo.active .bubble-gojo {
-    opacity: 1;
-    transform: scale(1) translateY(0);
-}
-
-.bubble-itachi {
-    transition-delay: 0.15s;
-}
-
-.bubble-cat {
-    transition-delay: 0.15s;
-}
-
-.bubble-gojo {
-    background: #FFFFFF;
     color: #000000;
-    font-size: 14px;
     padding: 10px 18px;
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6), 0 0 20px rgba(255, 255, 255, 0.4);
-    transition-delay: 0.18s;
+    border-radius: 22px;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5), 0 2px 8px rgba(0, 0, 0, 0.3);
+    margin-bottom: 12px;
+    max-width: 260px;
+    text-align: center;
+    border: 2px solid #FFFFFF;
 }
 
-/* Bubble Tails pointing to character mouth */
-.bubble-tail {
+.bubble-speech-text {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", sans-serif;
+    font-size: 13.5px;
+    font-weight: 800;
+    line-height: 1.3;
+    letter-spacing: 0.2px;
+    color: #000000;
+}
+
+.gojo-text {
+    font-size: 17px;
+    font-weight: 900;
+    letter-spacing: 0.4px;
+}
+
+/* Speech Bubble Tails pointing to character */
+.bubble-pointer {
     position: absolute;
     width: 0;
     height: 0;
-    bottom: -7px;
-    border-left: 7px solid transparent;
-    border-right: 7px solid transparent;
-    border-top: 8px solid #FFFFFF;
+    bottom: -10px;
+    border-left: 9px solid transparent;
+    border-right: 9px solid transparent;
+    border-top: 10px solid #FFFFFF;
 }
 
-.tail-left {
-    left: 26px;
+.pointer-left {
+    left: 36px;
 }
 
-.tail-right {
-    right: 26px;
+.pointer-right {
+    right: 36px;
 }
 
-.tail-center {
+.pointer-center {
     left: 50%;
     transform: translateX(-50%);
 }
 
-/* Typing dots animation */
-.typing-dots {
+/* Typewriter Cursor for Cat */
+.typewriter-cursor {
     display: inline-block;
-    margin-left: 2px;
-}
-.typing-dots span {
-    opacity: 0;
-    animation: typingBlink 1.4s infinite;
-}
-.typing-dots span:nth-child(1) { animation-delay: 0.1s; }
-.typing-dots span:nth-child(2) { animation-delay: 0.3s; }
-.typing-dots span:nth-child(3) { animation-delay: 0.5s; }
-
-@keyframes typingBlink {
-    0%, 20% { opacity: 0; }
-    50% { opacity: 1; }
-    100% { opacity: 0; }
-}
-
-/* Progress Card */
-.socials-progress-card {
-    background: rgba(255, 255, 255, 0.04);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 18px;
-    padding: 14px 16px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    margin-top: 6px;
-    position: relative;
-    z-index: 5;
-}
-
-.socials-progress-bar-track {
-    width: 100%;
-    height: 6px;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 999px;
-    overflow: hidden;
-    position: relative;
-}
-
-.socials-progress-bar-fill {
-    height: 100%;
-    width: 0%;
-    background: linear-gradient(90deg, #FFFFFF, #E5E5EA, #30D158);
-    border-radius: 999px;
-    box-shadow: 0 0 12px rgba(255, 255, 255, 0.6);
-    transition: width 0.65s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.socials-progress-footer {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    font-size: 11px;
-    color: #8E8E93;
-    font-weight: 600;
-}
-
-.socials-skip-link {
-    background: transparent;
-    border: none;
-    color: #E5E5EA;
-    font-size: 11px;
+    color: #000000;
     font-weight: 700;
-    cursor: pointer;
-    padding: 2px 6px;
-    border-radius: 6px;
-    transition: color 0.15s, background 0.15s;
+    animation: cursorBlink 0.6s infinite;
+    margin-left: 1px;
 }
 
-.socials-skip-link:hover {
-    color: #FFFFFF;
-    background: rgba(255, 255, 255, 0.1);
+@keyframes cursorBlink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
 }

@@ -12,5 +12,4 @@ config
 requirements.txt
 main.py
 *.log
-*.jpeg
-*.png
+!web-client/**
