@@ -21,37 +21,37 @@ let animFrames = 0, lastAnimTime = performance.now(), currentFps = 60;
 let trailFrameSkip = 0;
 
 const CONN = [
-    [0,1],[1,2],[2,3],[3,4],
-    [0,5],[5,6],[6,7],[7,8],
-    [0,9],[9,10],[10,11],[11,12],
-    [0,13],[13,14],[14,15],[15,16],
-    [0,17],[17,18],[18,19],[19,20],
-    [5,9],[9,13],[13,17],
+    [0, 1], [1, 2], [2, 3], [3, 4],
+    [0, 5], [5, 6], [6, 7], [7, 8],
+    [0, 9], [9, 10], [10, 11], [11, 12],
+    [0, 13], [13, 14], [14, 15], [15, 16],
+    [0, 17], [17, 18], [18, 19], [19, 20],
+    [5, 9], [9, 13], [13, 17],
 ];
 
 const TIP = [4, 8, 12, 16, 20];
 const DIP = [3, 7, 11, 15, 19];
 const PIP = [3, 6, 10, 14, 18];
-const MCP = [2, 5, 9,  13, 17];
+const MCP = [2, 5, 9, 13, 17];
 
-const FNAMES = ['thumb','index','middle','ring','pinky'];
-const FLABELS = ['THM','IDX','MID','RNG','PNK'];
+const FNAMES = ['thumb', 'index', 'middle', 'ring', 'pinky'];
+const FLABELS = ['THM', 'IDX', 'MID', 'RNG', 'PNK'];
 
 // ── Gesture Catalog — ZERO RED (Cupertino Gold, White, Titanium, Silver) ──
 const G = {
-    thumbs_up:     { label: 'THUMBS UP',     color: 0xd4af37 },
-    thumbs_down:   { label: 'THUMBS DOWN',   color: 0x8e8e93 },
-    peace:         { label: 'PEACE',          color: 0xffffff },
+    thumbs_up: { label: 'THUMBS UP', color: 0xd4af37 },
+    thumbs_down: { label: 'THUMBS DOWN', color: 0x8e8e93 },
+    peace: { label: 'PEACE', color: 0xffffff },
     middle_finger: { label: 'MIDDLE FINGER', color: 0x636366 },
-    rock:          { label: 'ROCK',           color: 0xd4af37 },
-    ok:            { label: 'OK SIGN',        color: 0xffffff },
-    pinch:         { label: 'PINCH',          color: 0xc5a059 },
-    open_palm:     { label: 'OPEN PALM',      color: 0xd4af37 },
-    fist:          { label: 'FIST',           color: 0x8e8e93 },
-    pointing:      { label: 'POINTING',       color: 0xffffff },
-    call_me:       { label: 'CALL ME',        color: 0xd4af37 },
-    three:         { label: 'THREE',          color: 0xc5a059 },
-    spiderman:     { label: 'SPIDERMAN',      color: 0xffffff },
+    rock: { label: 'ROCK', color: 0xd4af37 },
+    ok: { label: 'OK SIGN', color: 0xffffff },
+    pinch: { label: 'PINCH', color: 0xc5a059 },
+    open_palm: { label: 'OPEN PALM', color: 0xd4af37 },
+    fist: { label: 'FIST', color: 0x8e8e93 },
+    pointing: { label: 'POINTING', color: 0xffffff },
+    call_me: { label: 'CALL ME', color: 0xd4af37 },
+    three: { label: 'THREE', color: 0xc5a059 },
+    spiderman: { label: 'SPIDERMAN', color: 0xffffff },
 };
 
 
@@ -178,13 +178,13 @@ function createParticleSphere() {
         if (t < 0.5) {
             const s = t * 2;
             // Obsidian to Titanium Silver
-            col[i * 3]     = 0.12 * (1 - s) + 0.55 * s;
+            col[i * 3] = 0.12 * (1 - s) + 0.55 * s;
             col[i * 3 + 1] = 0.12 * (1 - s) + 0.55 * s;
             col[i * 3 + 2] = 0.14 * (1 - s) + 0.58 * s;
         } else {
             const s = (t - 0.5) * 2;
             // Titanium Silver to Warm Gold & Pure White
-            col[i * 3]     = 0.55 * (1 - s) + 0.85 * s;
+            col[i * 3] = 0.55 * (1 - s) + 0.85 * s;
             col[i * 3 + 1] = 0.55 * (1 - s) + 0.72 * s;
             col[i * 3 + 2] = 0.58 * (1 - s) + 0.35 * s;
         }
@@ -242,18 +242,18 @@ function updateSphere(time) {
             tx += fx; ty += fy; tz += fz;
             if (totalF > 0.03) {
                 const t = Math.min(1, totalF * 3);
-                col[i * 3]     += (1 - col[i * 3]) * t * 0.1;
+                col[i * 3] += (1 - col[i * 3]) * t * 0.1;
                 col[i * 3 + 1] += (1 - col[i * 3 + 1]) * t * 0.1;
                 col[i * 3 + 2] += (1 - col[i * 3 + 2]) * t * 0.05;
             }
         } else {
             const ot = (by / 1.6 + 1) / 2;
-            col[i * 3]     += (0.55 * (1 - ot) + 0.85 * ot - col[i * 3]) * 0.01;
+            col[i * 3] += (0.55 * (1 - ot) + 0.85 * ot - col[i * 3]) * 0.01;
             col[i * 3 + 1] += (0.55 * (1 - ot) + 0.72 * ot - col[i * 3 + 1]) * 0.01;
             col[i * 3 + 2] += (0.58 * (1 - ot) + 0.35 * ot - col[i * 3 + 2]) * 0.01;
         }
 
-        pos[i * 3]     += (tx - pos[i * 3]) * 0.07;
+        pos[i * 3] += (tx - pos[i * 3]) * 0.07;
         pos[i * 3 + 1] += (ty - pos[i * 3 + 1]) * 0.07;
         pos[i * 3 + 2] += (tz - pos[i * 3 + 2]) * 0.07;
     }
@@ -597,9 +597,11 @@ async function startCamera() {
             btnStart.disabled = true;
         }
 
-        // Hide camera off placeholder
-        const offState = document.getElementById('camera-off-state');
-        if (offState) offState.classList.add('hidden');
+        // Show PiP and floating FPS indicator when active
+        const camPanel = document.getElementById('camera-panel');
+        if (camPanel) camPanel.classList.add('active');
+        const fpsPill = document.getElementById('floating-fps-pill');
+        if (fpsPill) fpsPill.classList.add('active');
 
         // Update mobile dock button
         const mBtn = document.getElementById('mobile-btn-camera');
@@ -626,9 +628,11 @@ function stopCamera() {
     }
     handData = [];
 
-    // Show camera off placeholder
-    const offState = document.getElementById('camera-off-state');
-    if (offState) offState.classList.remove('hidden');
+    // Hide PiP and floating FPS indicator when inactive
+    const camPanel = document.getElementById('camera-panel');
+    if (camPanel) camPanel.classList.remove('active');
+    const fpsPill = document.getElementById('floating-fps-pill');
+    if (fpsPill) fpsPill.classList.remove('active');
 
     const ind = document.getElementById('connection-indicator');
     if (ind) {
@@ -873,13 +877,13 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // Touch event handlers for mobile
-        panel.addEventListener('touchstart', function(e) {
+        panel.addEventListener('touchstart', function (e) {
             if (e.target.closest('button, a')) return;
             const t = e.touches[0];
             startDrag(t.clientX, t.clientY);
         }, { passive: true });
 
-        window.addEventListener('touchmove', function(e) {
+        window.addEventListener('touchmove', function (e) {
             if (!isDragging) return;
             if (e.cancelable) e.preventDefault();
             const t = e.touches[0];
@@ -890,13 +894,13 @@ document.addEventListener('DOMContentLoaded', () => {
         window.addEventListener('touchcancel', endDrag);
 
         // Mouse event handlers for desktop
-        panel.addEventListener('mousedown', function(e) {
+        panel.addEventListener('mousedown', function (e) {
             if (e.target.closest('button, a')) return;
             startDrag(e.clientX, e.clientY);
             e.preventDefault();
         });
 
-        window.addEventListener('mousemove', function(e) {
+        window.addEventListener('mousemove', function (e) {
             if (!isDragging) return;
             e.preventDefault();
             moveDrag(e.clientX, e.clientY);
