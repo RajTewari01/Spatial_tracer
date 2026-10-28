@@ -36,22 +36,16 @@
         </div>
     </div>
 
-    <!-- Native App Floating Header: Only Two Elements (Left Cylindrical Pill + Right Settings) -->
+    <!-- Native App Floating Header: Clean Brand (SVG M + text, no outer pill) + Right Settings -->
     <header id="top-bar">
-        <!-- Left: Cylindrical Pill with SVG M, Made by alypion, and Live FPS -->
-        <div class="header-left-pill">
-            <div class="pill-m-icon">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                    <path d="M4 19V5L12 13L20 5V19" stroke="#FFFFFF" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-            </div>
-            <div class="pill-brand-text">
-                <span class="pill-brand-name">MotionW</span>
-                <span class="pill-brand-sub">Made by alypion</span>
-            </div>
-            <div class="pill-fps-badge">
-                <span id="fps-value" class="fps-num">60</span>
-                <span class="fps-unit">FPS</span>
+        <!-- Left: Clean SVG M vector and brand text (No outer pill) -->
+        <div class="header-brand-clean">
+            <svg class="brand-m-svg" width="22" height="22" viewBox="0 0 24 24" fill="none">
+                <path d="M4 19V5L12 13L20 5V19" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <div class="brand-text-clean">
+                <span class="brand-name">MotionW</span>
+                <span class="brand-sub">Made by alypion</span>
             </div>
         </div>
 
@@ -63,6 +57,13 @@
             </svg>
         </button>
     </header>
+
+    <!-- Floating Live FPS Indicator (Down Below the Navbar) -->
+    <div id="floating-fps-pill" class="floating-fps-badge">
+        <span class="fps-indicator-dot"></span>
+        <span id="fps-value" class="fps-num">60</span>
+        <span class="fps-unit">FPS</span>
+    </div>
 
     <!-- Desktop Sidebar Panel (Matte Solid Cupertino Style - Hidden on Mobile) -->
     <aside id="info-panel">

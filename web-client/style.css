@@ -82,75 +82,76 @@ html, body {
     pointer-events: none;
 }
 
-/* Left Cylindrical Pill */
-.header-left-pill {
+/* Left Brand: Clean SVG M vector and brand text (No outer pill) */
+.header-brand-clean {
     pointer-events: auto;
     display: flex;
     align-items: center;
-    gap: 10px;
-    height: 42px;
-    padding: 0 14px 0 8px;
-    border-radius: var(--radius-pill);
-    background: var(--surface-1);
-    border: 1px solid var(--border);
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.7);
-    transition: transform 0.15s ease, background 0.15s ease;
+    gap: 12px;
+    padding: 6px 0;
 }
 
-.pill-m-icon {
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
-    background: var(--surface-3);
-    border: 1px solid var(--border-light);
-    display: flex;
-    align-items: center;
-    justify-content: center;
+.brand-m-svg {
+    display: block;
     flex-shrink: 0;
 }
 
-.pill-brand-text {
+.brand-text-clean {
     display: flex;
     flex-direction: column;
     justify-content: center;
 }
 
-.pill-brand-name {
-    font-size: 13px;
+.brand-name {
+    font-size: 15px;
     font-weight: 800;
     color: var(--text-primary);
     line-height: 1.1;
-    letter-spacing: -0.2px;
+    letter-spacing: -0.3px;
 }
 
-.pill-brand-sub {
-    font-size: 9px;
+.brand-sub {
+    font-size: 10px;
     font-weight: 500;
     color: var(--text-secondary);
     letter-spacing: 0.2px;
 }
 
-.pill-fps-badge {
+/* Floating Live FPS Indicator — Down Below the Navbar */
+#floating-fps-pill {
+    position: fixed;
+    top: 68px;
+    left: 18px;
+    z-index: 95;
     display: flex;
     align-items: center;
-    gap: 3px;
-    padding: 3px 8px;
+    gap: 6px;
+    height: 30px;
+    padding: 0 12px;
     border-radius: var(--radius-pill);
-    background: var(--surface-3);
+    background: var(--surface-1);
     border: 1px solid var(--border);
-    margin-left: 4px;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.6);
+    pointer-events: auto;
+}
+
+.fps-indicator-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--green-live);
 }
 
 .fps-num {
     font-family: var(--mono);
-    font-size: 11px;
+    font-size: 12px;
     font-weight: 800;
-    color: var(--gold);
+    color: #FFFFFF;
 }
 
 .fps-unit {
     font-family: var(--mono);
-    font-size: 8px;
+    font-size: 9px;
     font-weight: 700;
     color: var(--text-secondary);
     letter-spacing: 0.5px;
@@ -843,6 +844,13 @@ html, body {
 
     #top-bar {
         padding: 12px 14px;
+    }
+
+    #floating-fps-pill {
+        top: 66px !important;
+        left: 14px !important;
+        height: 28px;
+        padding: 0 10px;
     }
 
     /* ── Mobile PiP Camera: Completely 16:9 Widescreen Rectangle ── */
