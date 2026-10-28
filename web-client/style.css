@@ -465,16 +465,20 @@ body {
     position: fixed;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%) scale(0.92);
     z-index: 150;
     pointer-events: none;
-    font-family: var(--mono);
-    font-size: 32px;
-    font-weight: 900;
-    letter-spacing: 4px;
-    color: var(--gold);
+    font-family: 'Pacifico', cursive, -apple-system, sans-serif !important;
+    font-size: clamp(32px, 7vw, 48px);
+    font-weight: 400 !important;
+    letter-spacing: 1.2px;
+    text-transform: capitalize;
+    color: #FFFFFF !important;
+    text-shadow: 0 4px 20px rgba(0, 0, 0, 0.9), 0 0 35px rgba(255, 255, 255, 0.45);
     opacity: 0;
-    transition: opacity 0.2s, transform 0.2s;
+    transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1), transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+    white-space: nowrap;
+    text-align: center;
 }
 
 .gesture-flash.visible {
@@ -484,6 +488,7 @@ body {
 
 .gesture-flash.hidden {
     opacity: 0;
+    transform: translate(-50%, -50%) scale(0.92);
 }
 
 /* ── Mobile Floating Bottom Dock (Zero Neon) ────────────────── */
@@ -1304,14 +1309,16 @@ body {
         display: flex;
         position: fixed;
         bottom: 24px;
-        left: 16px;
-        right: 16px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: calc(100% - 32px);
+        max-width: 440px;
         z-index: 140;
         align-items: center;
         justify-content: center;
-        gap: 0;
+        gap: 0px;
         padding-bottom: env(safe-area-inset-bottom, 0px);
-        transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+        transition: gap 0.48s cubic-bezier(0.16, 1, 0.3, 1);
         pointer-events: none;
     }
 
@@ -1321,14 +1328,15 @@ body {
 
     /* Idle: Single centered premium start pill */
     .dock-btn-primary {
-        flex: 0 1 auto;
-        min-width: 170px;
+        flex: 0 0 200px;
+        width: 200px;
+        min-width: 0;
         max-width: 250px;
         display: flex;
         align-items: center;
         justify-content: center;
         gap: 8px;
-        padding: 14px 34px;
+        padding: 14px 28px;
         border-radius: var(--radius-pill);
         background: #FFFFFF !important;
         color: #000000 !important;
@@ -1339,7 +1347,11 @@ body {
         border: none;
         cursor: pointer;
         box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45), 0 2px 8px rgba(0, 0, 0, 0.3);
-        transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+        transition: flex 0.48s cubic-bezier(0.16, 1, 0.3, 1),
+                    width 0.48s cubic-bezier(0.16, 1, 0.3, 1),
+                    padding 0.48s cubic-bezier(0.16, 1, 0.3, 1),
+                    transform 0.15s ease,
+                    box-shadow 0.4s ease;
     }
 
     .dock-btn-primary.active {
@@ -1351,57 +1363,87 @@ body {
         transform: scale(0.96);
     }
 
-    /* Idle: Posture / Gesture pill is completely hidden */
-    #mobile-dock #mobile-gesture-pill {
-        display: none !important;
+    /* Gesture / Posture pill — Fluid division via width/flex/opacity transition (NO display:none) */
+    .dock-pill {
+        display: flex !important;
+        flex: 0 0 0px;
+        width: 0;
+        min-width: 0;
+        max-width: 0;
+        padding: 13px 0 !important;
+        margin: 0 !important;
+        border: none !important;
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+        overflow: hidden;
+        white-space: nowrap;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        border-radius: var(--radius-pill);
+        background: #FFFFFF !important;
+        color: #000000 !important;
+        font-family: var(--font);
+        font-size: 13px;
+        font-weight: 800;
+        letter-spacing: 0.4px;
+        box-shadow: 0 0 0 transparent;
+        transform: scale(0.7) translateX(-20px);
+        transition: flex 0.48s cubic-bezier(0.16, 1, 0.3, 1),
+                    max-width 0.48s cubic-bezier(0.16, 1, 0.3, 1),
+                    width 0.48s cubic-bezier(0.16, 1, 0.3, 1),
+                    padding 0.48s cubic-bezier(0.16, 1, 0.3, 1),
+                    opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+                    transform 0.48s cubic-bezier(0.16, 1, 0.3, 1),
+                    box-shadow 0.4s ease,
+                    visibility 0.48s;
     }
 
-    /* Active: When camera starts, dock morphs and divides into Stop + Posture pill */
+    .dock-pill:active {
+        transform: scale(0.97);
+    }
+
+    /* Pill inner contents: smoothly fade in and scale */
+    .dock-pill .dock-gesture-icon,
+    .dock-pill #mobile-gesture-label {
+        opacity: 0;
+        transform: scale(0.7);
+        transition: opacity 0.2s ease, transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    /* Active: Smooth fluid separation into Stop (left) + Live Posture Pill (right) */
     #mobile-dock.camera-active {
-        justify-content: space-between;
-        gap: 10px;
+        gap: 12px;
     }
 
     #mobile-dock.camera-active .dock-btn-primary {
-        flex: 1;
+        flex: 1 1 0%;
+        width: auto;
         min-width: 0;
         max-width: none;
         padding: 13px 18px;
         font-size: 13px;
     }
 
-    #mobile-dock.camera-active #mobile-gesture-pill {
-        display: flex !important;
-        flex: 1.35;
-        min-width: 0;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-        padding: 13px 16px;
-        border-radius: var(--radius-pill);
-        background: #FFFFFF !important;
-        border: none !important;
-        color: #000000 !important;
-        font-family: var(--font);
-        font-size: 13px;
-        font-weight: 800;
-        letter-spacing: 0.4px;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
+    #mobile-dock.camera-active .dock-pill {
+        flex: 1.35 1 0%;
+        width: auto;
+        max-width: 280px;
+        padding: 13px 16px !important;
+        opacity: 1;
+        visibility: visible;
+        pointer-events: auto;
+        transform: scale(1) translateX(0);
         box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45), 0 2px 8px rgba(0, 0, 0, 0.3);
-        animation: dockPillPop 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
 
-    @keyframes dockPillPop {
-        0% {
-            opacity: 0;
-            transform: scale(0.82) translateY(6px);
-        }
-        100% {
-            opacity: 1;
-            transform: scale(1) translateY(0);
-        }
+    #mobile-dock.camera-active .dock-pill .dock-gesture-icon,
+    #mobile-dock.camera-active .dock-pill #mobile-gesture-label {
+        opacity: 1;
+        transform: scale(1);
+        transition: opacity 0.32s cubic-bezier(0.16, 1, 0.3, 1) 0.08s,
+                    transform 0.45s cubic-bezier(0.16, 1, 0.3, 1) 0.04s;
     }
 
     .dock-gesture-icon {

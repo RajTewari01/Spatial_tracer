@@ -753,14 +753,15 @@ function toggleCameraSize() {
 function flashGesture(text) {
     const el = document.getElementById('gesture-flash');
     if (!el) return;
-    el.textContent = text;
+    const formatted = String(text || '').toLowerCase().replace(/\b\w/g, c => c.toUpperCase());
+    el.textContent = formatted;
     el.classList.remove('hidden');
     el.classList.add('visible');
     if (gestureFlashTimer) clearTimeout(gestureFlashTimer);
     gestureFlashTimer = setTimeout(() => {
         el.classList.remove('visible');
         el.classList.add('hidden');
-    }, 600);
+    }, 750);
 }
 
 function addEventLog(msg) {
