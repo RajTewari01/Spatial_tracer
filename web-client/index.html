@@ -7,7 +7,7 @@
     <link rel="icon" type="image/png" sizes="32x32" href="./assets/images/favicon-32.png">
     <link rel="icon" type="image/png" sizes="64x64" href="./favicon.png">
     <link rel="apple-touch-icon" sizes="180x180" href="./assets/images/apple-touch-icon.png">
-    <link rel="stylesheet" href="./style.css?v=2.7">
+    <link rel="stylesheet" href="./style.css?v=3.0">
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
@@ -364,41 +364,44 @@
     </div>
 
     <!-- Anime Chibi Redirect Floating Bubbles Overlay (Translucent Page Backdrop) -->
-    <div id="socials-redirect-overlay" class="socials-redirect-overlay hidden" aria-hidden="true">
-        <!-- 1. Left Actor: Itachi -->
-        <div id="redirect-actor-itachi" class="redirect-actor actor-left">
-            <div class="comic-speech-bubble bubble-left">
-                <span class="bubble-speech-text">STOP!! You are getting redirected</span>
-                <div class="bubble-pointer pointer-left"></div>
+    <div id="socials-redirect-overlay" class="socials-redirect-overlay hidden" aria-hidden="true" onclick="cancelAnimeRedirect()">
+        <!-- Duo Stage: Itachi (Left) + Cat (Right) centered in the middle of the screen -->
+        <div id="redirect-duo-stage" class="redirect-duo-stage" onclick="event.stopPropagation()">
+            <!-- 1. Left Actor: Itachi (Typewriter: STOP!! We are getting redirected) -->
+            <div id="redirect-actor-itachi" class="redirect-actor actor-left">
+                <div class="comic-speech-bubble bubble-left">
+                    <span id="itachi-typewriter-text" class="bubble-speech-text"></span><span class="typewriter-cursor" id="itachi-cursor">|</span>
+                    <div class="bubble-pointer pointer-center"></div>
+                </div>
+                <div class="redirect-chibi-frame frame-itachi">
+                    <img src="./assets/images/itachi_chibi.png?v=3.0" alt="Itachi" class="redirect-chibi-img">
+                </div>
             </div>
-            <div class="redirect-chibi-frame">
-                <img src="./assets/images/itachi_chibi.png?v=2.7" alt="Itachi" class="redirect-chibi-img">
+
+            <!-- 2. Right Actor: Cat (Typewriter: Meow.. meow..) -->
+            <div id="redirect-actor-cat" class="redirect-actor actor-right">
+                <div class="comic-speech-bubble bubble-right">
+                    <span id="cat-typewriter-text" class="bubble-speech-text"></span><span class="typewriter-cursor" id="cat-cursor">|</span>
+                    <div class="bubble-pointer pointer-center"></div>
+                </div>
+                <div class="redirect-chibi-frame frame-cat">
+                    <img src="./assets/images/cat_chibi.png?v=3.0" alt="Cat" class="redirect-chibi-img">
+                </div>
             </div>
         </div>
 
-        <!-- 2. Right Actor: Cat (Typewriter effect: Meow.. meow..) -->
-        <div id="redirect-actor-cat" class="redirect-actor actor-right">
-            <div class="comic-speech-bubble bubble-right">
-                <span id="cat-typewriter-text" class="bubble-speech-text"></span><span class="typewriter-cursor">|</span>
-                <div class="bubble-pointer pointer-right"></div>
-            </div>
-            <div class="redirect-chibi-frame">
-                <img src="./assets/images/cat_chibi.png?v=2.7" alt="Cat" class="redirect-chibi-img">
-            </div>
-        </div>
-
-        <!-- 3. Center Actor: Gojo (Appears in middle after Itachi & Cat are gone) -->
-        <div id="redirect-actor-gojo" class="redirect-actor actor-center">
+        <!-- 3. Center Actor: Gojo (Bursts into dead center when duo is gone) -->
+        <div id="redirect-actor-gojo" class="redirect-actor actor-center" onclick="event.stopPropagation()">
             <div class="comic-speech-bubble bubble-center">
                 <span class="bubble-speech-text gojo-text">Let's Go! ⚡</span>
                 <div class="bubble-pointer pointer-center"></div>
             </div>
             <div class="redirect-chibi-frame frame-gojo">
-                <img src="./assets/images/gojo_chibi.png?v=2.7" alt="Gojo" class="redirect-chibi-img">
+                <img src="./assets/images/gojo_chibi.png?v=3.0" alt="Gojo" class="redirect-chibi-img">
             </div>
         </div>
     </div>
 
-    <script src="./app.js?v=2.7"></script>
+    <script src="./app.js?v=3.0"></script>
 </body>
 </html>

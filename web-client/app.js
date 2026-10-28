@@ -1282,10 +1282,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // ═══════════════════════════════════════════════════════════════
 //  ANIME CHIBI REDIRECT FLOATING BUBBLES CONTROLLER
-//  (Itachi + Cat Typewriter -> Vanish -> Gojo "Let's Go!" -> Redirect)
+//  (Itachi + Cat Dual Typewriter -> Vanish -> Gojo Hero Pop -> Redirect)
 // ═══════════════════════════════════════════════════════════════
 
 let redirectTimer = null;
+let itachiTypeInterval = null;
 let catTypeInterval = null;
 let redirectStepTimers = [];
 
@@ -1298,72 +1299,137 @@ function openSocialsAnimeLoader(event, url) {
 
     const overlay = document.getElementById('socials-redirect-overlay');
     if (!overlay) {
-        window.open(targetUrl, '_blank');
+        window.location.href = targetUrl;
         return;
     }
 
-    // Reset everything
-    clearAnimeRedirectTimers();
+    // Reset any ongoing timers or intervals
+    cancelAnimeRedirect();
 
+    const stage = document.getElementById('redirect-duo-stage');
     const itachi = document.getElementById('redirect-actor-itachi');
     const cat = document.getElementById('redirect-actor-cat');
     const gojo = document.getElementById('redirect-actor-gojo');
+    const itachiText = document.getElementById('itachi-typewriter-text');
     const catText = document.getElementById('cat-typewriter-text');
 
+    if (stage) stage.className = 'redirect-duo-stage';
     if (itachi) itachi.className = 'redirect-actor actor-left';
     if (cat) cat.className = 'redirect-actor actor-right';
     if (gojo) gojo.className = 'redirect-actor actor-center';
+    if (itachiText) itachiText.textContent = '';
     if (catText) catText.textContent = '';
 
     // Show translucent backdrop overlay on the same page
     overlay.classList.remove('hidden');
     overlay.classList.add('visible');
 
-    // Step 1: Itachi & Cat appear (t = 80ms)
+    // Step 1: Itachi & Cat appear in the middle (t = 60ms)
     redirectStepTimers.push(setTimeout(() => {
         if (!overlay.classList.contains('visible')) return;
         if (itachi) itachi.classList.add('active');
         if (cat) cat.classList.add('active');
 
-        // Typewriter effect on Cat: "Meow.. meow.."
-        const phrase = "Meow.. meow..";
-        let charIndex = 0;
+        // Dual Typewriter Effect:
+        // Itachi: "STOP!! We are getting redirected" (33 chars, ~27ms/char = ~890ms)
+        const itachiPhrase = "STOP!! We are getting redirected";
+        let itachiIndex = 0;
+        itachiTypeInterval = setInterval(() => {
+            if (itachiIndex < itachiPhrase.length) {
+                if (itachiText) itachiText.textContent += itachiPhrase[itachiIndex];
+                itachiIndex++;
+            } else {
+                clearInterval(itachiTypeInterval);
+                itachiTypeInterval = null;
+            }
+        }, 27);
+
+        // Cat: "Meow.. meow.." (14 chars, ~64ms/char = ~896ms)
+        const catPhrase = "Meow.. meow..";
+        let catIndex = 0;
         catTypeInterval = setInterval(() => {
-            if (charIndex < phrase.length) {
-                if (catText) catText.textContent += phrase[charIndex];
-                charIndex++;
+            if (catIndex < catPhrase.length) {
+                if (catText) catText.textContent += catPhrase[catIndex];
+                catIndex++;
             } else {
                 clearInterval(catTypeInterval);
+                catTypeInterval = null;
             }
-        }, 70);
-    }, 80));
+        }, 64);
+    }, 60));
 
-    // Step 2: Itachi & Cat vanish ("AND THEY WILL BE GONE") (t = 1350ms)
+    // Step 2: Duo stage vanishes ("AND THEY WILL BE GONE") (t = 1380ms)
     redirectStepTimers.push(setTimeout(() => {
         if (!overlay.classList.contains('visible')) return;
-        if (itachi) itachi.classList.add('gone');
-        if (cat) cat.classList.add('gone');
-    }, 1350));
+        if (stage) stage.classList.add('gone');
+    }, 1380));
 
-    // Step 3: In the middle Gojo appears in message bubble saying "Let's Go!" (t = 1680ms)
+    // Step 3: In the middle Gojo appears with message bubble saying "Let's Go!" (t = 1720ms)
     redirectStepTimers.push(setTimeout(() => {
         if (!overlay.classList.contains('visible')) return;
         if (gojo) gojo.classList.add('active');
-    }, 1680));
+    }, 1720));
 
-    // Step 4: Smooth Redirect to link (t = 2650ms)
+    // Step 4: Perform redirect while Gojo animation stays proudly active (t = 2850ms)
+    // The overlay is NOT dismissed before redirecting so animation is never cut short
     redirectTimer = setTimeout(() => {
         if (!overlay.classList.contains('visible')) return;
+        executeSafeRedirect(targetUrl);
+
+        // In case window.open opened in a new tab, fade overlay after navigation has started
+        redirectStepTimers.push(setTimeout(() => {
+            if (overlay && overlay.classList.contains('visible')) {
+                overlay.classList.remove('visible');
+                overlay.classList.add('hidden');
+            }
+        }, 800));
+    }, 2850);
+}
+
+// Guaranteed redirect helper: handles popup blockers on mobile & webviews
+function executeSafeRedirect(url) {
+    try {
+        const opened = window.open(url, '_blank');
+        if (!opened || opened.closed || typeof opened.closed === 'undefined') {
+            // Popup blocked by browser policy: directly navigate to target
+            window.location.href = url;
+        }
+    } catch (e) {
+        window.location.href = url;
+    }
+}
+
+// Cancel redirect animation and reset state (e.g., when user goes back or clicks backdrop)
+function cancelAnimeRedirect() {
+    clearAnimeRedirectTimers();
+    const overlay = document.getElementById('socials-redirect-overlay');
+    if (overlay) {
         overlay.classList.remove('visible');
         overlay.classList.add('hidden');
-        window.open(targetUrl, '_blank');
-    }, 2650);
+    }
+    const stage = document.getElementById('redirect-duo-stage');
+    const itachi = document.getElementById('redirect-actor-itachi');
+    const cat = document.getElementById('redirect-actor-cat');
+    const gojo = document.getElementById('redirect-actor-gojo');
+    const itachiText = document.getElementById('itachi-typewriter-text');
+    const catText = document.getElementById('cat-typewriter-text');
+
+    if (stage) stage.className = 'redirect-duo-stage';
+    if (itachi) itachi.className = 'redirect-actor actor-left';
+    if (cat) cat.className = 'redirect-actor actor-right';
+    if (gojo) gojo.className = 'redirect-actor actor-center';
+    if (itachiText) itachiText.textContent = '';
+    if (catText) catText.textContent = '';
 }
 
 function clearAnimeRedirectTimers() {
     if (redirectTimer) {
         clearTimeout(redirectTimer);
         redirectTimer = null;
+    }
+    if (itachiTypeInterval) {
+        clearInterval(itachiTypeInterval);
+        itachiTypeInterval = null;
     }
     if (catTypeInterval) {
         clearInterval(catTypeInterval);
@@ -1374,3 +1440,22 @@ function clearAnimeRedirectTimers() {
     }
     redirectStepTimers = [];
 }
+
+// Reset overlay if user navigates back using browser Back button (bfcache support)
+window.addEventListener('pageshow', function () {
+    cancelAnimeRedirect();
+});
+
+window.addEventListener('popstate', function () {
+    cancelAnimeRedirect();
+});
+
+// Allow user to press ESC to dismiss redirect overlay if desired
+window.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') {
+        const overlay = document.getElementById('socials-redirect-overlay');
+        if (overlay && overlay.classList.contains('visible')) {
+            cancelAnimeRedirect();
+        }
+    }
+});

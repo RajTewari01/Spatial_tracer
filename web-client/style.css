@@ -1527,24 +1527,25 @@ body {
 
 /* ═══════════════════════════════════════════════════════════════
    ANIME CHIBI REDIRECT FLOATING BUBBLES OVERLAY
-   (Translucent Backdrop, Floating White Speech Bubbles, Chibi Actors)
+   (Translucent Backdrop, Centered Middle Chibis, Floating White Bubbles)
    ═══════════════════════════════════════════════════════════════ */
 
 .socials-redirect-overlay {
     position: fixed;
     inset: 0;
-    z-index: 600;
+    z-index: 999999; /* Highest priority on page, above everything */
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(0, 0, 0, 0.65);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+    background: rgba(0, 0, 0, 0.72);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
     opacity: 0;
     visibility: hidden;
     pointer-events: none;
     transition: opacity 0.35s ease, visibility 0.35s ease;
     overflow: hidden;
+    user-select: none;
 }
 
 .socials-redirect-overlay.visible {
@@ -1553,119 +1554,106 @@ body {
     pointer-events: auto;
 }
 
-/* Actors: positioned directly on the translucent screen */
-.redirect-actor {
+/* ── Centered Duo Stage (Itachi + Cat in Middle of Screen) ── */
+.redirect-duo-stage {
     position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    gap: 36px;
+    width: 100%;
+    max-width: 700px;
+    padding: 0 16px;
+    pointer-events: none;
+    transition: opacity 0.38s cubic-bezier(0.16, 1, 0.3, 1),
+                transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.redirect-duo-stage.gone {
+    opacity: 0;
+    transform: translate(-50%, -50%) translateY(-24px) scale(0.65);
+    pointer-events: none;
+}
+
+/* Base Actor Component */
+.redirect-actor {
     display: flex;
     flex-direction: column;
     align-items: center;
-    opacity: 0;
-    pointer-events: none;
+    justify-content: flex-end;
+    text-align: center;
     transition: opacity 0.38s cubic-bezier(0.16, 1, 0.3, 1),
                 transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-/* 1. Itachi: Left side */
-.actor-left {
-    left: 8%;
-    bottom: 22%;
-    transform: translateY(40px) scale(0.6);
+/* 1. Itachi (Left) & 2. Cat (Right) entrance animations */
+.actor-left, .actor-right {
+    opacity: 0;
+    transform: translateY(35px) scale(0.7);
 }
 
-@media (max-width: 768px) {
-    .actor-left {
-        left: 4%;
-        bottom: 24%;
-    }
-}
-
-.actor-left.active {
+.actor-left.active, .actor-right.active {
     opacity: 1;
     transform: translateY(0) scale(1);
 }
 
-.actor-left.gone {
-    opacity: 0;
-    transform: translateY(-20px) scale(0.7);
-    transition: opacity 0.3s ease, transform 0.35s ease;
-}
-
-/* 2. Cat: Right side */
-.actor-right {
-    right: 8%;
-    bottom: 22%;
-    transform: translateY(40px) scale(0.6);
-}
-
-@media (max-width: 768px) {
-    .actor-right {
-        right: 4%;
-        bottom: 24%;
-    }
-}
-
-.actor-right.active {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-}
-
-.actor-right.gone {
-    opacity: 0;
-    transform: translateY(-20px) scale(0.7);
-    transition: opacity 0.3s ease, transform 0.35s ease;
-}
-
-/* 3. Gojo: Dead Center */
+/* 3. Gojo in Dead Center */
 .actor-center {
-    left: 50%;
+    position: absolute;
     top: 50%;
-    transform: translate(-50%, -50%) scale(0.4);
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.3);
     opacity: 0;
-    z-index: 20;
+    pointer-events: none;
+    z-index: 30;
 }
 
 .actor-center.active {
     opacity: 1;
     transform: translate(-50%, -50%) scale(1);
-    animation: gojoCenterPop 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    animation: gojoCenterPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
 }
 
 @keyframes gojoCenterPop {
-    0% { transform: translate(-50%, -50%) scale(0.3) rotate(-8deg); opacity: 0; }
-    65% { transform: translate(-50%, -50%) scale(1.15) rotate(2deg); opacity: 1; }
-    100% { transform: translate(-50%, -50%) scale(1) rotate(0deg); opacity: 1; }
+    0% {
+        transform: translate(-50%, -50%) scale(0.3) rotate(-6deg);
+        opacity: 0;
+    }
+    60% {
+        transform: translate(-50%, -50%) scale(1.15) rotate(2deg);
+        opacity: 1;
+        filter: drop-shadow(0 0 35px rgba(255, 255, 255, 0.8));
+    }
+    100% {
+        transform: translate(-50%, -50%) scale(1) rotate(0deg);
+        opacity: 1;
+        filter: drop-shadow(0 16px 36px rgba(0, 0, 0, 0.85));
+    }
 }
 
-/* Chibi Frames */
+/* ── Character Sizing (Prominent Middle-of-Screen Chibis) ── */
 .redirect-chibi-frame {
-    width: 140px;
-    height: 140px;
+    width: 250px;
+    height: 250px;
     display: flex;
     align-items: center;
     justify-content: center;
-}
-
-@media (max-width: 768px) {
-    .redirect-chibi-frame {
-        width: 120px;
-        height: 120px;
-    }
-    .frame-gojo {
-        width: 145px !important;
-        height: 145px !important;
-    }
+    flex-shrink: 0;
 }
 
 .frame-gojo {
-    width: 165px;
-    height: 165px;
+    width: 290px;
+    height: 290px;
 }
 
 .redirect-chibi-img {
     width: 100%;
     height: 100%;
     object-fit: contain;
-    filter: drop-shadow(0 12px 24px rgba(0, 0, 0, 0.65));
+    filter: drop-shadow(0 16px 32px rgba(0, 0, 0, 0.78));
 }
 
 /* ── Pure White Floating Comic Speech Bubbles ─────────────────── */
@@ -1673,26 +1661,29 @@ body {
     position: relative;
     background: #FFFFFF;
     color: #000000;
-    padding: 10px 18px;
-    border-radius: 22px;
-    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5), 0 2px 8px rgba(0, 0, 0, 0.3);
+    padding: 11px 18px;
+    border-radius: 20px;
+    box-shadow: 0 14px 36px rgba(0, 0, 0, 0.6), 0 2px 6px rgba(0, 0, 0, 0.35);
     margin-bottom: 12px;
     max-width: 260px;
-    text-align: center;
+    min-height: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     border: 2px solid #FFFFFF;
 }
 
 .bubble-speech-text {
-    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif;
     font-size: 13.5px;
     font-weight: 800;
     line-height: 1.3;
-    letter-spacing: 0.2px;
+    letter-spacing: 0.1px;
     color: #000000;
 }
 
 .gojo-text {
-    font-size: 17px;
+    font-size: 18px;
     font-weight: 900;
     letter-spacing: 0.4px;
 }
@@ -1702,30 +1693,19 @@ body {
     position: absolute;
     width: 0;
     height: 0;
-    bottom: -10px;
-    border-left: 9px solid transparent;
-    border-right: 9px solid transparent;
-    border-top: 10px solid #FFFFFF;
-}
-
-.pointer-left {
-    left: 36px;
-}
-
-.pointer-right {
-    right: 36px;
-}
-
-.pointer-center {
+    bottom: -9px;
     left: 50%;
     transform: translateX(-50%);
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-top: 9px solid #FFFFFF;
 }
 
-/* Typewriter Cursor for Cat */
+/* Blinking Typewriter Cursor */
 .typewriter-cursor {
     display: inline-block;
     color: #000000;
-    font-weight: 700;
+    font-weight: 800;
     animation: cursorBlink 0.6s infinite;
     margin-left: 1px;
 }
@@ -1733,4 +1713,64 @@ body {
 @keyframes cursorBlink {
     0%, 100% { opacity: 1; }
     50% { opacity: 0; }
+}
+
+/* ── Responsive Adaptations for Mobile ────────────────────────── */
+@media (max-width: 768px) {
+    .redirect-duo-stage {
+        gap: 12px;
+        padding: 0 8px;
+        max-width: 100%;
+    }
+
+    .redirect-chibi-frame {
+        width: 180px;
+        height: 180px;
+    }
+
+    .frame-gojo {
+        width: 230px;
+        height: 230px;
+    }
+
+    .comic-speech-bubble {
+        padding: 8px 12px;
+        max-width: 170px;
+        min-height: 46px;
+        margin-bottom: 8px;
+    }
+
+    .bubble-speech-text {
+        font-size: 11.5px !important;
+    }
+
+    .gojo-text {
+        font-size: 16px !important;
+    }
+}
+
+@media (max-width: 390px) {
+    .redirect-duo-stage {
+        gap: 8px;
+    }
+
+    .redirect-chibi-frame {
+        width: 155px;
+        height: 155px;
+    }
+
+    .frame-gojo {
+        width: 205px;
+        height: 205px;
+    }
+
+    .comic-speech-bubble {
+        padding: 6px 10px;
+        max-width: 150px;
+        min-height: 42px;
+    }
+
+    .bubble-speech-text {
+        font-size: 10px !important;
+    }
 }
