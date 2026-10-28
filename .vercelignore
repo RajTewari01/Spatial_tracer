@@ -1,0 +1,16 @@
+api
+engine
+vision_tracker
+desktop-client
+mobile-client
+mobile_client_v2
+motion_web
+proofs
+ui
+wiki
+config
+requirements.txt
+main.py
+*.log
+*.jpeg
+*.png
