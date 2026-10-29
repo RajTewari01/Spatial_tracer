@@ -1281,13 +1281,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 // ═══════════════════════════════════════════════════════════════
-//  ANIME CHIBI REDIRECT FLOATING BUBBLES CONTROLLER
-//  (Itachi + Cat Dual Typewriter -> Vanish -> Gojo Hero Pop -> Redirect)
+//  MANGA CUTOUTS ANIME REDIRECT CONTROLLER
+//  (Act 1: Itachi "you need to stop..." -> Kakashi "let us go" -> Naruto "then runnnn"
+//   Act 2: All vanish -> Angry Itachi in middle with "... ... ..." -> Redirect)
 // ═══════════════════════════════════════════════════════════════
 
 let redirectTimer = null;
-let itachiTypeInterval = null;
-let catTypeInterval = null;
+let redirectTypewriterIntervals = [];
 let redirectStepTimers = [];
 
 function openSocialsAnimeLoader(event, url) {
@@ -1306,84 +1306,105 @@ function openSocialsAnimeLoader(event, url) {
     // Reset any ongoing timers or intervals
     cancelAnimeRedirect();
 
-    const stage = document.getElementById('redirect-duo-stage');
-    const itachi = document.getElementById('redirect-actor-itachi');
-    const cat = document.getElementById('redirect-actor-cat');
-    const gojo = document.getElementById('redirect-actor-gojo');
-    const itachiText = document.getElementById('itachi-typewriter-text');
-    const catText = document.getElementById('cat-typewriter-text');
+    const trioStage = document.getElementById('redirect-trio-stage');
+    const itachiPod = document.getElementById('actor-itachi-start');
+    const kakashiPod = document.getElementById('actor-kakashi');
+    const narutoPod = document.getElementById('actor-naruto');
+    const angryStage = document.getElementById('redirect-angry-stage');
 
-    if (stage) stage.className = 'redirect-duo-stage';
-    if (itachi) itachi.className = 'redirect-actor actor-left';
-    if (cat) cat.className = 'redirect-actor actor-right';
-    if (gojo) gojo.className = 'redirect-actor actor-center';
+    const itachiText = document.getElementById('itachi-text');
+    const kakashiText = document.getElementById('kakashi-text');
+    const narutoText = document.getElementById('naruto-text');
+    const angryText = document.getElementById('angry-itachi-text');
+
+    if (trioStage) trioStage.className = 'redirect-trio-stage';
+    if (itachiPod) itachiPod.className = 'manga-actor-pod actor-itachi-start';
+    if (kakashiPod) kakashiPod.className = 'manga-actor-pod actor-kakashi';
+    if (narutoPod) narutoPod.className = 'manga-actor-pod actor-naruto';
+    if (angryStage) angryStage.className = 'redirect-angry-stage';
+
     if (itachiText) itachiText.textContent = '';
-    if (catText) catText.textContent = '';
+    if (kakashiText) kakashiText.textContent = '';
+    if (narutoText) narutoText.textContent = '';
+    if (angryText) angryText.textContent = '';
 
     // Show translucent backdrop overlay on the same page
     overlay.classList.remove('hidden');
     overlay.classList.add('visible');
 
-    // Step 1: Itachi & Cat appear in the middle (t = 60ms)
+    // ── Phase 1: Itachi starts with warning (t = 80ms) ───────────
     redirectStepTimers.push(setTimeout(() => {
         if (!overlay.classList.contains('visible')) return;
-        if (itachi) itachi.classList.add('active');
-        if (cat) cat.classList.add('active');
+        if (itachiPod) itachiPod.classList.add('active');
 
-        // Dual Typewriter Effect:
-        // Itachi: "STOP!! We are getting redirected" (33 chars, ~27ms/char = ~890ms)
-        const itachiPhrase = "STOP!! We are getting redirected";
-        let itachiIndex = 0;
-        itachiTypeInterval = setInterval(() => {
-            if (itachiIndex < itachiPhrase.length) {
-                if (itachiText) itachiText.textContent += itachiPhrase[itachiIndex];
-                itachiIndex++;
-            } else {
-                clearInterval(itachiTypeInterval);
-                itachiTypeInterval = null;
-            }
-        }, 27);
+        // Typewriter: "you need to stop you are getting redirected........"
+        typewriteMangaText(itachiText, "you need to stop you are getting redirected........", 23);
+    }, 80));
 
-        // Cat: "Meow.. meow.." (14 chars, ~64ms/char = ~896ms)
-        const catPhrase = "Meow.. meow..";
-        let catIndex = 0;
-        catTypeInterval = setInterval(() => {
-            if (catIndex < catPhrase.length) {
-                if (catText) catText.textContent += catPhrase[catIndex];
-                catIndex++;
-            } else {
-                clearInterval(catTypeInterval);
-                catTypeInterval = null;
-            }
-        }, 64);
-    }, 60));
-
-    // Step 2: Duo stage vanishes ("AND THEY WILL BE GONE") (t = 1380ms)
+    // ── Phase 2: Kakashi tells "let us go" (t = 1250ms) ───────────
     redirectStepTimers.push(setTimeout(() => {
         if (!overlay.classList.contains('visible')) return;
-        if (stage) stage.classList.add('gone');
-    }, 1380));
+        if (kakashiPod) kakashiPod.classList.add('active');
 
-    // Step 3: In the middle Gojo appears with message bubble saying "Let's Go!" (t = 1720ms)
+        // Typewriter: "let us go"
+        typewriteMangaText(kakashiText, "let us go", 38);
+    }, 1250));
+
+    // ── Phase 3: Naruto says "then runnnn" (t = 1800ms) ──────────
     redirectStepTimers.push(setTimeout(() => {
         if (!overlay.classList.contains('visible')) return;
-        if (gojo) gojo.classList.add('active');
-    }, 1720));
+        if (narutoPod) narutoPod.classList.add('active');
 
-    // Step 4: Perform redirect while Gojo animation stays proudly active (t = 2850ms)
-    // The overlay is NOT dismissed before redirecting so animation is never cut short
+        // Typewriter: "then runnnn"
+        typewriteMangaText(narutoText, "then runnnn", 38);
+    }, 1800));
+
+    // ── Phase 4: All previous stickers disappear (t = 3200ms) ────
+    redirectStepTimers.push(setTimeout(() => {
+        if (!overlay.classList.contains('visible')) return;
+        if (trioStage) trioStage.classList.add('gone');
+    }, 3200));
+
+    // ── Phase 5: Angry Itachi in middle with angry bubble "... ... ..." (t = 3650ms)
+    redirectStepTimers.push(setTimeout(() => {
+        if (!overlay.classList.contains('visible')) return;
+        if (angryStage) angryStage.classList.add('active');
+
+        // Typewriter: "... ... ..."
+        typewriteMangaText(angryText, "... ... ...", 90);
+    }, 3650));
+
+    // ── Phase 6: Perform safe redirect while Angry Itachi stares down (t = 5000ms)
     redirectTimer = setTimeout(() => {
         if (!overlay.classList.contains('visible')) return;
         executeSafeRedirect(targetUrl);
 
-        // In case window.open opened in a new tab, fade overlay after navigation has started
+        // If opened in new tab, fade overlay away after navigation begins
         redirectStepTimers.push(setTimeout(() => {
             if (overlay && overlay.classList.contains('visible')) {
                 overlay.classList.remove('visible');
                 overlay.classList.add('hidden');
             }
-        }, 800));
-    }, 2850);
+        }, 900));
+    }, 5000);
+}
+
+// Reusable typewriter engine
+function typewriteMangaText(element, text, speed, onDone) {
+    if (!element) return;
+    element.textContent = '';
+    let charIndex = 0;
+    const interval = setInterval(() => {
+        if (charIndex < text.length) {
+            element.textContent += text[charIndex];
+            charIndex++;
+        } else {
+            clearInterval(interval);
+            redirectTypewriterIntervals = redirectTypewriterIntervals.filter(i => i !== interval);
+            if (onDone) onDone();
+        }
+    }, speed);
+    redirectTypewriterIntervals.push(interval);
 }
 
 // Guaranteed redirect helper: handles popup blockers on mobile & webviews
@@ -1407,19 +1428,28 @@ function cancelAnimeRedirect() {
         overlay.classList.remove('visible');
         overlay.classList.add('hidden');
     }
-    const stage = document.getElementById('redirect-duo-stage');
-    const itachi = document.getElementById('redirect-actor-itachi');
-    const cat = document.getElementById('redirect-actor-cat');
-    const gojo = document.getElementById('redirect-actor-gojo');
-    const itachiText = document.getElementById('itachi-typewriter-text');
-    const catText = document.getElementById('cat-typewriter-text');
 
-    if (stage) stage.className = 'redirect-duo-stage';
-    if (itachi) itachi.className = 'redirect-actor actor-left';
-    if (cat) cat.className = 'redirect-actor actor-right';
-    if (gojo) gojo.className = 'redirect-actor actor-center';
+    const trioStage = document.getElementById('redirect-trio-stage');
+    const itachiPod = document.getElementById('actor-itachi-start');
+    const kakashiPod = document.getElementById('actor-kakashi');
+    const narutoPod = document.getElementById('actor-naruto');
+    const angryStage = document.getElementById('redirect-angry-stage');
+
+    const itachiText = document.getElementById('itachi-text');
+    const kakashiText = document.getElementById('kakashi-text');
+    const narutoText = document.getElementById('naruto-text');
+    const angryText = document.getElementById('angry-itachi-text');
+
+    if (trioStage) trioStage.className = 'redirect-trio-stage';
+    if (itachiPod) itachiPod.className = 'manga-actor-pod actor-itachi-start';
+    if (kakashiPod) kakashiPod.className = 'manga-actor-pod actor-kakashi';
+    if (narutoPod) narutoPod.className = 'manga-actor-pod actor-naruto';
+    if (angryStage) angryStage.className = 'redirect-angry-stage';
+
     if (itachiText) itachiText.textContent = '';
-    if (catText) catText.textContent = '';
+    if (kakashiText) kakashiText.textContent = '';
+    if (narutoText) narutoText.textContent = '';
+    if (angryText) angryText.textContent = '';
 }
 
 function clearAnimeRedirectTimers() {
@@ -1427,14 +1457,11 @@ function clearAnimeRedirectTimers() {
         clearTimeout(redirectTimer);
         redirectTimer = null;
     }
-    if (itachiTypeInterval) {
-        clearInterval(itachiTypeInterval);
-        itachiTypeInterval = null;
+    for (const interval of redirectTypewriterIntervals) {
+        clearInterval(interval);
     }
-    if (catTypeInterval) {
-        clearInterval(catTypeInterval);
-        catTypeInterval = null;
-    }
+    redirectTypewriterIntervals = [];
+
     for (const t of redirectStepTimers) {
         clearTimeout(t);
     }

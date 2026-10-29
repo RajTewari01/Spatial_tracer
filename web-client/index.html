@@ -7,7 +7,7 @@
     <link rel="icon" type="image/png" sizes="32x32" href="./assets/images/favicon-32.png">
     <link rel="icon" type="image/png" sizes="64x64" href="./favicon.png">
     <link rel="apple-touch-icon" sizes="180x180" href="./assets/images/apple-touch-icon.png">
-    <link rel="stylesheet" href="./style.css?v=3.0">
+    <link rel="stylesheet" href="./style.css?v=3.5">
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
@@ -365,43 +365,62 @@
 
     <!-- Anime Chibi Redirect Floating Bubbles Overlay (Translucent Page Backdrop) -->
     <div id="socials-redirect-overlay" class="socials-redirect-overlay hidden" aria-hidden="true" onclick="cancelAnimeRedirect()">
-        <!-- Duo Stage: Itachi (Left) + Cat (Right) centered in the middle of the screen -->
-        <div id="redirect-duo-stage" class="redirect-duo-stage" onclick="event.stopPropagation()">
-            <!-- 1. Left Actor: Itachi (Typewriter: STOP!! We are getting redirected) -->
-            <div id="redirect-actor-itachi" class="redirect-actor actor-left">
-                <div class="comic-speech-bubble bubble-left">
-                    <span id="itachi-typewriter-text" class="bubble-speech-text"></span><span class="typewriter-cursor" id="itachi-cursor">|</span>
-                    <div class="bubble-pointer pointer-center"></div>
+        <!-- Act 1: The Trio Stage (Itachi Warning, Kakashi "Let us go", Naruto "Then runnnn") -->
+        <div id="redirect-trio-stage" class="redirect-trio-stage" onclick="event.stopPropagation()">
+            <!-- Character 1: Itachi Standing ("you need to stop you are getting redirected........") -->
+            <div id="actor-itachi-start" class="manga-actor-pod actor-itachi-start">
+                <div class="manga-bubble-frame manga-bubble-normal">
+                    <img src="./assets/images/cutouts/bubble_normal.png?v=3.5" alt="Speech Bubble" class="manga-bubble-img">
+                    <div class="manga-bubble-text">
+                        <span id="itachi-text" class="speech-typewriter-text"></span><span class="typewriter-cursor" id="itachi-cursor">|</span>
+                    </div>
                 </div>
-                <div class="redirect-chibi-frame frame-itachi">
-                    <img src="./assets/images/itachi_chibi.png?v=3.0" alt="Itachi" class="redirect-chibi-img">
+                <div class="manga-chibi-frame frame-itachi-start">
+                    <img src="./assets/images/cutouts/itachi_start.png?v=3.5" alt="Itachi" class="manga-chibi-img">
                 </div>
             </div>
 
-            <!-- 2. Right Actor: Cat (Typewriter: Meow.. meow..) -->
-            <div id="redirect-actor-cat" class="redirect-actor actor-right">
-                <div class="comic-speech-bubble bubble-right">
-                    <span id="cat-typewriter-text" class="bubble-speech-text"></span><span class="typewriter-cursor" id="cat-cursor">|</span>
-                    <div class="bubble-pointer pointer-center"></div>
+            <!-- Character 2: Kakashi Reading Book ("let us go") -->
+            <div id="actor-kakashi" class="manga-actor-pod actor-kakashi">
+                <div class="manga-bubble-frame manga-bubble-normal">
+                    <img src="./assets/images/cutouts/bubble_normal.png?v=3.5" alt="Speech Bubble" class="manga-bubble-img">
+                    <div class="manga-bubble-text">
+                        <span id="kakashi-text" class="speech-typewriter-text"></span><span class="typewriter-cursor" id="kakashi-cursor">|</span>
+                    </div>
                 </div>
-                <div class="redirect-chibi-frame frame-cat">
-                    <img src="./assets/images/cat_chibi.png?v=3.0" alt="Cat" class="redirect-chibi-img">
+                <div class="manga-chibi-frame frame-kakashi">
+                    <img src="./assets/images/cutouts/kakashi.png?v=3.5" alt="Kakashi" class="manga-chibi-img">
+                </div>
+            </div>
+
+            <!-- Character 3: Naruto Pointing ("then runnnn") -->
+            <div id="actor-naruto" class="manga-actor-pod actor-naruto">
+                <div class="manga-bubble-frame manga-bubble-normal">
+                    <img src="./assets/images/cutouts/bubble_normal.png?v=3.5" alt="Speech Bubble" class="manga-bubble-img">
+                    <div class="manga-bubble-text">
+                        <span id="naruto-text" class="speech-typewriter-text"></span><span class="typewriter-cursor" id="naruto-cursor">|</span>
+                    </div>
+                </div>
+                <div class="manga-chibi-frame frame-naruto">
+                    <img src="./assets/images/cutouts/naruto.png?v=3.5" alt="Naruto" class="manga-chibi-img">
                 </div>
             </div>
         </div>
 
-        <!-- 3. Center Actor: Gojo (Bursts into dead center when duo is gone) -->
-        <div id="redirect-actor-gojo" class="redirect-actor actor-center" onclick="event.stopPropagation()">
-            <div class="comic-speech-bubble bubble-center">
-                <span class="bubble-speech-text gojo-text">Let's Go! ⚡</span>
-                <div class="bubble-pointer pointer-center"></div>
+        <!-- Act 2: Climax in Middle (All previous stickers disappeared, Angry Itachi in angry message bubble "... ... ...") -->
+        <div id="redirect-angry-stage" class="redirect-angry-stage" onclick="event.stopPropagation()">
+            <div class="manga-bubble-frame manga-bubble-angry">
+                <img src="./assets/images/cutouts/bubble_angry.png?v=3.5" alt="Angry Bubble" class="manga-bubble-img">
+                <div class="manga-bubble-text">
+                    <span id="angry-itachi-text" class="speech-typewriter-text angry-dots-text"></span><span class="typewriter-cursor" id="angry-cursor">|</span>
+                </div>
             </div>
-            <div class="redirect-chibi-frame frame-gojo">
-                <img src="./assets/images/gojo_chibi.png?v=3.0" alt="Gojo" class="redirect-chibi-img">
+            <div class="manga-chibi-frame frame-itachi-angry">
+                <img src="./assets/images/cutouts/itachi_angry.png?v=3.5" alt="Angry Itachi" class="manga-chibi-img">
             </div>
         </div>
     </div>
 
-    <script src="./app.js?v=3.0"></script>
+    <script src="./app.js?v=3.5"></script>
 </body>
 </html>

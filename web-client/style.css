@@ -1526,8 +1526,8 @@ body {
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   ANIME CHIBI REDIRECT FLOATING BUBBLES OVERLAY
-   (Translucent Backdrop, Centered Middle Chibis, Floating White Bubbles)
+   MANGA CUTOUTS ANIME REDIRECT OVERLAY
+   (Act 1: Trio Itachi/Kakashi/Naruto -> Act 2: Angry Itachi in Middle)
    ═══════════════════════════════════════════════════════════════ */
 
 .socials-redirect-overlay {
@@ -1537,7 +1537,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(0, 0, 0, 0.72);
+    background: rgba(0, 0, 0, 0.78);
     backdrop-filter: blur(14px);
     -webkit-backdrop-filter: blur(14px);
     opacity: 0;
@@ -1554,8 +1554,8 @@ body {
     pointer-events: auto;
 }
 
-/* ── Centered Duo Stage (Itachi + Cat in Middle of Screen) ── */
-.redirect-duo-stage {
+/* ── Act 1: The Trio Stage (Centered in Middle of Screen) ───── */
+.redirect-trio-stage {
     position: absolute;
     top: 50%;
     left: 50%;
@@ -1563,142 +1563,112 @@ body {
     display: flex;
     align-items: flex-end;
     justify-content: center;
-    gap: 36px;
+    gap: 24px;
     width: 100%;
-    max-width: 700px;
+    max-width: 960px;
     padding: 0 16px;
     pointer-events: none;
     transition: opacity 0.38s cubic-bezier(0.16, 1, 0.3, 1),
                 transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.redirect-duo-stage.gone {
+.redirect-trio-stage.gone {
     opacity: 0;
-    transform: translate(-50%, -50%) translateY(-24px) scale(0.65);
+    transform: translate(-50%, -50%) translateY(-28px) scale(0.6);
     pointer-events: none;
 }
 
-/* Base Actor Component */
-.redirect-actor {
+/* Base Actor Pod (Vertical Stack: Bubble on top, Character below) */
+.manga-actor-pod {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: flex-end;
     text-align: center;
+    opacity: 0;
+    transform: translateY(35px) scale(0.7);
     transition: opacity 0.38s cubic-bezier(0.16, 1, 0.3, 1),
                 transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-/* 1. Itachi (Left) & 2. Cat (Right) entrance animations */
-.actor-left, .actor-right {
-    opacity: 0;
-    transform: translateY(35px) scale(0.7);
-}
-
-.actor-left.active, .actor-right.active {
+.manga-actor-pod.active {
     opacity: 1;
     transform: translateY(0) scale(1);
 }
 
-/* 3. Gojo in Dead Center */
-.actor-center {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%) scale(0.3);
-    opacity: 0;
-    pointer-events: none;
-    z-index: 30;
-}
-
-.actor-center.active {
-    opacity: 1;
-    transform: translate(-50%, -50%) scale(1);
-    animation: gojoCenterPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-}
-
-@keyframes gojoCenterPop {
-    0% {
-        transform: translate(-50%, -50%) scale(0.3) rotate(-6deg);
-        opacity: 0;
-    }
-    60% {
-        transform: translate(-50%, -50%) scale(1.15) rotate(2deg);
-        opacity: 1;
-        filter: drop-shadow(0 0 35px rgba(255, 255, 255, 0.8));
-    }
-    100% {
-        transform: translate(-50%, -50%) scale(1) rotate(0deg);
-        opacity: 1;
-        filter: drop-shadow(0 16px 36px rgba(0, 0, 0, 0.85));
-    }
-}
-
-/* ── Character Sizing (Prominent Middle-of-Screen Chibis) ── */
-.redirect-chibi-frame {
-    width: 250px;
-    height: 250px;
+/* ── Manga Speech Bubble Frames (Uses User's Custom Cutout Bubbles) ── */
+.manga-bubble-frame {
+    position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
 }
 
-.frame-gojo {
-    width: 290px;
-    height: 290px;
+/* Normal Bubble (Cloud Style Cutout) */
+.manga-bubble-normal {
+    width: 225px;
+    height: 165px;
+    margin-bottom: 6px;
 }
 
-.redirect-chibi-img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    filter: drop-shadow(0 16px 32px rgba(0, 0, 0, 0.78));
-}
-
-/* ── Pure White Floating Comic Speech Bubbles ─────────────────── */
-.comic-speech-bubble {
-    position: relative;
-    background: #FFFFFF;
-    color: #000000;
-    padding: 11px 18px;
-    border-radius: 20px;
-    box-shadow: 0 14px 36px rgba(0, 0, 0, 0.6), 0 2px 6px rgba(0, 0, 0, 0.35);
-    margin-bottom: 12px;
-    max-width: 260px;
-    min-height: 52px;
+.manga-bubble-normal .manga-bubble-text {
+    position: absolute;
+    top: 10%;
+    left: 10%;
+    right: 14%;
+    bottom: 26%;
     display: flex;
     align-items: center;
     justify-content: center;
-    border: 2px solid #FFFFFF;
+    text-align: center;
+    padding: 4px 8px;
 }
 
-.bubble-speech-text {
+/* Angry Bubble (Explosive Manga Cutout in Act 2) */
+.manga-bubble-angry {
+    width: 330px;
+    height: 240px;
+    margin-bottom: 8px;
+}
+
+.manga-bubble-angry .manga-bubble-text {
+    position: absolute;
+    top: 16%;
+    left: 16%;
+    right: 16%;
+    bottom: 16%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 8px 12px;
+}
+
+.manga-bubble-img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    filter: drop-shadow(0 10px 24px rgba(0, 0, 0, 0.7));
+}
+
+/* Dialogue Typography inside Custom Bubbles */
+.speech-typewriter-text {
     font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif;
     font-size: 13.5px;
     font-weight: 800;
-    line-height: 1.3;
-    letter-spacing: 0.1px;
+    line-height: 1.25;
     color: #000000;
+    text-transform: uppercase;
+    letter-spacing: 0.2px;
 }
 
-.gojo-text {
-    font-size: 18px;
-    font-weight: 900;
-    letter-spacing: 0.4px;
-}
-
-/* Speech Bubble Tails pointing to character */
-.bubble-pointer {
-    position: absolute;
-    width: 0;
-    height: 0;
-    bottom: -9px;
-    left: 50%;
-    transform: translateX(-50%);
-    border-left: 8px solid transparent;
-    border-right: 8px solid transparent;
-    border-top: 9px solid #FFFFFF;
+/* Large Dramatic Dots in Angry Itachi Bubble */
+.angry-dots-text {
+    font-size: 34px !important;
+    font-weight: 900 !important;
+    letter-spacing: 8px !important;
+    color: #000000;
 }
 
 /* Blinking Typewriter Cursor */
@@ -1715,62 +1685,156 @@ body {
     50% { opacity: 0; }
 }
 
-/* ── Responsive Adaptations for Mobile ────────────────────────── */
+/* ── Character Cutout Frames ──────────────────────────────────── */
+.manga-chibi-frame {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.frame-itachi-start {
+    width: 215px;
+    height: 250px;
+}
+
+.frame-kakashi {
+    width: 185px;
+    height: 240px;
+}
+
+.frame-naruto {
+    width: 205px;
+    height: 250px;
+}
+
+.frame-itachi-angry {
+    width: 270px;
+    height: 290px;
+}
+
+.manga-chibi-img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    filter: drop-shadow(0 14px 28px rgba(0, 0, 0, 0.85));
+}
+
+/* ── Act 2: Climax in Middle (Angry Itachi with Angry Bubble) ──── */
+.redirect-angry-stage {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.35);
+    opacity: 0;
+    pointer-events: none;
+    z-index: 50;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.redirect-angry-stage.active {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+    animation: angryItachiShockwave 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+@keyframes angryItachiShockwave {
+    0% {
+        transform: translate(-50%, -50%) scale(0.35) rotate(-6deg);
+        opacity: 0;
+    }
+    60% {
+        transform: translate(-50%, -50%) scale(1.12) rotate(2deg);
+        opacity: 1;
+        filter: drop-shadow(0 0 35px rgba(255, 30, 30, 0.6));
+    }
+    100% {
+        transform: translate(-50%, -50%) scale(1) rotate(0deg);
+        opacity: 1;
+        filter: drop-shadow(0 18px 36px rgba(0, 0, 0, 0.9));
+    }
+}
+
+/* ── Responsive Adaptations for Mobile Devices ────────────────── */
 @media (max-width: 768px) {
-    .redirect-duo-stage {
-        gap: 12px;
-        padding: 0 8px;
+    .redirect-trio-stage {
+        gap: 6px;
+        padding: 0 4px;
         max-width: 100%;
     }
 
-    .redirect-chibi-frame {
-        width: 180px;
+    .manga-bubble-normal {
+        width: 115px;
+        height: 95px;
+        margin-bottom: 2px;
+    }
+
+    .speech-typewriter-text {
+        font-size: 9.5px !important;
+        line-height: 1.2;
+    }
+
+    .frame-itachi-start {
+        width: 110px;
+        height: 145px;
+    }
+
+    .frame-kakashi {
+        width: 98px;
+        height: 135px;
+    }
+
+    .frame-naruto {
+        width: 108px;
+        height: 145px;
+    }
+
+    .manga-bubble-angry {
+        width: 240px;
         height: 180px;
+        margin-bottom: 6px;
     }
 
-    .frame-gojo {
-        width: 230px;
-        height: 230px;
+    .frame-itachi-angry {
+        width: 210px;
+        height: 235px;
     }
 
-    .comic-speech-bubble {
-        padding: 8px 12px;
-        max-width: 170px;
-        min-height: 46px;
-        margin-bottom: 8px;
-    }
-
-    .bubble-speech-text {
-        font-size: 11.5px !important;
-    }
-
-    .gojo-text {
-        font-size: 16px !important;
+    .angry-dots-text {
+        font-size: 26px !important;
+        letter-spacing: 5px !important;
     }
 }
 
 @media (max-width: 390px) {
-    .redirect-duo-stage {
-        gap: 8px;
+    .redirect-trio-stage {
+        gap: 3px;
     }
 
-    .redirect-chibi-frame {
-        width: 155px;
-        height: 155px;
+    .manga-bubble-normal {
+        width: 104px;
+        height: 86px;
     }
 
-    .frame-gojo {
-        width: 205px;
-        height: 205px;
+    .speech-typewriter-text {
+        font-size: 8.5px !important;
     }
 
-    .comic-speech-bubble {
-        padding: 6px 10px;
-        max-width: 150px;
-        min-height: 42px;
+    .frame-itachi-start {
+        width: 100px;
+        height: 132px;
     }
 
-    .bubble-speech-text {
-        font-size: 10px !important;
+    .frame-kakashi {
+        width: 90px;
+        height: 124px;
+    }
+
+    .frame-naruto {
+        width: 98px;
+        height: 132px;
     }
 }
